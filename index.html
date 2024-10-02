@@ -519,121 +519,108 @@
 
               <!-- Reports -->
               <div class="col-12">
-                <div class="card">
+                <div class="card" style="padding: 10px;">
                   <div class="filter">
-                    <a class="icon" href="#" data-bs-toggle="dropdown"
-                      ><i class="bi bi-three-dots"></i
-                    ></a>
-                    <ul
-                      class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
-                    >
+                    <a class="icon" href="#" data-bs-toggle="dropdown" style="font-size: 12px;">
+                      <i class="bi bi-three-dots"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                       <li class="dropdown-header text-start">
-                        <h6>Filter</h6>
+                        <h6 style="font-size: 12px;">Filter</h6>
                       </li>
-
-                      <li><a class="dropdown-item" href="#">Today</a></li>
-                      <li><a class="dropdown-item" href="#">Month</a></li>
-                      <li><a class="dropdown-item" href="#">Year</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Today</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Month</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Year</a></li>
                     </ul>
                   </div>
-
-                  <div class="card-body">
-                    <h5 class="card-title">Total Bids <span>/ Month</span></h5>
-
+              
+                  <div class="card-body" style="padding: 10px;">
+                    <h5 class="card-title" style="font-size: 14px;">Total Bids <span style="font-size: 12px;">/ Month</span></h5>
+              
                     <!-- Line Chart -->
-                    <div id="reportsChart"></div>
-
+                    <div id="reportsChart" style="height: 250px;"></div>
+              
                     <script>
                       document.addEventListener("DOMContentLoaded", () => {
-                        new ApexCharts(
-                          document.querySelector("#reportsChart"),
-                          {
-                            series: [
-                              {
-                                name: "Number Bids",
-                                data: [10, 5, 5, 17, 11, 8, 4], // Total bids values (solid blue line)
-                              },
-                              {
-                                name: "Total Revenue of Bids (in Mil)",
-                                data: [15, 10, 8, 18, 12, 10, 7], // Number of bids values (dotted orange line)
-                              },
-                            ],
-                            chart: {
-                              height: 350,
+                        new ApexCharts(document.querySelector("#reportsChart"), {
+                          series: [
+                            {
+                              name: "Number Bids",
+                              data: [10, 5, 5, 17, 11, 8, 4],
+                              type: "area",
+                            },
+                            {
+                              name: "Total Revenue of Bids (in Mil)",
+                              data: [15, 10, 8, 18, 12, 10, 7],
                               type: "line",
-                              toolbar: {
-                                show: false,
-                              },
                             },
-                            markers: {
-                              size: 6,
+                          ],
+                          chart: {
+                            height: 250, // Adjusted height
+                            type: "line",
+                            toolbar: {
+                              show: false,
                             },
-                            stroke: {
-                              curve: "smooth",
-                              width: 3,
-                              dashArray: [0, 5], // Solid line for total bids, dashed for number of bids
+                          },
+                          markers: {
+                            size: 4, // Smaller markers
+                          },
+                          stroke: {
+                            curve: "smooth",
+                            width: 2, // Thinner lines
+                            dashArray: [0, 5],
+                          },
+                          colors: ["#4154f1", "#ff771d"],
+                          xaxis: {
+                            categories: ["January", "February", "March", "April", "May", "June", "July"],
+                          },
+                          yaxis: {
+                            min: 0,
+                            max: 20,
+                          },
+                          tooltip: {
+                            x: {
+                              format: "MMMM",
                             },
-                            colors: ["#4154f1", "#ff771d"], // Blue and orange colors
-                            xaxis: {
-                              categories: [
-                                "January",
-                                "February",
-                                "March",
-                                "April",
-                                "May",
-                                "June",
-                                "July",
-                              ], // Months
-                            },
-                            yaxis: {
-                              min: 0, // Starting y-axis at 0 for clarity
-                              max: 20, // Adjust the range as per your data needs
-                            },
-                            tooltip: {
-                              x: {
-                                format: "MMMM",
-                              },
-                            },
-                          }
-                        ).render();
+                          },
+                          fill: {
+                            type: "solid",
+                            opacity: [0.3, 1], // Reduced opacity for area
+                          },
+                        }).render();
                       });
                     </script>
+              
                     <!-- End Line Chart -->
                   </div>
                 </div>
-              </div>
+              </div>              
               <!-- End Reports -->
 
               <!-- Infra Solution -->
               <div class="col-12">
-                <div class="card recent-sales overflow-auto">
+                <div class="card recent-sales overflow-auto" style="padding: 10px;">
                   <div class="filter">
-                    <a class="icon" href="#" data-bs-toggle="dropdown"
-                      ><i class="bi bi-three-dots"></i
-                    ></a>
-                    <ul
-                      class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"
-                    >
+                    <a class="icon" href="#" data-bs-toggle="dropdown" style="font-size: 12px;">
+                      <i class="bi bi-three-dots"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                       <li class="dropdown-header text-start">
-                        <h6>Filter</h6>
+                        <h6 style="font-size: 12px;">Filter</h6>
                       </li>
-
-                      <li><a class="dropdown-item" href="#">Today</a></li>
-                      <li><a class="dropdown-item" href="#">Month</a></li>
-                      <li><a class="dropdown-item" href="#">Year</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Today</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Month</a></li>
+                      <li><a class="dropdown-item" href="#" style="font-size: 12px;">Year</a></li>
                     </ul>
                   </div>
-
-                  <div class="card-body">
-                    <h5 class="card-title">
-                      Infra Solution <span>| Today</span>
+              
+                  <div class="card-body" style="padding: 10px;">
+                    <h5 class="card-title" style="font-size: 14px;">
+                      Infra Solution <span style="font-size: 12px;">| Today</span>
                     </h5>
-
+              
                     <!-- Stacked Bar Chart -->
-                    <canvas
-                      id="stakedBarChart"
-                      style="max-height: 400px"
-                    ></canvas>
+                    <canvas id="stakedBarChart" style="max-height: 250px;"></canvas>
                     <script>
                       document.addEventListener("DOMContentLoaded", () => {
                         new Chart(document.querySelector("#stakedBarChart"), {
@@ -650,35 +637,34 @@
                               {
                                 label: "Channel",
                                 data: [10, 15, 12, 5, 2], // Data for Channel
-                                backgroundColor: '#6CC3DF', // Color for Channel
+                                backgroundColor: "#6CC3DF", // Color for Channel
                               },
                               {
                                 label: "IMG",
                                 data: [20, 10, 5, 3, 2], // Data for IMG
-                                backgroundColor: '#FF6B6B', // Color for IMG
+                                backgroundColor: "#FF6B6B", // Color for IMG
                               },
                               {
                                 label: "NMG",
                                 data: [15, 8, 10, 1, 3], // Data for NMG
-                                backgroundColor: '#F9D266', // Color for NMG
+                                backgroundColor: "#F9D266", // Color for NMG
                               },
                               {
                                 label: "TMG Private Sector",
                                 data: [20, 10, 8, 2, 1], // Data for TMG Private Sector
-                                backgroundColor: '#4668E6', // Color for TMG Private Sector
+                                backgroundColor: "#4668E6", // Color for TMG Private Sector
                               },
                               {
                                 label: "TMG Public Sector",
                                 data: [11, 5, 0, 0, 1], // Data for TMG Public Sector
-                                backgroundColor: '#7EC968', // Color for TMG Public Sector
+                                backgroundColor: "#7EC968", // Color for TMG Public Sector
                               },
                             ],
                           },
                           options: {
                             plugins: {
                               title: {
-                                display: true,
-                                // text: 'Infra Solutions' // Chart title
+                                display: false, // Hiding the chart title to save space
                               },
                             },
                             responsive: true,
@@ -698,10 +684,10 @@
                     <!-- End Stacked Bar Chart -->
                   </div>
                 </div>
-              </div>
+              </div>              
               <!-- Infra Solution  Ends -->
 
-              <!-- Top Selling -->
+              <!-- Bid Types and Pipelines -->
               <div class="col-12">
                 <div class="card top-selling overflow-auto">
                   <div class="filter">
@@ -722,96 +708,9 @@
                   </div>
 
                   <div class="card-body pb-0">
-                    <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                    <table class="table table-borderless">
-                      <thead>
-                        <tr>
-                          <th scope="col">Preview</th>
-                          <th scope="col">Product</th>
-                          <th scope="col">Price</th>
-                          <th scope="col">Sold</th>
-                          <th scope="col">Revenue</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row">
-                            <a href="#"
-                              ><img src="assets/img/product-1.jpg" alt=""
-                            /></a>
-                          </th>
-                          <td>
-                            <a href="#" class="text-primary fw-bold"
-                              >Ut inventore ipsa voluptas nulla</a
-                            >
-                          </td>
-                          <td>$64</td>
-                          <td class="fw-bold">124</td>
-                          <td>$5,828</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">
-                            <a href="#"
-                              ><img src="assets/img/product-2.jpg" alt=""
-                            /></a>
-                          </th>
-                          <td>
-                            <a href="#" class="text-primary fw-bold"
-                              >Exercitationem similique doloremque</a
-                            >
-                          </td>
-                          <td>$46</td>
-                          <td class="fw-bold">98</td>
-                          <td>$4,508</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">
-                            <a href="#"
-                              ><img src="assets/img/product-3.jpg" alt=""
-                            /></a>
-                          </th>
-                          <td>
-                            <a href="#" class="text-primary fw-bold"
-                              >Doloribus nisi exercitationem</a
-                            >
-                          </td>
-                          <td>$59</td>
-                          <td class="fw-bold">74</td>
-                          <td>$4,366</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">
-                            <a href="#"
-                              ><img src="assets/img/product-4.jpg" alt=""
-                            /></a>
-                          </th>
-                          <td>
-                            <a href="#" class="text-primary fw-bold"
-                              >Officiis quaerat sint rerum error</a
-                            >
-                          </td>
-                          <td>$32</td>
-                          <td class="fw-bold">63</td>
-                          <td>$2,016</td>
-                        </tr>
-                        <tr>
-                          <th scope="row">
-                            <a href="#"
-                              ><img src="assets/img/product-5.jpg" alt=""
-                            /></a>
-                          </th>
-                          <td>
-                            <a href="#" class="text-primary fw-bold"
-                              >Sit unde debitis delectus repellendus</a
-                            >
-                          </td>
-                          <td>$79</td>
-                          <td class="fw-bold">41</td>
-                          <td>$3,239</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <h5 class="card-title">
+                      Bid Types and Pipelines <span>| Today</span>
+                    </h5>
                   </div>
                 </div>
               </div>
@@ -822,30 +721,40 @@
 
           <!-- Right side columns -->
           <div class="col-lg-4">
-
             <!-- Start Status Columns -->
-            <div class="card">
+            <div class="card" style="max-width: 400px">
               <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"
-                  ><i class="bi bi-three-dots"></i
-                ></a>
+                <a class="icon" href="#" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
+                    <h6 style="font-size: 12px">Filter</h6>
                   </li>
-
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">Month</a></li>
-                  <li><a class="dropdown-item" href="#">Year</a></li>
+                  <li>
+                    <a class="dropdown-item" href="#" style="font-size: 12px"
+                      >Today</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" style="font-size: 12px"
+                      >Month</a
+                    >
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" style="font-size: 12px"
+                      >Year</a
+                    >
+                  </li>
                 </ul>
               </div>
 
               <div class="card-body pb-0">
-                <h5 class="card-title">
-                  Status <span>| Today</span>
+                <h5 class="card-title" style="font-size: 14px">
+                  Status <span style="font-size: 12px">| Today</span>
                 </h5>
 
-                <table class="table tables-general">
+                <table class="table tables-general" style="font-size: 12px">
                   <thead>
                     <tr>
                       <th scope="col">Status</th>
@@ -867,17 +776,17 @@
                     </tr>
                   </tbody>
                 </table>
-                
               </div>
             </div>
-            <!-- Start Status Columns -->
+
+            <!-- End Status Columns -->
 
             <!-- Start Bids Sector -->
-            <div class="card">
+            <div class="card" style="max-width: 400px">
               <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"
-                  ><i class="bi bi-three-dots"></i
-                ></a>
+                <a class="icon" href="#" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
                     <h6>Filter</h6>
@@ -890,13 +799,13 @@
               </div>
 
               <div class="card-body pb-0">
-                <h5 class="card-title">
-                  Bids By Market Sector <span>| Today</span>
+                <h5 class="card-title" style="font-size: 14px;">
+                  Bids By Market Sector <span style="font-size: 12px;">| Today</span>
                 </h5>
 
                 <div
                   id="sectorChart"
-                  style="min-height: 400px"
+                  style="min-height: 250px"
                   class="echart"
                 ></div>
 
@@ -909,14 +818,18 @@
                           trigger: "item",
                         },
                         legend: {
-                          top: "5%",
+                          top: "5%", // Move the legend to the top
                           left: "center",
+                          itemGap: 5, // Reduce gap between legend items
+                          textStyle: {
+                            fontSize: 10, // Reduce font size for the legend
+                          },
                         },
                         series: [
                           {
                             name: "Access From",
                             type: "pie",
-                            radius: ["40%", "70%"],
+                            radius: ["30%", "60%"], // Reduce the radius of the pie chart
                             avoidLabelOverlap: false,
                             label: {
                               show: false,
@@ -925,7 +838,7 @@
                             emphasis: {
                               label: {
                                 show: true,
-                                fontSize: "18",
+                                fontSize: "14", // Reduce font size for emphasis
                                 fontWeight: "bold",
                               },
                             },
@@ -961,14 +874,15 @@
                 </script>
               </div>
             </div>
+
             <!-- End Bid Sector Column -->
 
             <!-- Sector Chart -->
-            <div class="card">
+            <div class="card" style="max-width: 400px">
               <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown"
-                  ><i class="bi bi-three-dots"></i
-                ></a>
+                <a class="icon" href="#" data-bs-toggle="dropdown">
+                  <i class="bi bi-three-dots"></i>
+                </a>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                   <li class="dropdown-header text-start">
                     <h6>Filter</h6>
@@ -981,62 +895,68 @@
               </div>
 
               <div class="card-body pb-0">
-                <h5 class="card-title">
-                  # <span>| Today</span>
-                </h5>
+                <!-- <h5 class="card-title"># <span>| Today</span></h5> -->
 
                 <!-- Sector Bar Chart -->
                 <div
-                id="horizontalBarChart"
-                style="min-height: 400px"
-                class="echart"
-              ></div>
+                  id="horizontalBarChart"
+                  style="min-height: 200px"
+                  class="echart"
+                ></div>
 
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  echarts
-                    .init(document.querySelector("#horizontalBarChart"))
-                    .setOption({
-                      tooltip: {
-                        trigger: "axis",
-                        axisPointer: {
-                          type: "shadow",
+                <script>
+                  document.addEventListener("DOMContentLoaded", () => {
+                    echarts
+                      .init(document.querySelector("#horizontalBarChart"))
+                      .setOption({
+                        tooltip: {
+                          trigger: "axis",
+                          axisPointer: {
+                            type: "shadow",
+                          },
                         },
-                      },
-                      grid: {
-                        left: "3%",
-                        right: "4%",
-                        bottom: "3%",
-                        containLabel: true,
-                      },
-                      xAxis: {
-                        type: "value",
-                        boundaryGap: [0, 0.01],
-                      },
-                      yAxis: {
-                        type: "category",
-                        data: [
-                          "TMG (Private Sector)",
-                          "TMG (Public Sector)",
-                          "NMG",
-                          "IMG",
-                          "Channel",
-                        ], // Categories for the y-axis
-                      },
-                      series: [
-                        {
-                          name: "Value",
-                          type: "bar",
-                          data: [1048, 735, 580, 484, 300], // Corresponding values for each category
+                        grid: {
+                          left: "5%", // Adjust for smaller space
+                          right: "5%",
+                          bottom: "5%",
+                          top: "10%", // Adjust top margin
+                          containLabel: true,
                         },
-                      ],
-                    });
-                });
-              </script>
-
-              <!-- End Sector Chart -->
+                        xAxis: {
+                          type: "value",
+                          boundaryGap: [0, 0.01],
+                          axisLabel: {
+                            fontSize: 10, // Reduce font size
+                          },
+                        },
+                        yAxis: {
+                          type: "category",
+                          data: [
+                            "TMG (Private Sector)",
+                            "TMG (Public Sector)",
+                            "NMG",
+                            "IMG",
+                            "Channel",
+                          ],
+                          axisLabel: {
+                            fontSize: 10, // Reduce font size
+                          },
+                        },
+                        series: [
+                          {
+                            name: "Value",
+                            type: "bar",
+                            data: [1048, 735, 580, 484, 300],
+                            barWidth: "40%", // Narrower bars for smaller chart
+                          },
+                        ],
+                      });
+                  });
+                </script>
+                <!-- End Sector Chart -->
               </div>
             </div>
+
             <!-- End Sector Chart -->
           </div>
           <!-- End Right side columns -->
