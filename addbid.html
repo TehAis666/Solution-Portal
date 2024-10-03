@@ -36,6 +36,227 @@
 
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet" />
+
+    <!--New Css Added-->
+    <style>
+        /*--Dark Mode Style--*/
+        .dark-mode {
+            background-color: #121212; /* Dark background for body */
+            color: #ffffff; /* Light text for body */
+        }
+
+        .dark-mode input[type="text"],
+        .dark-mode input[type="number"],
+        .dark-mode select,
+        .dark-mode input[type="date"] {
+            background-color: #1e1e1e; /* Dark input fields */
+            color: #ffffff; /* Light text in inputs */
+            border: 1px solid #555; /* Darker border for input fields */
+        }
+        .dark-mode h1{
+            color:   white;
+        }
+        .dark-mode .form-group label {
+            color: #ffffff; /* Light text color for labels */
+            background: none; /* Make label background transparent */
+            /* No border or padding adjustments needed to hide the box */
+        }
+
+        .dark-mode .submit-btn {
+            background-color: #4CAF50; /* Keep button color the same */
+            color: white; /* Ensure the text on the button remains visible */
+        }
+
+        body.dark-mode {
+            background-color: gray; /* Set the body background to gray */
+        }
+
+        .card.dark-mode h5{
+            color:   #bb86fc;
+        }
+        .card-body.dark-mode {
+            color: white; /* Ensure text color in card body is white */
+        }
+
+        .card.dark-mode {
+            background-color: black; /* Set card background to black */
+            color: white; /* Set text color in the card to white */
+        }
+
+        .card.dark-mode input::placeholder {
+            color: #aaa; /* Lighter placeholder text */
+        }
+
+        header.dark-mode{
+          color: #121212;
+        }
+        /*-- Form Style--*/
+        .container{
+            padding: 30px 14% 70px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+            gap: 2rem;
+            text-align: center;	
+        }
+        .container-box{
+            padding: 43px 43px 43px 43px;
+            background: var(--other-color);
+            border-radius: 3rem;
+        }
+        .container-box img{
+            width: 100%;
+            max-width: 50px;
+            height: auto;
+        }
+        .container-box h3{
+            font-size: 21px;
+            font-weight: bold;
+            margin: 16px 0;
+        }
+        .container-box a{
+            color: var(--second-color);
+            font-size: var(--p-font);
+            letter-spacing: 1px;
+            transition: all .50s ease;
+        }
+        .container-box a:hover{
+            color: var(--main-color);
+        }
+        .container1 {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: #f7f7f7;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        /* Adjusting the select element's width */
+        select {
+            width: 98%;  /* Full width for select elements */
+            padding: 12px;  /* Adding padding for better appearance */
+            border: 1px solid #ccc;  /* Border styling */
+            border-radius: 5px;  /* Rounded corners */
+            box-sizing: border-box;  /* Ensures the width includes padding and border */
+            font-size: 16px;  /* Font size */
+            color: #333;  /* Text color */
+            background-color: #fff;  /* Background color */
+        }
+
+        /* Optional: Hover effect for the select element */
+        select:hover {
+            border-color: #4CAF50;  /* Green border on hover */
+        }
+
+        /* Styling the date input to match select elements */
+        input[type="date"] {
+            width: 98%;  /* Full width for the date input */
+            padding: 12px;  /* Padding for comfort */
+            border: 1px solid #ccc;  /* Border similar to select */
+            border-radius: 5px;  /* Rounded corners */
+            box-sizing: border-box;  /* Ensures width includes padding and border */
+            font-size: 16px;  /* Same font size as select */
+            color: #333;  /* Text color */
+            background-color: #fff;  /* Background color */
+        }
+
+        /* Optional: Hover effect for the date input */
+        input[type="date"]:hover {
+            border-color: #4CAF50;  /* Green border on hover */
+        }
+
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        label {
+            color: #555;
+            font-weight: bold;
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 10px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .file-upload {
+            position: relative;
+        }
+
+        .upload-btn3 {
+            display: inline-block;
+            background-color: #ccccff;
+            color: white; /* Changed text color to white */
+            padding: 6px 12px; /* Adjusted padding */
+            border-radius: 5px; /* Adjusted border radius */
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s; /* Added transition */
+            font-size: 14px; /* Adjusted font size */
+            margin-bottom: 10px;
+        }
+
+        .upload-btn3:hover {
+            background-color: #333; /* Darken the background color on hover */
+        }
+
+
+
+        .file-label {
+            cursor: pointer;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .material-icons {
+            vertical-align: middle;
+        }
+
+        .file-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    
+    </style>
   </head>
 
   <body>
@@ -67,7 +288,7 @@
                 >Pipol</span
               > </a
             ><!-- End Profile Iamge Icon -->
-
+            <button id="toggleButton" onclick="toggleDarkMode()">Toggle Dark Mode</button>
             <ul
               class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
             >
@@ -420,7 +641,7 @@
 
     <main id="main" class="main">
       <div class="pagetitle">
-        <h1>Dashboard</h1>
+        <h1>Add Bid</h1>
         <nav>
           <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -431,154 +652,153 @@
       <!-- End Page Title -->
 
       <section class="section dashboard">
-        <div class="col-8">
-            <div class="card" >
-              <div class="card-body" >
-                <h5 class="card-title">Total Bids</h5>
-                <form>
-                    <div class="row mb-3">
-                      <label for="inputText" class="col-sm-2 col-form-label">Text</label>
-                      <div class="col-sm-10">
-                        <input type="text" class="form-control">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-                      <div class="col-sm-10">
-                        <input type="email" class="form-control">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                      <div class="col-sm-10">
-                        <input type="password" class="form-control">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputNumber" class="col-sm-2 col-form-label">Number</label>
-                      <div class="col-sm-10">
-                        <input type="number" class="form-control">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputNumber" class="col-sm-2 col-form-label">File Upload</label>
-                      <div class="col-sm-10">
-                        <input class="form-control" type="file" id="formFile">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputDate" class="col-sm-2 col-form-label">Date</label>
-                      <div class="col-sm-10">
-                        <input type="date" class="form-control">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputTime" class="col-sm-2 col-form-label">Time</label>
-                      <div class="col-sm-10">
-                        <input type="time" class="form-control">
-                      </div>
-                    </div>
-    
-                    <div class="row mb-3">
-                      <label for="inputColor" class="col-sm-2 col-form-label">Color Picker</label>
-                      <div class="col-sm-10">
-                        <input type="color" class="form-control form-control-color" id="exampleColorInput" value="#4154f1" title="Choose your color">
-                      </div>
-                    </div>
-                    <div class="row mb-3">
-                      <label for="inputPassword" class="col-sm-2 col-form-label">Textarea</label>
-                      <div class="col-sm-10">
-                        <textarea class="form-control" style="height: 100px"></textarea>
-                      </div>
-                    </div>
-                    <fieldset class="row mb-3">
-                      <legend class="col-form-label col-sm-2 pt-0">Radios</legend>
-                      <div class="col-sm-10">
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
-                          <label class="form-check-label" for="gridRadios1">
-                            First radio
-                          </label>
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Bid Management</h5>
+                    <form id="bidmanagementForm" action="BidManagementForm" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="custName">Customer Name:</label>
+                                <input type="text" id="custName" name="Name" required placeholder="Enter customer name">
+                            </div>
+                            <div class="form-group">
+                              <label for="scope">HMS Scope:</label>
+                              <input type="text" id="scope" name="Scope" required placeholder="HMS Scope">
+                            </div>
                         </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios2" value="option2">
-                          <label class="form-check-label" for="gridRadios2">
-                            Second radio
-                          </label>
-                        </div>
-                        <div class="form-check disabled">
-                          <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios" value="option" disabled>
-                          <label class="form-check-label" for="gridRadios3">
-                            Third disabled radio
-                          </label>
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="tender">Tender/Proposal:</label>
+                            <input type="text" id="tender" name="Tender" required placeholder="Tender or Proposal">
                         </div>
                       </div>
-                    </fieldset>
-                    <div class="row mb-3">
-                      <legend class="col-form-label col-sm-2 pt-0">Checkboxes</legend>
-                      <div class="col-sm-10">
-    
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="gridCheck1">
-                          <label class="form-check-label" for="gridCheck1">
-                            Example checkbox
-                          </label>
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="type">Type:</label>
+                            <select id="type" name="Type" required>
+                                <option value="">Select type</option>
+                                <option value="RFQ">RFQ</option>
+                                <option value="RFI">RFI</option>
+                                <option value="RFP">RFP</option>
+                                <option value="Tender">Tender</option>
+                                <option value="Upstream">Upstream</option>
+                                <option value="Quotation">Quotation</option>
+                                <option value="Strategic Iniative">Strategic Iniative</option>
+                                <option value="Strategic Proposal">Strategic Proposal</option>
+                            </select>
                         </div>
-    
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" id="gridCheck2" checked>
-                          <label class="form-check-label" for="gridCheck2">
-                            Example checkbox 2
-                          </label>
+                        <div class="form-group">
+                          <label for="businessUnit">Business Unit:</label>
+                          <select id="businessUnit" name="BusinessUnit" required>
+                              <option value="">Select business unit</option>
+                              <option value="TMG (Private Sector)">TMG (Private Sector)</option>
+                              <option value="TMG (Public Sector)">TMG (Public Sector)</option>
+                              <option value="IMG">IMG</option>
+                              <option value="NMG">NMG</option>
+                              <option value="Channel">Channel</option>
+                          </select>
+                      </div>
                         </div>
-    
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="accountSector">Account Sector:</label>
+                            <select id="accountSector" name="AccountSector" required>
+                                <option value="">Select acccount sector</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Goverment">Goverment</option>
+                                <option value="FSI">FSI</option>
+                                <option value="eGLC">eGLC</option>
+                                <option value="sGLC">sGLC</option>
+                                <option value="PBT/SME">PBT/SME</option>
+                                <option value="Health Sector">Health Sector</option>
+                                <option value="Channel Partner">Channel Partner</option>
+                                <option value="Open Market">Open Market</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="AM">Account Manager:</label>
+                          <input type="text" id="AM" name="AM" required placeholder="Account Manager Name">
+                        </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="solution">HMS Solution:</label>
+                            <select id="solution" name="Solution" required>
+                                <option value="">Select HMS solution</option>
+                                <option value="iOS">PaduNet</option>
+                                <option value="Android">Secure-X</option>
+                                <option value="Windows">AwanHeiTech</option>
+                                <option value="Android">i-Sentric</option>
+                                <option value="Windows">Mix Solution</option>
+                            </select>
+                          </div>
+                            <div class="form-group">
+                              <label for="PIC/Presales">PIC/Presales:</label>
+                              <input type="text" id="PIC/Presales" name="PIC/Presales" required placeholder="Enter PIC/Presales name">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                              <label for="requestDate" >Request Date:</label>
+                              <div class="">
+                                <input type="date" class="form-control">
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <label for="submissionDate">Submission Date:</label>
+                              <div class="">
+                                <input type="date" class="form-control">
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="value">Value:</label>
+                            <input type="text" id="value" name="Value" required placeholder="Bid Value">
+                          </div>
+                          <div class="form-group">
+                            <label for="RMValue">Value (RM):</label>
+                            <input type="text" id="RMValue" name="RMValue" required placeholder="Value of bid in Ringgit Malaysia">
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group">
+                            <label for="status">Status:</label>
+                            <select id="status" name="Status" required>
+                                <option value="">Select Bid Status</option>
+                                <option value="Submitted">Submitted</option>
+                                <option value="Drop">Drop</option>
+                                <option value="WIP">WIP</option>
+                            </select>
+                        </div>
+                          <div class="form-group">
+                              <label for="tenderStatus">Tender Status:</label>
+                              <select id="tenderStatus" name="TenderStatus" required>
+                                  <option value="">Select tender status</option>
+                                  <option value="Clarification">Clarification</option>
+                                  <option value="Close">Close</option>
+                                  <option value="Intro">Intro</option>
+                                  <option value="KIV">KIV</option>
+                                  <option value="Lose">Lose</option>
+                                  <option value="Unknown">Unknown</option>
+                              </select>
+                          </div>
                       </div>
+                      <div class="form-row">
+                        <div class="form-group">
+                          <label for="remarks">Remarks:</label>
+                          <input type="text" id="remarks" name="Remarks" required placeholder="Enter remarks (optional)">
+                        </div>
                     </div>
-    
-                    <div class="row mb-3">
-                      <label class="col-sm-2 col-form-label">Disabled</label>
-                      <div class="col-sm-10">
-                        <input type="text" class="form-control" value="Read only / Disabled" disabled>
-                      </div>
-                    </div>
-    
-                    <div class="row mb-3">
-                      <label class="col-sm-2 col-form-label">Select</label>
-                      <div class="col-sm-10">
-                        <select class="form-select" aria-label="Default select example">
-                          <option selected>Open this select menu</option>
-                          <option value="1">One</option>
-                          <option value="2">Two</option>
-                          <option value="3">Three</option>
-                        </select>
-                      </div>
-                    </div>
-    
-                    <div class="row mb-3">
-                      <label class="col-sm-2 col-form-label">Multi Select</label>
-                      <div class="col-sm-10">
-                        <select class="form-select" multiple aria-label="multiple select example">
-                          <option selected>Open this select menu</option>
-                          <option value="1">One</option>
-                          <option value="2">Two</option>
-                          <option value="3">Three</option>
-                        </select>
-                      </div>
-                    </div>
-    
-                    <div class="row mb-3">
-                      <label class="col-sm-2 col-form-label">Submit Button</label>
-                      <div class="col-sm-10">
-                        <button type="submit" class="btn btn-primary">Submit Form</button>
-                      </div>
-                    </div>
-    
-                  </form><!-- End General Form Elements -->
-    
-              </div>
+                    <div class="form-group">
+                      <input type="submit" value="Submit" class="submit-btn">
+                  </div>      
+                    </form>
+                </div>
             </div>
-          </div> 
-      </section>
+        </div>
+    </section>
     </main>
     <!-- End #main -->
 
@@ -610,5 +830,41 @@
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
+    <script>
+      function toggleDarkMode() {
+          const body = document.body;
+          const darkMode = body.classList.toggle("dark-mode");
+          
+          // Store the current mode in local storage
+          localStorage.setItem("darkMode", darkMode ? "enabled" : "disabled");
+          
+          // Update the styles based on the current mode
+          if (darkMode) {
+              body.style.backgroundColor = "#121212"; // Dark background
+              body.style.color = "#ffffff"; // Light text
+              // Add more styles as needed
+          } else {
+              body.style.backgroundColor = "#ffffff"; // Light background
+              body.style.color = "#000000"; // Dark text
+              // Add more styles as needed
+          }
+      }
+  
+      // Check local storage for mode on page load
+      document.addEventListener("DOMContentLoaded", () => {
+          const darkMode = localStorage.getItem("darkMode");
+          if (darkMode === "enabled") {
+              toggleDarkMode();
+          }
+      });
+
+      function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode'); // Toggle dark mode on body
+    const card = document.querySelector('.card'); // Get the card element
+    if (card) {
+        card.classList.toggle('dark-mode'); // Toggle dark mode on card
+    }
+}
+  </script>
   </body>
 </html>
