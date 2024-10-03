@@ -1231,3 +1231,23 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+
+/* Make chart container responsive */
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+#bidTypesBarChart, #pipelinesBarChart {
+  width: 48%;
+  height: 300px;
+}
+
+/* Stack the charts vertically on smaller screens */
+@media (max-width: 768px) {
+  #bidTypesBarChart, #pipelinesBarChart {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
