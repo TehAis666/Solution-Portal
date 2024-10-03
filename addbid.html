@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+    .container{
+	padding: 30px 14% 70px;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, auto));
+	gap: 2rem;
+	text-align: center;	
+}
+.container-box{
+	padding: 43px 43px 43px 43px;
+	background: var(--other-color);
+	border-radius: 3rem;
+}
+.container-box img{
+	width: 100%;
+	max-width: 50px;
+	height: auto;
+}
+.container-box h3{
+	font-size: 21px;
+	font-weight: bold;
+	margin: 16px 0;
+}
+.container-box a{
+	color: var(--second-color);
+	font-size: var(--p-font);
+	letter-spacing: 1px;
+	transition: all .50s ease;
+}
+.container-box a:hover{
+	color: var(--main-color);
+}
+
+
+
+-----------------------------------------------------------------------------------
+
+
+.container1 {
+    max-width: 800px;
+    margin: 100px auto;
+    padding: 30px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    flex: 1;
+    margin: 0 10px;
+}
+
+label {
+    color: #555;
+    font-weight: bold;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: calc(100% - 10px);
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #333;
+}
+
+.file-upload {
+    position: relative;
+}
+
+.upload-btn3 {
+    display: inline-block;
+    background-color: #ccccff;
+    color: white; /* Changed text color to white */
+    padding: 6px 12px; /* Adjusted padding */
+    border-radius: 5px; /* Adjusted border radius */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Added transition */
+    font-size: 14px; /* Adjusted font size */
+    margin-bottom: 10px;
+}
+
+.upload-btn3:hover {
+    background-color: #333; /* Darken the background color on hover */
+}
+
+
+
+.file-label {
+    cursor: pointer;
+}
+
+.file-input {
+    display: none;
+}
+
+.material-icons {
+    vertical-align: middle;
+}
+
+.file-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.submit-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #45a049;
+}
+
+</style>
+
+<meta charset="ISO-8859-1">
+<title>Add Bid Report</title>
+
+<!---box icons--->	
+<link rel="stylesheet"
+href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" 
+rel="stylesheet">
+
+<!---google fonts--->	
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?
+family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+	
+	
+<!---header--->
+<header>
+</header>
+
+<section>
+    <div class="container1">
+        <h2>Add Smartphone</h2>
+        <form id="addSmartphoneForm" action="AddSmartphoneController" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="smartphoneName">Smartphone Name:</label>
+                    <input type="text" id="smartphoneName" name="Name" required placeholder="Enter smartphone name">
+                </div>
+                <div class="form-group">
+                    <label for="brand">Brand:</label>
+                    <select id="brand" name="Brands" required>
+                        <option value="">Select brand</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Oppo">Oppo</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">Price (RM):</label>
+                    <input type="text" id="price" name="Price" required placeholder="E.g., RM 10,000.00 or RM 10,000.00 - RM 11,000.00">
+                    <span class="error" id="priceError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="cameraCapacity">Main Camera (MP):</label>
+                    <input type="text" id="cameraCapacity" name="MainCamera" required placeholder="E.g., 50 + 10 + 12MP">
+                    <span class="error" id="cameraError"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="battery">Battery Capacity (mAh):</label>
+                    <input type="text" id="battery" name="BatteryCapacity" required placeholder="E.g., 4900">
+                    <span class="error" id="batteryError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="storage">Storage (GB):</label>
+                    <select id="storage" name="Storage" required>
+                        <option value="">Select storage</option>
+                        <option value="64GB">64GB</option>
+                        <option value="128GB">128GB</option>
+                        <option value="256GB">256GB</option>
+                        <option value="512GB">512GB</option>
+                        <option value="1TB">1TB</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="screenSize">Screen Size (inches):</label>
+                    <input type="text" id="screenSize" name="Screen" required placeholder="E.g., 6.7">
+                    <span class="error" id="screenError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="platform">Platform:</label>
+                    <input type="text" id="platform" name="Platform" required placeholder="Enter platform">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="processorSpeed">Processor Speed (GHz):</label>
+                    <input type="text" id="processorSpeed" name="ProcessorSpeed" required placeholder="E.g., 2.9">
+                    <span class="error" id="processorError"></span>
+                </div>
+            </div>
+            <div class="form-group file-upload">
+                <label for="image">Upload Image:</label>
+                <div class="upload-btn3">
+                    <label for="image" class="file-label">
+                        <span class="material-icons">cloud_upload</span> Choose File
+                    </label>
+                    <input type="file" id="image" name="SmpImage" accept="image/*" required><br><br>
+                </div>
+                <span class="file-info">Supported formats: JPG, PNG. Max size: 5MB</span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" class="submit-btn">
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+function validateForm() {
+    var price = document.getElementById("price").value;
+    var cameraCapacity = document.getElementById("cameraCapacity").value;
+    var screenSize = document.getElementById("screenSize").value;
+    var processorSpeed = document.getElementById("processorSpeed").value;
+    var batteryCapacity = document.getElementById("battery").value;
+
+    var pricePattern = /^(RM\s\d{1,3}(,\d{3})*(\.\d{2})?( - RM\s\d{1,3}(,\d{3})*(\.\d{2})?)?)$/;
+    var cameraPattern = /^(\d{1,3}\s\+\s\d{1,3}\s\+\s\d{1,3}MP|\d{1,3}\s\+\s\d{1,3}MP|\d{1,3}\s\+\s\d{1,3}\s\+\s\d{1,3}MP)$/;
+    var numericPattern = /^\d+(\.\d+)?$/;
+
+    var isValid = true;
+
+    if (!pricePattern.test(price)) {
+        document.getElementById("priceError").textContent = "Please enter a valid price. Examples: RM 10,000.00 or RM 10,000.00 - RM 11,000.00";
+        isValid = false;
+    } else {
+        document.getElementById("priceError").textContent = "";
+    }
+
+    if (!cameraPattern.test(cameraCapacity)) {
+        document.getElementById("cameraError").textContent = "Please enter a valid camera capacity. Examples: 50 + 10 + 12MP or 10 + 12MP or 10 + 50 + 10 + 12MP";
+        isValid = false;
+    } else {
+        document.getElementById("cameraError").textContent = "";
+    }
+
+    if (!numericPattern.test(screenSize)) {
+        document.getElementById("screenError").textContent = "Please enter a valid screen size. Example: 6.7";
+        isValid = false;
+    } else {
+        document.getElementById("screenError").textContent = "";
+    }
+
+    if (!numericPattern.test(processorSpeed)) {
+        document.getElementById("processorError").textContent = "Please enter a valid processor speed. Example: 2.9";
+        isValid = false;
+    } else {
+        document.getElementById("processorError").textContent = "";
+    }
+
+    if (!numericPattern.test(batteryCapacity)) {
+        document.getElementById("batteryError").textContent = "Please enter a valid battery capacity. Example: 4900";
+        isValid = false;
+    } else {
+        document.getElementById("batteryError").textContent = "";
+    }
+
+    if (isValid) {
+        alert("Smartphone added successfully!");
+    }
+
+    return isValid;
+}
+</script>
+
+<script src="https://unpkg.com/scrollreveal"></script>
+<script src="dropdown.js"></script>
+
+</body>
+</html>
+

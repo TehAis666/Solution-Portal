@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Screen</title>
+  <style>
+    :root {
+      --p: hsl(213deg 85% 97%);
+      --s: hsl(233deg 36% 38%);
+    }
+    * {
+      font-family: 'Poppins';
+    }
+    body {
+        user-select: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: hsl(218deg 50% 91%);
+        min-height: 100vh; /* Ensures the body takes full height */
+        margin: 0; /* Removes default margin */
+    }
+
+    .screen-1 {
+        background: var(--p);
+        padding: 2em;
+        display: flex;
+        flex-direction: column;
+        border-radius: 30px;
+        box-shadow: 0 0 2em hsl(231deg 62% 94%);
+        gap: 2em;
+        max-width: 320px; /* Adjust the width for better centering */
+        width: 100%;
+        /* Add max-height to prevent overflow */
+        max-height: 80vh; /* Restricts height to 80% of viewport */
+        overflow: auto; /* Adds scrolling if content overflows */
+        padding-top: 70px;
+    }
+
+    .screen-1 .logo {
+      margin-top: -3em;
+    }
+    .email, .password {
+      background: hsl(0deg 0% 100%);
+      box-shadow: 0 0 2em hsl(231deg 62% 94%);
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+      border-radius: 20px;
+      color: hsl(0deg 0% 30%);
+      margin-top: -1em;
+    }
+    .email input, .password input {
+      outline: none;
+      border: none;
+      font-size: 1em;
+    }
+    .email input::placeholder, .password input::placeholder {
+      color: hsl(0deg 0% 0%);
+      font-size: 0.9em;
+    }
+    ion-icon {
+      color: hsl(0deg 0% 30%);
+      margin-bottom: -0.2em;
+    }
+    .show-hide {
+      margin-right: -5em;
+    }
+    .login {
+      padding: 1em;
+      background: var(--s);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+    }
+    .footer {
+      display: flex;
+      font-size: 0.7em;
+      color: hsl(0deg 0% 37%);
+      gap: 14em;
+      padding-bottom: 2em;
+      padding-left: 15px;
+    }
+    .footer span {
+      cursor: pointer;
+    }
+    button {
+      cursor: pointer;
+    }
+
+    .logo-container {
+        display: flex; 
+        align-items: center; /* Center the logo and text vertically */
+        gap: 1em; /* Space between the logo and text */
+        margin-bottom: 1em; /* Optional space below the logo-text container */
+    }
+
+    .logo {
+        width: 80px; /* Adjust the logo size */
+        height: auto;
+    }
+
+    .logo-text {
+        font-size: 1.9em; /* Adjust text size */
+        color: hsl(233deg 36% 38%); /* Color for the text */
+        font-weight: 600; /* Bold text */
+    }
+
+  </style>
+</head>
+<body>
+    <div class="screen-1">
+        <div class="logo-container">
+            <img src="images/logo2.png" alt="Logo 2" class="logo" />
+            <span class="logo-text"> Solution Portal</span> <!-- Add your desired text -->
+        </div>
+      
+        <div class="email">
+            <label for="email">Email Address</label>
+            <div class="sec-2">
+                <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+                <input type="email" name="email" placeholder="Username@heitech.com.my" required>
+            </div>
+        </div>
+        
+        <div class="password">
+            <label for="password">Password</label>
+            <div class="sec-2">
+                <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+                <input class="pas" type="password" name="password" placeholder="························" required>
+                <!-- <ion-icon class="show-hide" name="eye-outline"></ion-icon> -->
+            </div>
+        </div>
+      
+        <button class="login">Login</button>
+      
+        <div class="footer">
+          <span>Sign up</span>
+          <span>Forgot Password?</span>
+        </div>
+      </div>
+</body>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</html>
