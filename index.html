@@ -55,9 +55,10 @@
           <!-- Dark/Light Nav -->
           <li class="nav-item">
             <a class="nav-link nav-icon" href="#" id="toggleTheme">
-              <i class="ri-contrast-2-line" id="themeIcon"></i>
-            </a><!-- End Dark/Light Icon -->
-          </li><!-- End Dark/Light Nav -->
+              <i class="ri-contrast-2-line" id="themeIcon"></i> </a
+            ><!-- End Dark/Light Icon -->
+          </li>
+          <!-- End Dark/Light Nav -->
 
           <li class="nav-item dropdown pe-3">
             <a
@@ -733,12 +734,12 @@
                                 backgroundColor: "#F9D266", // Color for NMG
                               },
                               {
-                                label: "TMG Private Sector",
+                                label: "TMG (Private Sector)",
                                 data: [20, 10, 8, 2, 1], // Data for TMG Private Sector
                                 backgroundColor: "#4668E6", // Color for TMG Private Sector
                               },
                               {
-                                label: "TMG Public Sector",
+                                label: "TMG (Public Sector)",
                                 data: [11, 5, 0, 0, 1], // Data for TMG Public Sector
                                 backgroundColor: "#7EC968", // Color for TMG Public Sector
                               },
@@ -768,7 +769,7 @@
                   </div>
                 </div>
               </div>
-              <!-- Infra Solution  Ends -->
+              <!-- Infra Solution Ends -->
             </div>
           </div>
           <!-- End Left side columns -->
@@ -836,6 +837,7 @@
             <!-- End Status Columns -->
 
             <!-- Start Bids Sector -->
+
             <div class="card" style="max-width: 600px">
               <div class="filter">
                 <a class="icon" href="#" data-bs-toggle="dropdown">
@@ -866,70 +868,233 @@
 
                 <script>
                   document.addEventListener("DOMContentLoaded", () => {
-                    echarts
-                      .init(document.querySelector("#sectorChart"))
-                      .setOption({
-                        tooltip: {
-                          trigger: "item",
+                    var pieChart = echarts.init(
+                      document.querySelector("#sectorChart")
+                    );
+                    var barChart = echarts.init(
+                      document.querySelector("#horizontalBarChart")
+                    );
+
+                    var pieOption = {
+                      tooltip: {
+                        trigger: "item",
+                      },
+                      legend: {
+                        top: "5%",
+                        left: "center",
+                        itemGap: 5,
+                        textStyle: {
+                          fontSize: 10,
                         },
-                        legend: {
-                          top: "5%", // Move the legend to the top
-                          left: "center",
-                          itemGap: 5, // Reduce gap between legend items
-                          textStyle: {
-                            fontSize: 10, // Reduce font size for the legend
+                      },
+                      series: [
+                        {
+                          name: "Bids",
+                          type: "pie",
+                          radius: ["30%", "60%"],
+                          avoidLabelOverlap: false,
+                          label: {
+                            show: false,
+                            position: "center",
                           },
-                        },
-                        series: [
-                          {
-                            name: "Access From",
-                            type: "pie",
-                            radius: ["30%", "60%"], // Reduce the radius of the pie chart
-                            avoidLabelOverlap: false,
+                          emphasis: {
+                            itemStyle: {
+                              shadowBlur: 10,
+                              shadowOffsetX: 0,
+                              shadowColor: "rgba(0, 0, 0, 0.5)",
+                            },
                             label: {
-                              show: false,
-                              position: "center",
+                              show: true,
+                              fontSize: "14",
+                              fontWeight: "bold",
                             },
-                            emphasis: {
-                              label: {
-                                show: true,
-                                fontSize: "14", // Reduce font size for emphasis
-                                fontWeight: "bold",
-                              },
-                            },
-                            labelLine: {
-                              show: false,
-                            },
-                            data: [
-                              {
-                                value: 1048,
-                                name: "TMG (Private Sector)",
-                              },
-                              {
-                                value: 735,
-                                name: "TMG (Public Sector)",
-                              },
-                              {
-                                value: 580,
-                                name: "NMG",
-                              },
-                              {
-                                value: 484,
-                                name: "IMG",
-                              },
-                              {
-                                value: 300,
-                                name: "Channel",
-                              },
-                            ],
                           },
+                          labelLine: {
+                            show: false,
+                          },
+                          data: [
+                            { value: 1048, name: "TMG (Private Sector)" },
+                            { value: 735, name: "TMG (Public Sector)" },
+                            { value: 580, name: "NMG" },
+                            { value: 484, name: "IMG" },
+                            { value: 300, name: "Channel" },
+                          ],
+                        },
+                      ],
+                    };
+
+                    var barOption = {
+                      tooltip: {
+                        trigger: "axis",
+                        axisPointer: {
+                          type: "shadow",
+                        },
+                      },
+                      grid: {
+                        left: "5%",
+                        right: "5%",
+                        bottom: "5%",
+                        top: "10%",
+                        containLabel: true,
+                      },
+                      xAxis: {
+                        type: "value",
+                        boundaryGap: [0, 0.01],
+                        axisLabel: {
+                          fontSize: 10,
+                        },
+                      },
+                      yAxis: {
+                        type: "category",
+                        data: [
+                          "TMG (Private Sector)",
+                          "TMG (Public Sector)",
+                          "NMG",
+                          "IMG",
+                          "Channel",
                         ],
+                        axisLabel: {
+                          fontSize: 10,
+                        },
+                      },
+                      series: [
+                        {
+                          name: "Value",
+                          type: "bar",
+                          data: [1048, 735, 580, 484, 300],
+                          barWidth: "40%",
+                          itemStyle: {
+                            color: "#3398DB", // Default bar color
+                          },
+                          label: {
+                            show: false, // Initially hide labels
+                            position: "insideRight",
+                            fontSize: 12,
+                            fontWeight: "bold",
+                          },
+                        },
+                      ],
+                    };
+
+                    // Track the last clicked sector
+                    let lastClickedSector = null;
+
+                    // Set initial chart options
+                    pieChart.setOption(pieOption);
+                    barChart.setOption(barOption);
+
+                    // Add click event to pie chart
+                    pieChart.on("click", function (params) {
+                      var sectorName = params.name; // Get the clicked sector's name
+
+                      // Toggle between hiding others and resetting all datasets
+                      if (lastClickedSector === sectorName) {
+                        resetStackedBarChart(); // Reset stacked bar chart
+                        resetHorizontalBarChart(); // Reset horizontal bar chart
+                        resetPieChart(); // Reset pie chart
+                        lastClickedSector = null; // Clear the last clicked sector
+                      } else {
+                        updateStackedBarChart(sectorName); // Show only the clicked sector in stacked bar chart
+                        updateHorizontalBarChart(sectorName); // Highlight corresponding sector in horizontal bar chart
+                        updatePieChart(sectorName); // Highlight corresponding sector in pie chart
+                        lastClickedSector = sectorName; // Set the last clicked sector
+                      }
+                    });
+
+                    // Function to show only the dataset that corresponds to the clicked sector in stacked bar chart
+                    function updateStackedBarChart(sectorName) {
+                      const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
+
+                      // Update the visibility of each dataset in the stacked bar chart
+                      chart.data.datasets.forEach(function (dataset) {
+                        dataset.hidden = dataset.label !== sectorName; // Show only the clicked sector
                       });
+
+                      // Re-render the chart to reflect changes
+                      chart.update();
+                    }
+
+                    // Function to reset the stacked bar chart to show all datasets
+                    function resetStackedBarChart() {
+                      const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
+
+                      // Reset the visibility of all datasets to show them all
+                      chart.data.datasets.forEach(function (dataset) {
+                        dataset.hidden = false;
+                      });
+
+                      // Re-render the chart to reflect changes
+                      chart.update();
+                    }
+
+                    // Function to update horizontal bar chart by highlighting the clicked sector
+                    function updateHorizontalBarChart(sectorName) {
+                      // Update the bar chart's itemStyle to highlight only the selected sector
+                      barOption.series[0].itemStyle = {
+                        color: function (param) {
+                          return param.name === sectorName
+                            ? "#FF0000"
+                            : "#3398DB"; // Red for the highlighted sector, blue for others
+                        },
+                      };
+
+                      // Update the series label to show the value for the clicked sector
+                      barOption.series[0].label = {
+                        show: true,
+                        formatter: function (param) {
+                          return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
+                        },
+                      };
+
+                      // Refresh the horizontal bar chart
+                      barChart.setOption(barOption);
+                    }
+
+                    // Function to reset the horizontal bar chart to its default state
+                    function resetHorizontalBarChart() {
+                      // Reset the horizontal bar chart's itemStyle to default colors for all sectors
+                      barOption.series[0].itemStyle = {
+                        color: "#3398DB", // Reset color to blue for all bars
+                      };
+
+                      // Hide the labels for all sectors again
+                      barOption.series[0].label = {
+                        show: false,
+                      };
+
+                      // Refresh the horizontal bar chart
+                      barChart.setOption(barOption);
+                    }
+
+                    // Function to highlight only the clicked sector in the pie chart
+                    function updatePieChart(sectorName) {
+                      // Update the pie chart's data to hide other sectors
+                      pieOption.series[0].data.forEach(function (item) {
+                        item.itemStyle = {
+                          opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
+                        };
+                      });
+
+                      // Refresh the pie chart to reflect changes
+                      pieChart.setOption(pieOption);
+                    }
+
+                    // Function to reset the pie chart to its default state
+                    function resetPieChart() {
+                      // Reset the pie chart's data to show all sectors
+                      pieOption.series[0].data.forEach(function (item) {
+                        item.itemStyle = {
+                          opacity: 1, // Reset opacity for all sectors
+                        };
+                      });
+
+                      // Refresh the pie chart to reflect changes
+                      pieChart.setOption(pieOption);
+                    }
                   });
                 </script>
               </div>
             </div>
-
             <!-- End Bid Sector Column -->
 
             <!-- Sector Chart Section -->
@@ -950,8 +1115,6 @@
               </div>
 
               <div class="card-body pb-0">
-                <!-- <h5 class="card-title"># <span>| Today</span></h5> -->
-
                 <!-- Sector Bar Chart -->
                 <div
                   id="horizontalBarChart"
@@ -961,142 +1124,234 @@
 
                 <script>
                   document.addEventListener("DOMContentLoaded", () => {
-                    echarts
-                      .init(document.querySelector("#horizontalBarChart"))
-                      .setOption({
-                        tooltip: {
-                          trigger: "axis",
-                          axisPointer: {
-                            type: "shadow",
+                    // Initialize pie chart
+                    var pieChart = echarts.init(document.querySelector("#sectorChart"));
+                    var pieOption = {
+                      tooltip: {
+                        trigger: "item",
+                      },
+                      legend: {
+                        top: "5%",
+                        left: "center",
+                        itemGap: 5,
+                        textStyle: {
+                          fontSize: 10,
+                        },
+                      },
+                      series: [
+                        {
+                          name: "Bids",
+                          type: "pie",
+                          radius: ["30%", "60%"],
+                          avoidLabelOverlap: false,
+                          label: {
+                            show: false,
+                            position: "center",
                           },
-                        },
-                        grid: {
-                          left: "5%", // Adjust for smaller space
-                          right: "5%",
-                          bottom: "5%",
-                          top: "10%", // Adjust top margin
-                          containLabel: true,
-                        },
-                        xAxis: {
-                          type: "value",
-                          boundaryGap: [0, 0.01],
-                          axisLabel: {
-                            fontSize: 10, // Reduce font size
+                          emphasis: {
+                            itemStyle: {
+                              shadowBlur: 10,
+                              shadowOffsetX: 0,
+                              shadowColor: "rgba(0, 0, 0, 0.5)",
+                            },
+                            label: {
+                              show: true,
+                              fontSize: "14",
+                              fontWeight: "bold",
+                            },
                           },
-                        },
-                        yAxis: {
-                          type: "category",
+                          labelLine: {
+                            show: false,
+                          },
                           data: [
-                            "TMG (Private Sector)",
-                            "TMG (Public Sector)",
-                            "NMG",
-                            "IMG",
-                            "Channel",
+                            { value: 1048, name: "TMG (Private Sector)" },
+                            { value: 735, name: "TMG (Public Sector)" },
+                            { value: 580, name: "NMG" },
+                            { value: 484, name: "IMG" },
+                            { value: 300, name: "Channel" },
                           ],
-                          axisLabel: {
-                            fontSize: 10, // Reduce font size
-                          },
                         },
-                        series: [
-                          {
-                            name: "Value",
-                            type: "bar",
-                            data: [1048, 735, 580, 484, 300],
-                            barWidth: "40%", // Narrower bars for smaller chart
-                          },
-                        ],
-                      });
-                  });
-                </script>
-                <!-- End Sector Chart -->
-              </div>
-            </div>
-            <!-- End Sector Chart Section -->
-
-            <!-- Company Total Section -->
-            <div class="card" style="max-width: 600px">
-              <!-- Increased width for better spacing -->
-              <div class="filter">
-                <a class="icon" href="#" data-bs-toggle="dropdown">
-                  <i class="bi bi-three-dots"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                  <li class="dropdown-header text-start">
-                    <h6>Filter</h6>
-                  </li>
-                  <li><a class="dropdown-item" href="#">Today</a></li>
-                  <li><a class="dropdown-item" href="#">This Month</a></li>
-                  <li><a class="dropdown-item" href="#">This Year</a></li>
-                </ul>
-              </div>
-
-              <div class="card-body pb-0">
-                <!-- Bar Chart -->
-                <canvas id="barChart" style="max-height: 400px"></canvas>
-                <script>
-                  document.addEventListener("DOMContentLoaded", () => {
-                    new Chart(document.querySelector("#barChart"), {
-                      type: "bar",
-                      data: {
-                        labels: [
-                          "Mix Solution",
-                          "PaduNet",
-                          "Secure-X",
-                          "AwanHeiTech",
-                          "i-Sentrix",
-                        ], // Series names
-                        datasets: [
-                          {
-                            label: "Bid Value ($M)", // Label for the chart
-                            data: [65, 59, 80, 81, 56], // Corresponding bid values in million dollars
-                            backgroundColor: "#4668E6", // Updated background color
-                            borderColor: "#4668E6", // Same border color as background
-                            borderWidth: 1,
-                          },
-                        ],
-                      },
-                      options: {
-                        scales: {
-                          y: {
-                            beginAtZero: true,
-                            ticks: {
-                              callback: function (value) {
-                                return "$" + value + "M"; // Display as $X million
-                              },
-                            },
-                          },
-                          x: {
-                            ticks: {
-                              autoSkip: false, // Ensures all labels are shown
-                              maxRotation: 0, // Ensures labels are fully horizontal
-                              minRotation: 0, // Ensures labels are fully horizontal
-                            },
-                            barPercentage: 0.4, // Reduce bar width (range 0-1, lower is narrower)
-                            categoryPercentage: 0.6, // Increase spacing between bars (range 0-1, lower is more spacing)
-                          },
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false, // Allow the chart to take full height of the card
-                        plugins: {
-                          tooltip: {
-                            callbacks: {
-                              label: function (context) {
-                                return (
-                                  context.dataset.label +
-                                  ": $" +
-                                  context.raw +
-                                  "M"
-                                ); // Tooltip format
-                              },
-                            },
-                          },
-                          legend: {
-                            display: true, // Show the legend
-                            position: "top", // Position the legend at the top
-                          },
+                      ],
+                    };
+                    pieChart.setOption(pieOption);
+            
+                    // Initialize horizontal bar chart
+                    var barChart = echarts.init(document.querySelector("#horizontalBarChart"));
+                    var barOption = {
+                      tooltip: {
+                        trigger: "axis",
+                        axisPointer: {
+                          type: "shadow",
                         },
                       },
+                      grid: {
+                        left: "5%",
+                        right: "5%",
+                        bottom: "5%",
+                        top: "10%",
+                        containLabel: true,
+                      },
+                      xAxis: {
+                        type: "value",
+                        boundaryGap: [0, 0.01],
+                        axisLabel: {
+                          fontSize: 10,
+                        },
+                      },
+                      yAxis: {
+                        type: "category",
+                        data: [
+                          "TMG (Private Sector)",
+                          "TMG (Public Sector)",
+                          "NMG",
+                          "IMG",
+                          "Channel",
+                        ],
+                        axisLabel: {
+                          fontSize: 10,
+                        },
+                      },
+                      series: [
+                        {
+                          name: "Value",
+                          type: "bar",
+                          data: [1048, 735, 580, 484, 300],
+                          barWidth: "40%",
+                          itemStyle: {
+                            color: "#3398DB",
+                          },
+                          label: {
+                            show: false, // Initially hide the labels
+                            position: "insideRight",
+                            fontSize: 12,
+                            fontWeight: "bold",
+                          },
+                        },
+                      ],
+                    };
+                    barChart.setOption(barOption);
+            
+                    // Track the last clicked sector
+                    let lastClickedSector = null;
+            
+                    // Add click event to pie chart
+                    pieChart.on("click", function (params) {
+                      var sectorName = params.name; // Get the clicked sector's name
+            
+                      // Toggle between hiding others and resetting all datasets
+                      if (lastClickedSector === sectorName) {
+                        resetHorizontalBarChart(); // Reset horizontal bar chart
+                        resetStackedBarChart(); // Reset stacked bar chart
+                        resetPieChart(); // Reset pie chart
+                        lastClickedSector = null; // Clear the last clicked sector
+                      } else {
+                        updatePieChart(sectorName); // Highlight clicked sector in pie chart
+                        updateStackedBarChart(sectorName); // Show only the clicked sector in stacked bar chart
+                        updateHorizontalBarChart(sectorName); // Show only the clicked sector in horizontal bar chart
+                        lastClickedSector = sectorName; // Set the last clicked sector
+                      }
                     });
+            
+                    // Add click event to horizontal bar chart
+                    barChart.on("click", function (params) {
+                      var sectorName = params.name; // Get the clicked sector's name
+            
+                      // Toggle between hiding others and resetting all datasets
+                      if (lastClickedSector === sectorName) {
+                        resetHorizontalBarChart(); // Reset horizontal bar chart
+                        resetStackedBarChart(); // Reset stacked bar chart
+                        resetPieChart(); // Reset pie chart
+                        lastClickedSector = null; // Clear the last clicked sector
+                      } else {
+                        updateHorizontalBarChart(sectorName); // Highlight clicked sector in horizontal bar chart
+                        updateStackedBarChart(sectorName); // Show only the clicked sector in stacked bar chart
+                        updatePieChart(sectorName); // Highlight clicked sector in pie chart
+                        lastClickedSector = sectorName; // Set the last clicked sector
+                      }
+                    });
+            
+                    // Function to update pie chart by highlighting the clicked sector
+                    function updatePieChart(sectorName) {
+                      pieOption.series[0].data.forEach(function (item) {
+                        item.itemStyle = {
+                          opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
+                        };
+                      });
+                      pieChart.setOption(pieOption);
+                    }
+            
+                    // Function to reset the pie chart to its default state
+                    function resetPieChart() {
+                      pieOption.series[0].data.forEach(function (item) {
+                        item.itemStyle = {
+                          opacity: 1, // Reset opacity for all sectors
+                        };
+                      });
+                      pieChart.setOption(pieOption);
+                    }
+            
+                    // Function to update horizontal bar chart by highlighting the clicked sector
+                    function updateHorizontalBarChart(sectorName) {
+                      // Update the bar chart's itemStyle to highlight only the selected sector
+                      barOption.series[0].itemStyle = {
+                        color: function (param) {
+                          return param.name === sectorName ? "#FF0000" : "#3398DB"; // Red for the highlighted sector, blue for others
+                        },
+                      };
+            
+                      // Update the series label to show the value for the clicked sector
+                      barOption.series[0].label = {
+                        show: true,
+                        formatter: function (param) {
+                          return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
+                        },
+                      };
+            
+                      // Refresh the horizontal bar chart
+                      barChart.setOption(barOption);
+                    }
+            
+                    // Function to reset the horizontal bar chart to its default state
+                    function resetHorizontalBarChart() {
+                      // Reset the horizontal bar chart's itemStyle to default colors for all sectors
+                      barOption.series[0].itemStyle = {
+                        color: "#3398DB", // Reset color to blue for all bars
+                      };
+            
+                      // Hide the labels for all sectors again
+                      barOption.series[0].label = {
+                        show: false,
+                      };
+            
+                      // Refresh the horizontal bar chart
+                      barChart.setOption(barOption);
+                    }
+            
+                    // Function to show only the dataset that corresponds to the clicked sector in stacked bar chart
+                    function updateStackedBarChart(sectorName) {
+                      const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
+            
+                      // Update the visibility of each dataset in the stacked bar chart
+                      chart.data.datasets.forEach(function (dataset) {
+                        dataset.hidden = dataset.label !== sectorName; // Show only the clicked sector
+                      });
+            
+                      // Re-render the chart to reflect changes
+                      chart.update();
+                    }
+            
+                    // Function to reset the stacked bar chart to show all datasets
+                    function resetStackedBarChart() {
+                      const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
+            
+                      // Reset the visibility of all datasets to show them all
+                      chart.data.datasets.forEach(function (dataset) {
+                        dataset.hidden = false;
+                      });
+            
+                      // Re-render the chart to reflect changes
+                      chart.update();
+                    }
                   });
                 </script>
                 <!-- End Bar Chart -->
@@ -1108,83 +1363,127 @@
         </div>
 
         <!-- Responsive Bid Types and Pipelines -->
-<div class="card top-selling overflow-auto">
-  <div class="filter">
-    <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-      <li class="dropdown-header text-start"><h6>Filter</h6></li>
-      <li><a class="dropdown-item" href="#">Today</a></li>
-      <li><a class="dropdown-item" href="#">This Month</a></li>
-      <li><a class="dropdown-item" href="#">This Year</a></li>
-    </ul>
-  </div>
+        <div class="card top-selling overflow-auto">
+          <div class="filter">
+            <a class="icon" href="#" data-bs-toggle="dropdown"
+              ><i class="bi bi-three-dots"></i
+            ></a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+              <li class="dropdown-header text-start"><h6>Filter</h6></li>
+              <li><a class="dropdown-item" href="#">Today</a></li>
+              <li><a class="dropdown-item" href="#">This Month</a></li>
+              <li><a class="dropdown-item" href="#">This Year</a></li>
+            </ul>
+          </div>
 
-  <div class="card-body pb-0">
-    <h5 class="card-title">Bid Types and Pipelines <span>| Today</span></h5>
+          <div class="card-body pb-0">
+            <h5 class="card-title">
+              Bid Types and Pipelines <span>| Today</span>
+            </h5>
 
-    <!-- Responsive container for Bid Types and Pipelines Bar Charts -->
-    <div class="chart-container">
-      <!-- Bid Types Bar Chart -->
-      <div id="bidTypesBarChart"></div>
+            <!-- Responsive container for Bid Types and Pipelines Bar Charts -->
+            <div class="chart-container">
+              <!-- Bid Types Bar Chart -->
+              <div id="bidTypesBarChart"></div>
 
-      <!-- Pipelines Bar Chart -->
-      <div id="pipelinesBarChart"></div>
-    </div>
+              <!-- Pipelines Bar Chart -->
+              <div id="pipelinesBarChart"></div>
+            </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Bid Types Bar Chart
-        echarts.init(document.querySelector("#bidTypesBarChart")).setOption({
-          title: {
-            text: "Bid Types",
-            left: "center",
-            textStyle: { fontSize: 14 },
-          },
-          tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-          grid: { left: "5%", right: "5%", bottom: "5%", top: "15%", containLabel: true },
-          xAxis: { type: "value", axisLabel: { fontSize: 10 } },
-          yAxis: {
-            type: "category",
-            data: ["RFQ", "Tender", "Quotation", "RFP", "RFI", "Upstream"],
-            axisLabel: { fontSize: 10 }
-          },
-          series: [{
-            name: "Bid Types",
-            type: "bar",
-            data: [18, 11, 30, 1, 0, 0],
-            color: "#4668E6",
-            barWidth: "50%"
-          }]
-        });
+            <script>
+              document.addEventListener("DOMContentLoaded", () => {
+                // Bid Types Bar Chart
+                echarts
+                  .init(document.querySelector("#bidTypesBarChart"))
+                  .setOption({
+                    title: {
+                      text: "Bid Types",
+                      left: "center",
+                      textStyle: { fontSize: 14 },
+                    },
+                    tooltip: {
+                      trigger: "axis",
+                      axisPointer: { type: "shadow" },
+                    },
+                    grid: {
+                      left: "5%",
+                      right: "5%",
+                      bottom: "5%",
+                      top: "15%",
+                      containLabel: true,
+                    },
+                    xAxis: { type: "value", axisLabel: { fontSize: 10 } },
+                    yAxis: {
+                      type: "category",
+                      data: [
+                        "RFQ",
+                        "Tender",
+                        "Quotation",
+                        "RFP",
+                        "RFI",
+                        "Upstream",
+                      ],
+                      axisLabel: { fontSize: 10 },
+                    },
+                    series: [
+                      {
+                        name: "Bid Types",
+                        type: "bar",
+                        data: [18, 11, 30, 1, 0, 0],
+                        color: "#4668E6",
+                        barWidth: "50%",
+                      },
+                    ],
+                  });
 
-        // Pipelines Bar Chart
-        echarts.init(document.querySelector("#pipelinesBarChart")).setOption({
-          title: {
-            text: "Pipelines",
-            left: "center",
-            textStyle: { fontSize: 14 }
-          },
-          tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
-          grid: { left: "5%", right: "5%", bottom: "5%", top: "15%", containLabel: true },
-          xAxis: { type: "value", axisLabel: { fontSize: 10 } },
-          yAxis: {
-            type: "category",
-            data: ["Unknown", "Loss", "Close", "KIV", "Intro", "Clarification"],
-            axisLabel: { fontSize: 10 }
-          },
-          series: [{
-            name: "Pipelines",
-            type: "bar",
-            data: [57, 2, 1, 0, 0, 0],
-            color: "#4668E6",
-            barWidth: "50%"
-          }]
-        });
-      });
-    </script>
-  </div>
-</div>
-<!-- End Responsive Bid Types and Pipelines -->
+                // Pipelines Bar Chart
+                echarts
+                  .init(document.querySelector("#pipelinesBarChart"))
+                  .setOption({
+                    title: {
+                      text: "Pipelines",
+                      left: "center",
+                      textStyle: { fontSize: 14 },
+                    },
+                    tooltip: {
+                      trigger: "axis",
+                      axisPointer: { type: "shadow" },
+                    },
+                    grid: {
+                      left: "5%",
+                      right: "5%",
+                      bottom: "5%",
+                      top: "15%",
+                      containLabel: true,
+                    },
+                    xAxis: { type: "value", axisLabel: { fontSize: 10 } },
+                    yAxis: {
+                      type: "category",
+                      data: [
+                        "Unknown",
+                        "Loss",
+                        "Close",
+                        "KIV",
+                        "Intro",
+                        "Clarification",
+                      ],
+                      axisLabel: { fontSize: 10 },
+                    },
+                    series: [
+                      {
+                        name: "Pipelines",
+                        type: "bar",
+                        data: [57, 2, 1, 0, 0, 0],
+                        color: "#4668E6",
+                        barWidth: "50%",
+                      },
+                    ],
+                  });
+              });
+            </script>
+          </div>
+        </div>
+        <!-- End Responsive Bid Types and Pipelines -->
       </section>
     </main>
     <!-- End #main -->
@@ -1220,42 +1519,44 @@
 
     <script>
       // Function to apply dark mode
-  function applyDarkMode(isDark) {
-    const body = document.body;
-    const icon = document.getElementById("themeIcon");
+      function applyDarkMode(isDark) {
+        const body = document.body;
+        const icon = document.getElementById("themeIcon");
 
-    if (isDark) {
-      body.classList.add('dark-mode'); // Add dark mode class
-      body.style.backgroundColor = "#121212"; // Set background color
-      icon.classList.remove("ri-contrast-2-line");
-      icon.classList.add("ri-contrast-2-fill"); // Change icon for light mode
-    } else {
-      body.classList.remove('dark-mode'); // Remove dark mode class
-      body.style.backgroundColor = ""; // Reset background color
-      icon.classList.remove("ri-contrast-2-fill");
-      icon.classList.add("ri-contrast-2-line"); // Change icon for dark mode
-    }
-  }
+        if (isDark) {
+          body.classList.add("dark-mode"); // Add dark mode class
+          body.style.backgroundColor = "#121212"; // Set background color
+          icon.classList.remove("ri-contrast-2-line");
+          icon.classList.add("ri-contrast-2-fill"); // Change icon for light mode
+        } else {
+          body.classList.remove("dark-mode"); // Remove dark mode class
+          body.style.backgroundColor = ""; // Reset background color
+          icon.classList.remove("ri-contrast-2-fill");
+          icon.classList.add("ri-contrast-2-line"); // Change icon for dark mode
+        }
+      }
 
-  // Check user's preference in localStorage
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    applyDarkMode(savedTheme === 'dark');
-  }
+      // Check user's preference in localStorage
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) {
+        applyDarkMode(savedTheme === "dark");
+      }
 
-  document.getElementById("toggleTheme").addEventListener("click", function () {
-    const icon = document.getElementById("themeIcon");
-    const isDarkMode = document.body.classList.contains('dark-mode');
+      document
+        .getElementById("toggleTheme")
+        .addEventListener("click", function () {
+          const icon = document.getElementById("themeIcon");
+          const isDarkMode = document.body.classList.contains("dark-mode");
 
-    // Toggle between light and dark modes
-    if (isDarkMode) {
-      applyDarkMode(false);
-      localStorage.setItem('theme', 'light'); // Store preference
-    } else {
-      applyDarkMode(true);
-      localStorage.setItem('theme', 'dark'); // Store preference
-    }
-  });
+          // Toggle between light and dark modes
+          if (isDarkMode) {
+            applyDarkMode(false);
+            localStorage.setItem("theme", "light"); // Store preference
+          } else {
+            applyDarkMode(true);
+            localStorage.setItem("theme", "dark"); // Store preference
+          }
+        });
     </script>
   </body>
 </html>
