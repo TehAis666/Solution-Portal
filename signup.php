@@ -7,14 +7,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'signup') {
         // Signup Logic
+        $staffId = $_POST['staffId'];
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $role = $_POST['role'];
         $phone = $_POST['phone'];
 
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password, role, phone) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $name, $email, $password, $role, $phone);
+        $stmt = $conn->prepare("INSERT INTO user (staff_id, name, email, password, role, phone) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $staffId, $name, $email, $password, $role, $phone);
 
         if ($stmt->execute()) {
             echo json_encode(['success' => true]);

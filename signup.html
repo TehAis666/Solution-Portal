@@ -470,5 +470,55 @@
                 parent.classList.remove('slide-up')
             }
         });
-    });</script>
+    });
+    
+     // Handle login submission
+     document.querySelector('.login .submit-btn').addEventListener('click', async () => {
+        const email = document.querySelector('.login input[placeholder="Email"]').value;
+        const password = document.querySelector('.login input[placeholder="Password"]').value;
+
+        const response = await fetch('http://localhost/my-project/api/auth.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ action: 'login', email, password })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Login successful: ' + JSON.stringify(data.user));
+        } else {
+            alert('Login failed: ' + data.error);
+        }
+    });
+
+    // Handle signup submission
+    document.querySelector('.singup .submit-btn').addEventListener('click', async () => {
+        const staffId = document.querySelector('input[placeholder="Staff ID"]').value;
+        const name = document.querySelector('input[placeholder="Name"]').value;
+        const email = document.querySelector('input[placeholder="Email"]').value;
+        const password = document.querySelector('input[placeholder="Password"]').value;
+        const role = document.querySelector('#roleDisplay').value; // Get the selected role
+        const phone = document.querySelector('input[placeholder="Phone Number"]').value;
+
+        const response = await fetch('http://localhost/my-project/api/signup.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({ action: 'signup', staffId, name, email, password, role, phone })
+        });
+        
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Signup successful!');
+        } else {
+            alert('Signup failed: ' + data.error);
+        }
+    });
+    
+    
+    </script>
 </html>

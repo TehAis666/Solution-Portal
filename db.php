@@ -2,7 +2,7 @@
 // db.php
 
 $host = 'localhost';
-$db = 'solutiodb';
+$db = 'solutiondb';
 $user = 'root'; // Default user for Laragon
 $pass = 'system'; // Default password is empty
 
