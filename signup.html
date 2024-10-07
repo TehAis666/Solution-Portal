@@ -19,13 +19,14 @@
     font-family: "Fira Sans", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: lightblue;
 }
 
 .form-structor {
     background-color: #222;
     border-radius: 15px;
     height: 550px;
-    width: 350px;
+    width: 370px;
     position: relative;
     overflow: hidden;
 }
@@ -168,7 +169,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #fff;
+    background-color: white;
     z-index: 5;
     transition: all .3s ease;
 }
@@ -179,7 +180,7 @@
     left: 50%;
     top: -20px;
     transform: translate(-50%, 0);
-    background-color: #fff;
+    background-color: white;
     width: 200%;
     height: 250px;
     border-radius: 50%;
@@ -199,10 +200,14 @@
     transition: all .3s ease;
 }
 
+.singup .form-title::before{
+    text-align: center;
+}
+
 .singup .form-title {
     color: #000;
     font-size: 1.7em;
-    text-align: center;
+    text-align: center; /* Center text */
 }
 
 .singup .form-title span {
@@ -214,10 +219,10 @@
 
 .singup .form-holder {
     border-radius: 15px;
-    background-color: #fff;
-    border: 1px solid #eee;
+    background-color: #5edbf15e;
+    border: 3px solid #eeeeee90;
     overflow: hidden;
-    margin-top: 50px;
+    margin-top: 20px;
     opacity: 1;
     visibility: visible;
     transition: all .3s ease;
@@ -246,7 +251,7 @@
 
 .singup .submit-btn {
     background-color: #6B92A4;
-    color: rgba(256, 256, 256, 0.7);
+    color: white;
     border: 0;
     border-radius: 15px;
     display: block;
@@ -399,7 +404,7 @@
                         <input type="text" class="input" id="roleDisplay" placeholder="Role" readonly />
                         <div class="dropdown">
                             <ul>
-                                <li data-value="Admin">Super Admin</li>
+                                <!-- <li data-value="Admin">Super Admin</li> -->
                                 <li data-value="Presales">Presales</li>
                                 <li data-value="ProdAdmin">Product Admin</li>
                                 <li data-value="Management">Management</li>
