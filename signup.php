@@ -418,7 +418,7 @@
         <div class="singup slide-up">
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
-                <form id="signupcont" action="signupcont.php" method="POST">
+                <form id="signupcont" action="controller/signupcont.php" method="POST">
                 <div class="form-holder">
                         <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
                         <input type="text" name="name" class="input" placeholder="Name" required />

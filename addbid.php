@@ -554,7 +554,7 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Bid Management</h5>
-            <form id="addbidcont" action="addbidcont.php" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <form id="addbidcont" action="controller/addbidcont.php" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
               <div class="form-row">
                 <div class="form-group">
                   <label for="custName">Customer Name:</label>
