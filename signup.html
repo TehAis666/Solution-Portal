@@ -397,24 +397,26 @@
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
                 <div class="form-holder">
-                    <input type="text" class="input" placeholder="Staff ID" />
-                    <input type="text" class="input" placeholder="Name" />
-                    <input type="email" class="input" placeholder="Email" />
-                    <input type="password" class="input" placeholder="Password" />
-                    <div class="">
-                        <input type="text" class="input" id="roleDisplay" placeholder="Role" readonly />
-                        <div class="dropdown">
-                            <ul>
-                                <!-- <li data-value="Admin">Super Admin</li> -->
-                                <li data-value="Presales">Presales</li>
-                                <li data-value="ProdAdmin">Product Admin</li>
-                                <li data-value="Management">Management</li>
-                            </ul>
+                    <form id="signupcont" action="signup.php" method="POST">
+                        <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
+                        <input type="text" name="name" class="input" placeholder="Name" required />
+                        <input type="email" name="email" class="input" placeholder="Email" required />
+                        <input type="password" name="password" class="input" placeholder="Password" required />
+                        
+                        <div class="role-selection">
+                            <input type="text" name="role" class="input" id="roleDisplay" placeholder="Role" readonly required />
+                            <div class="dropdown">
+                                <ul>
+                                    <li onclick="setRole('Presales')" data-value="Presales">Presales</li>
+                                    <li onclick="setRole('ProdAdmin')" data-value="ProdAdmin">Product Admin</li>
+                                    <li onclick="setRole('Management')" data-value="Management">Management</li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <input type="phone" class="input" placeholder="Phone Number" />
-                </div>
-                <button class="submit-btn">Sign Up</button>
+                
+                        <input type="phone" name="phone" class="input" placeholder="Phone Number" required />
+                        <button type="submit" class="submit-btn">Sign Up</button>
+                    </form>
             </div>
         </div>
     </div>
@@ -470,5 +472,7 @@
                 parent.classList.remove('slide-up')
             }
         });
-    });</script>
+    });
+
+    </script>
 </html>
