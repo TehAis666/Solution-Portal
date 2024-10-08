@@ -102,6 +102,33 @@
       /* Lighter placeholder text */
     }
 
+    /* Dark Mode for the Dropdown */
+    .dark-mode .dropbtn {
+      background-color: #1e1e1e;
+      /* Dark background for dropdown button */
+      color: #ffffff;
+      /* Light text color */
+      border: 1px solid #555;
+      /* Darker border for dropdown */
+    }
+
+    .dark-mode .dropdown-content {
+      background-color: #1e1e1e;
+      /* Dark background for dropdown content */
+      box-shadow: 0px 8px 16px 0px rgba(255, 255, 255, 0.2);
+      /* Lighter shadow */
+    }
+
+    .dark-mode .dropdown-checkbox label {
+      color: #ffffff;
+      /* Light text for checkbox labels */
+    }
+
+    .dark-mode .dropdown-checkbox label:hover {
+      background-color: #333333;
+      /* Darker hover effect for checkbox options */
+    }
+
     header.dark-mode {
       color: #121212;
     }
@@ -211,6 +238,7 @@
       /* Green border on hover */
     }
 
+
     .form-row {
       display: flex;
       justify-content: space-between;
@@ -302,53 +330,40 @@
       background-color: #45a049;
     }
 
-    /* Style the dropdown button */
-    .dropbtn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 12px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      text-align: left;
-      border-radius: 10px;
-    }
-
-    /* Dropdown container */
-    .dropdown-checkbox {
-      position: relative;
-      display: inline-block;
-      width: 100%;
-    }
-
-    /* Dropdown content (hidden by default) */
+    /* Styling Checkox */
+    /* Hide the dropdown content by default */
     .dropdown-content {
       display: none;
       position: absolute;
       background-color: #f9f9f9;
-      min-width: 100%;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
       z-index: 1;
-      max-height: 150px; /* Limit the height of the dropdown */
-      overflow-y: auto; /* Scroll if there are too many checkboxes */
-      border-radius: 10px;
     }
 
-    /* Show the dropdown content when clicked */
-    .show {
+    /* Show the dropdown when it is toggled open */
+    .dropdown-content.show {
       display: block;
     }
 
-    /* Checkboxes and labels inside dropdown */
-    .dropdown-content label {
-      padding: 8px 12px;
+    /* Style the dropdown checkboxes */
+    .dropdown-checkbox label {
       display: block;
+      padding: 8px;
+    }
+
+    .dropbtn {
+      background-color: #fff;
+      /* A different color from submit button */
+      color: #333;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
       cursor: pointer;
-    }
-
-    .dropdown-content input[type="checkbox"] {
-      margin-right: 8px;
+      width: 98%;
+      text-align: left;
+      border-radius: 15px;
+      /* Make the dropdown button more rounded */
     }
   </style>
 </head>
@@ -558,9 +573,9 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="type">Type:</label>
+                  <label for="type">Bid Type:</label>
                   <select id="type" name="Type" required>
-                    <option value="">Select type</option>
+                    <option value="">Select bid type</option>
                     <option value="RFQ">RFQ</option>
                     <option value="RFI">RFI</option>
                     <option value="RFP">RFP</option>
@@ -606,34 +621,42 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="solution">HMS Solution:</label>
-                  <div class="dropdown-checkbox">
-                    <button type="button" class="dropbtn" onclick="toggleDropdown()">Select HMS Solution</button>
-                    <div id="solutionDropdown" class="dropdown-content">
-                      <label><input type="checkbox" name="solution[]" value="PaduNet"> PaduNet</label><br>
-                      <label><input type="checkbox" name="solution[]" value="Secure"> Secure-X</label><br>
-                      <label><input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech</label><br>
-                      <label><input type="checkbox" name="solution[]" value="Sentric"> i-Sentric</label><br>
+                    <label for="solution">HMS Solution:</label>
+                    <div class="dropdown-checkbox">
+                      <button type="button" class="dropbtn" id="dropdownButton" onclick="toggleDropdown()">Select HMS Solution</button>
+                      <div id="solutionDropdown" class="dropdown-content">
+                        <label onclick="event.stopPropagation()">
+                          <input type="checkbox" name="solution[]" value="PaduNet"> PaduNet
+                        </label><br>
+                        <label onclick="event.stopPropagation()">
+                          <input type="checkbox" name="solution[]" value="Secure-X"> Secure-X
+                        </label><br>
+                        <label onclick="event.stopPropagation()">
+                          <input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech
+                        </label><br>
+                        <label onclick="event.stopPropagation()">
+                          <input type="checkbox" name="solution[]" value="i-Sentric"> i-Sentric
+                        </label><br>
+                      </div>
                     </div>
-                  </div>
-                  <input type="hidden" name="Solution" id="finalSolution" required>
+                    <input type="hidden" name="Solution" id="finalSolution" required>
                 </div>
                 <div class="form-group">
                   <label for="PIC/Presales">PIC/Presales:</label>
-                  <input type="text" id="PIC/Presales" name="PIC/Presales" required placeholder="Enter PIC/Presales name">
+                  <input type="text" id="PIC/Presales" name="PIC/Presales" placeholder="Enter PIC/Presales name" required>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-group">
                   <label for="requestDate">Request Date:</label>
                   <div class="">
-                    <input type="date" class="form-control" name="RequestDate" id="requestDate">
+                    <input type="date" class="form-control" name="RequestDate" id="requestDate" required>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="submissionDate">Submission Date:</label>
                   <div class="">
-                    <input type="date" class="form-control" name="SubmissionDate" id="submissionDate">
+                    <input type="date" class="form-control" name="SubmissionDate" id="submissionDate" required>
                   </div>
                 </div>
               </div>
@@ -673,10 +696,11 @@
               <div class="form-row">
                 <div class="form-group">
                   <label for="remarks">Remarks:</label>
-                  <input type="text" id="remarks" name="Remarks" required placeholder="Enter remarks (optional)">
+                  <input type="text" id="remarks" name="Remarks" placeholder="Enter remarks (optional)">
                 </div>
               </div>
               <div class="form-group">
+              <p id="checkboxError" style="color: red; display: none;">Please select at least one HMS Solution</p>
                 <input type="submit" value="Submit" class="submit-btn">
               </div>
             </form>
@@ -748,6 +772,7 @@
       }
     }
 
+    // Listen for checkbox changes
     document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
       checkbox.addEventListener('change', function() {
         const selected = [];
@@ -755,11 +780,16 @@
           selected.push(selectedCheckbox.value);
         });
 
+        // Set the hidden input value based on selected checkboxes
         if (selected.length > 1) {
           document.getElementById('finalSolution').value = "Mix Solution";
         } else {
           document.getElementById('finalSolution').value = selected[0] || "";
         }
+
+        // Update the dropdown button text to show selected options
+        const button = document.getElementById('dropdownButton');
+        button.innerText = selected.length > 0 ? `Selected: ${selected.join(', ')}` : 'Select HMS Solution';
       });
     });
 
@@ -767,6 +797,28 @@
       document.getElementById("solutionDropdown").classList.toggle("show");
     }
 
+    function validateForm() {
+      // Get all checkboxes within the solution group
+      const checkboxes = document.querySelectorAll('input[name="solution[]"]');
+
+      // Check if at least one checkbox is checked
+      let isChecked = false;
+      for (const checkbox of checkboxes) {
+        if (checkbox.checked) {
+          isChecked = true;
+          break;
+        }
+      }
+
+      // If no checkbox is checked, show an alert and return false to prevent submission
+      if (!isChecked) {
+        alert("Please select at least one HMS Solution.");
+        return false; // Prevent form submission
+      }
+
+      // If validation passes, allow the form to be submitted
+      return true;
+    }
     // Close the dropdown if the user clicks outside of it
     window.onclick = function(event) {
       if (!event.target.matches('.dropbtn')) {
@@ -779,7 +831,6 @@
         }
       }
     }
-
   </script>
 </body>
 
