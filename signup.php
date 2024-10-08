@@ -397,7 +397,7 @@
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
                 <div class="form-holder">
-                    <form id="signupcont" action="signupcont.php" method="POST">
+                    <form id="signupcont" action="controller/signupcont.php" method="POST">
                         <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
                         <input type="text" name="name" class="input" placeholder="Name" required />
                         <input type="email" name="email" class="input" placeholder="Email" required />
