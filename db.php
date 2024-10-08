@@ -1,16 +1,17 @@
 <?php
-// db.php
+define('db_user','root');
+define('db_password','system');
+define('db_host','localhost');
+define('db_name','solutiondb');
 
-$host = 'localhost';
-$db = 'solutiondb';
-$user = 'root'; // Default user for Laragon
-$pass = 'system'; // Default password is empty
+$conn = mysqli_connect (db_host, db_user, db_password, db_name, 3305);
 
-// Create connection
-$conn = new mysqli($host, $user, $pass, $db);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (mysqli_connect_errno())
+{
+	echo "Failed to connect to MySQL: ".mysqli_connect_error();
 }
+else{
+	echo "successful";
+}
+
 ?>

@@ -397,24 +397,26 @@
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
                 <div class="form-holder">
-                    <input type="text" class="input" placeholder="Staff ID" />
-                    <input type="text" class="input" placeholder="Name" />
-                    <input type="email" class="input" placeholder="Email" />
-                    <input type="password" class="input" placeholder="Password" />
-                    <div class="">
-                        <input type="text" class="input" id="roleDisplay" placeholder="Role" readonly />
-                        <div class="dropdown">
-                            <ul>
-                                <!-- <li data-value="Admin">Super Admin</li> -->
-                                <li data-value="Presales">Presales</li>
-                                <li data-value="ProdAdmin">Product Admin</li>
-                                <li data-value="Management">Management</li>
-                            </ul>
+                    <form id="signupcont" action="signup.php" method="POST">
+                        <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
+                        <input type="text" name="name" class="input" placeholder="Name" required />
+                        <input type="email" name="email" class="input" placeholder="Email" required />
+                        <input type="password" name="password" class="input" placeholder="Password" required />
+                        
+                        <div class="role-selection">
+                            <input type="text" name="role" class="input" id="roleDisplay" placeholder="Role" readonly required />
+                            <div class="dropdown">
+                                <ul>
+                                    <li onclick="setRole('Presales')" data-value="Presales">Presales</li>
+                                    <li onclick="setRole('ProdAdmin')" data-value="ProdAdmin">Product Admin</li>
+                                    <li onclick="setRole('Management')" data-value="Management">Management</li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <input type="phone" class="input" placeholder="Phone Number" />
-                </div>
-                <button class="submit-btn">Sign Up</button>
+                
+                        <input type="phone" name="phone" class="input" placeholder="Phone Number" required />
+                        <button type="submit" class="submit-btn">Sign Up</button>
+                    </form>
             </div>
         </div>
     </div>
@@ -471,54 +473,6 @@
             }
         });
     });
-    
-     // Handle login submission
-     document.querySelector('.login .submit-btn').addEventListener('click', async () => {
-        const email = document.querySelector('.login input[placeholder="Email"]').value;
-        const password = document.querySelector('.login input[placeholder="Password"]').value;
 
-        const response = await fetch('http://localhost/my-project/api/auth.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ action: 'login', email, password })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-            alert('Login successful: ' + JSON.stringify(data.user));
-        } else {
-            alert('Login failed: ' + data.error);
-        }
-    });
-
-    // Handle signup submission
-    document.querySelector('.singup .submit-btn').addEventListener('click', async () => {
-        const staffId = document.querySelector('input[placeholder="Staff ID"]').value;
-        const name = document.querySelector('input[placeholder="Name"]').value;
-        const email = document.querySelector('input[placeholder="Email"]').value;
-        const password = document.querySelector('input[placeholder="Password"]').value;
-        const role = document.querySelector('#roleDisplay').value; // Get the selected role
-        const phone = document.querySelector('input[placeholder="Phone Number"]').value;
-
-        const response = await fetch('http://localhost/my-project/api/signup.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({ action: 'signup', staffId, name, email, password, role, phone })
-        });
-        
-
-        const data = await response.json();
-        if (data.success) {
-            alert('Signup successful!');
-        } else {
-            alert('Signup failed: ' + data.error);
-        }
-    });
-    
-    
     </script>
 </html>
