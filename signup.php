@@ -436,7 +436,14 @@
                             </div>
                         </div>
 
-                        <input type="phone" name="phone" class="input" placeholder="Phone Number" required />
+                        <input
+                            type="tel"
+                            name="phone"
+                            class="input"
+                            placeholder="Phone Number"
+                            required
+                            pattern="0\d{9,11}"
+                            title="Phone number must start with '0' followed by 9 to 11 digits." />
                 </div>
                 <button type="submit" class="submit-btn">Sign Up</button>
                 </form>
