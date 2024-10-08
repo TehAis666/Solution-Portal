@@ -373,9 +373,6 @@
 #roleDisplay {
     cursor: pointer;
 }
-
-
-
   </style>
 </head>
 <body>
@@ -396,8 +393,8 @@
         <div class="singup slide-up">
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
+                <form id="signupcont" action="signupcont.php" method="POST">
                 <div class="form-holder">
-                    <form id="signupcont" action="signupcont.php" method="POST">
                         <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
                         <input type="text" name="name" class="input" placeholder="Name" required />
                         <input type="email" name="email" class="input" placeholder="Email" required />
@@ -415,9 +412,9 @@
                         </div>
 
                         <input type="phone" name="phone" class="input" placeholder="Phone Number" required />
-                        <button type="submit" class="submit-btn">Sign Up</button>
-                    </form>
                 </div>
+                <button type="submit" class="submit-btn">Sign Up</button>
+                </form>
             </div>
         </div>
     </div>
