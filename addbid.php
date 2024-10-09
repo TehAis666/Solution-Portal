@@ -543,7 +543,7 @@
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
+          <li class="breadcrumb-item active">Bids</li>
         </ol>
       </nav>
     </div>
@@ -621,25 +621,25 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                    <label for="solution">HMS Solution:</label>
-                    <div class="dropdown-checkbox">
-                      <button type="button" class="dropbtn" id="dropdownButton" onclick="toggleDropdown()">Select HMS Solution</button>
-                      <div id="solutionDropdown" class="dropdown-content">
-                        <label onclick="event.stopPropagation()">
-                          <input type="checkbox" name="solution[]" value="PaduNet"> PaduNet
-                        </label><br>
-                        <label onclick="event.stopPropagation()">
-                          <input type="checkbox" name="solution[]" value="Secure-X"> Secure-X
-                        </label><br>
-                        <label onclick="event.stopPropagation()">
-                          <input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech
-                        </label><br>
-                        <label onclick="event.stopPropagation()">
-                          <input type="checkbox" name="solution[]" value="i-Sentric"> i-Sentric
-                        </label><br>
-                      </div>
+                  <label for="solution">HMS Solution:</label>
+                  <div class="dropdown-checkbox">
+                    <button type="button" class="dropbtn" id="dropdownButton" onclick="toggleDropdown()">Select HMS Solution</button>
+                    <div id="solutionDropdown" class="dropdown-content">
+                      <label onclick="event.stopPropagation()">
+                        <input type="checkbox" name="solution[]" value="PaduNet"> PaduNet
+                      </label><br>
+                      <label onclick="event.stopPropagation()">
+                        <input type="checkbox" name="solution[]" value="Secure-X"> Secure-X
+                      </label><br>
+                      <label onclick="event.stopPropagation()">
+                        <input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech
+                      </label><br>
+                      <label onclick="event.stopPropagation()">
+                        <input type="checkbox" name="solution[]" value="i-Sentric"> i-Sentric
+                      </label><br>
                     </div>
-                    <input type="hidden" name="Solution" id="finalSolution" required>
+                  </div>
+                  <input type="hidden" name="Solution" id="finalSolution" required>
                 </div>
                 <div class="form-group">
                   <label for="PIC/Presales">PIC/Presales:</label>
@@ -662,47 +662,49 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="value">Value:</label>
-                  <input type="text" id="value" name="Value" required placeholder="Bid Value">
-                </div>
-                <div class="form-group">
-                  <label for="RMValue">Value (RM):</label>
-                  <input type="text" id="RMValue" name="RMValue"  placeholder="Value of bid in Ringgit Malaysia" disabled>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="status">Status:</label>
-                  <select id="status" name="Status" required>
-                    <option value="">Select Bid Status</option>
-                    <option value="Submitted">Submitted</option>
-                    <option value="Drop">Drop</option>
-                    <option value="WIP">WIP</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="tenderStatus">Tender Status:</label>
-                  <select id="tenderStatus" name="TenderStatus" required>
-                    <option value="">Select tender status</option>
-                    <option value="Clarification">Clarification</option>
-                    <option value="Close">Close</option>
-                    <option value="Intro">Intro</option>
-                    <option value="KIV">KIV</option>
-                    <option value="Lose">Lose</option>
-                    <option value="Unknown">Unknown</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="remarks">Remarks:</label>
-                  <input type="text" id="remarks" name="Remarks" placeholder="Enter remarks (optional)">
-                </div>
-              </div>
-              <div class="form-group">
-              <p id="checkboxError" style="color: red; display: none;">Please select at least one HMS Solution</p>
-                <input type="submit" value="Submit" class="submit-btn">
-              </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="value">Value:</label>
+                      <input type="text" id="value" name="Value" required placeholder="Bid Value">
+                    </div>
+                    <div class="form-group">
+                      <label for="RMValue">Value (RM):</label>
+                      <input type="text" id="RMValue" name="RMValue" placeholder="Value of bid in Ringgit Malaysia" readonly>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="status">Status:</label>
+                      <select id="status" name="Status" required>
+                        <option value="">Select Bid Status</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Drop">Drop</option>
+                        <option value="WIP">WIP</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="tenderStatus">Tender Status:</label>
+                      <select id="tenderStatus" name="TenderStatus" required>
+                        <option value="">Select tender status</option>
+                        <option value="Clarification">Clarification</option>
+                        <option value="Close">Close</option>
+                        <option value="Intro">Intro</option>
+                        <option value="KIV">KIV</option>
+                        <option value="Lose">Lose</option>
+                        <option value="Unknown">Unknown</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="remarks">Remarks:</label>
+                      <input type="text" id="remarks" name="Remarks" placeholder="Enter remarks (optional)">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <p id="checkboxError" style="color: red; display: none;">Please select at least one HMS Solution</p>
+                    <input type="submit" value="Submit" class="submit-btn">
+                  </div>
             </form>
           </div>
         </div>
@@ -798,39 +800,46 @@
     }
 
     function validateForm() {
-      // Get all checkboxes within the solution group
-      const checkboxes = document.querySelectorAll('input[name="solution[]"]');
+    // Get all checkboxes within the solution group
+    const checkboxes = document.querySelectorAll('input[name="solution[]"]');
 
-      // Check if at least one checkbox is checked
-      let isChecked = false;
-      for (const checkbox of checkboxes) {
-        if (checkbox.checked) {
-          isChecked = true;
-          break;
-        }
-      }
-
-      // If no checkbox is checked, show an alert and return false to prevent submission
-      if (!isChecked) {
-        alert("Please select at least one HMS Solution.");
-        return false; // Prevent form submission
-      }
-
-      // If validation passes, allow the form to be submitted
-      return true;
-    }
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function(event) {
-      if (!event.target.matches('.dropbtn')) {
-        var dropdowns = document.getElementsByClassName("dropdown-content");
-        for (var i = 0; i < dropdowns.length; i++) {
-          var openDropdown = dropdowns[i];
-          if (openDropdown.classList.contains('show')) {
-            openDropdown.classList.remove('show');
-          }
-        }
+    // Check if at least one checkbox is checked
+    let isChecked = false;
+    for (const checkbox of checkboxes) {
+      if (checkbox.checked) {
+        isChecked = true;
+        break;
       }
     }
+
+    // If no checkbox is checked, show an alert and return false to prevent submission
+    if (!isChecked) {
+      alert("Please select at least one HMS Solution.");
+      return false; // Prevent form submission
+    }
+
+    // Since remarks is optional, we don't need to check it here
+
+    // If validation passes, allow the form to be submitted
+    return true;
+  }
+
+  // Close the dropdown if the user clicks outside of it
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn')) {
+      var dropdowns = document.getElementsByClassName("dropdown-content");
+      for (var i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }
+    document.getElementById("value").addEventListener("input", function() {
+      let value = this.value;
+      document.getElementById("RMValue").value = value ? "RM " + value : ""; // Add " RM" next to the value
+  });
   </script>
 </body>
 
