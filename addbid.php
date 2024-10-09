@@ -667,7 +667,7 @@
                 </div>
                 <div class="form-group">
                   <label for="RMValue">Value (RM):</label>
-                  <input type="text" id="RMValue" name="RMValue" required placeholder="Value of bid in Ringgit Malaysia">
+                  <input type="text" id="RMValue" name="RMValue"  placeholder="Value of bid in Ringgit Malaysia" disabled>
                 </div>
               </div>
               <div class="form-row">

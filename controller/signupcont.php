@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the query
     if ($stmt->execute()) {
-        echo "<script>alert('Staff successfully created.'); window.location.href = '/SolutionP/signup';</script>";
+        echo "<script>alert('Staff successfully created.'); window.location.href = '../signup.php';</script>";
     } else {
         echo "Error: " . $stmt->error;
     }
