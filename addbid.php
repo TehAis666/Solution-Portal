@@ -454,7 +454,7 @@
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <li class="nav-item">
-        <a class="nav-link collapsed" href="index.html">
+        <a class="nav-link collapsed" href="dashboard.php">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -474,13 +474,13 @@
           class="nav-content collapse show"
           data-bs-parent="#sidebar-nav">
           <li>
-            <a href="addbid.html" class="active">
+            <a href="addbid.php" class="active">
               <i class="bi bi-circle"></i><span>Add</span>
             </a>
           </li>
           <li>
-            <a href="#">
-              <i class="bi bi-circle"></i><span>Bids1</span>
+            <a href="managebid.php">
+              <i class="bi bi-circle"></i><span>Manage</span>
             </a>
           </li>
         </ul>
@@ -555,6 +555,23 @@
           <div class="card-body">
             <h5 class="card-title">Bid Management</h5>
             <form id="addbidcont" action="controller/addbidcont.php" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="form-row">
+                <div class="form-group">
+                  <label for="requestDate">Request Date:</label>
+                  <div class="">
+                    <input type="date" class="form-control" name="RequestDate" id="requestDate" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                      <label for="status">Status:</label>
+                      <select id="status" name="Status" required>
+                        <option value="">Select Bid Status</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Drop">Drop</option>
+                        <option value="WIP">WIP</option>
+                      </select>
+                    </div>
+              </div>
               <div class="form-row">
                 <div class="form-group">
                   <label for="custName">Customer Name:</label>
@@ -648,41 +665,12 @@
               </div>
               <div class="form-row">
                 <div class="form-group">
-                  <label for="requestDate">Request Date:</label>
-                  <div class="">
-                    <input type="date" class="form-control" name="RequestDate" id="requestDate" required>
-                  </div>
-                </div>
-                <div class="form-group">
                   <label for="submissionDate">Submission Date:</label>
                   <div class="">
                     <input type="date" class="form-control" name="SubmissionDate" id="submissionDate" required>
                   </div>
                 </div>
-              </div>
-              <div class="form-row">
                 <div class="form-group">
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="value">Value:</label>
-                      <input type="text" id="value" name="Value" required placeholder="Bid Value">
-                    </div>
-                    <div class="form-group">
-                      <label for="RMValue">Value (RM):</label>
-                      <input type="text" id="RMValue" name="RMValue" placeholder="Value of bid in Ringgit Malaysia" readonly>
-                    </div>
-                  </div>
-                  <div class="form-row">
-                    <div class="form-group">
-                      <label for="status">Status:</label>
-                      <select id="status" name="Status" required>
-                        <option value="">Select Bid Status</option>
-                        <option value="Submitted">Submitted</option>
-                        <option value="Drop">Drop</option>
-                        <option value="WIP">WIP</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
                       <label for="tenderStatus">Tender Status:</label>
                       <select id="tenderStatus" name="TenderStatus" required>
                         <option value="">Select tender status</option>
@@ -694,7 +682,7 @@
                         <option value="Unknown">Unknown</option>
                       </select>
                     </div>
-                  </div>
+              </div>
                   <div class="form-row">
                     <div class="form-group">
                       <label for="remarks">Remarks:</label>
@@ -836,10 +824,6 @@
       }
     }
   }
-    document.getElementById("value").addEventListener("input", function() {
-      let value = this.value;
-      document.getElementById("RMValue").value = value ? "RM " + value : ""; // Add " RM" next to the value
-  });
   </script>
 </body>
 

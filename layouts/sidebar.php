@@ -25,13 +25,13 @@
             data-bs-parent="#sidebar-nav"
           >
             <li>
-              <a href="addbid.html">
+              <a href="addbid.php">
                 <i class="bi bi-circle"></i><span>Add</span>
               </a>
             </li>
             <li>
               <a href="#">
-                <i class="bi bi-circle"></i><span>Bids1</span>
+                <i class="bi bi-circle"></i><span>Manage</span>
               </a>
             </li>
           </ul>
