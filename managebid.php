@@ -156,6 +156,67 @@ $conn->close();
       color: #121212;
     }
 
+    /* Dark Mode Styles for Table */
+.dark-mode table {
+  background-color: #1e1e1e !important; /* Force dark background */
+  color: white !important; /* Light text for table */
+}
+
+.dark-mode table th,
+.dark-mode table td {
+  border: 1px solid #555 !important; /* Darker borders for table cells */
+}
+
+.dark-mode table th {
+  background-color: #333 !important; /* Darker background for table headers */
+  color: white;
+}
+
+.dark-mode table td {
+  background-color: #333 !important; /* Darker background for table data */
+  color: white;
+}
+
+.dark-mode table tr:nth-child(even) {
+  background-color: #2a2a2a !important; /* Even rows darker for striping effect */
+}
+
+.dark-mode table tr:nth-child(odd) {
+  background-color: #1e1e1e !important; /* Odd rows lighter for striping effect */
+}
+
+/* Dark Mode for Badges */
+.dark-mode .badge.bg-success {
+  background-color: #4caf50 !important; /* Green background for 'Submitted' badge */
+}
+
+.dark-mode .badge.bg-danger {
+  background-color: #f44336 !important; /* Red background for 'Dropped' badge */
+}
+
+.dark-mode .badge.bg-warning {
+  background-color: #ff9800 !important; /* Orange background for 'WIP' badge */
+}
+
+.dark-mode .badge.bg-secondary {
+  background-color: #757575 !important; /* Gray background for 'Unknown' badge */
+}
+
+/* Dark Mode for Button and Table Actions */
+.dark-mode .btn-primary {
+  background-color: #333 !important; /* Dark background for buttons */
+  color: white !important; /* Light text for buttons */
+}
+
+.dark-mode .btn-primary:hover {
+  background-color: #555 !important; /* Hover effect for buttons */
+}
+
+.dark-mode .viewbtn {
+  background-color: #00008B !important;
+  color: white !important;
+}
+
     /* Badge Styles */
 
     .text-center {
@@ -409,36 +470,6 @@ $conn->close();
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Bids List</h5>
-
-              <!-- Table with stripped rows -->
-              <!-- <table class="table datatable">
-                <thead>
-                  <tr>
-                    <th data-type="date" data-format="YYYY/DD/MM">
-                      Latest Update
-                    </th>
-                    <th>Customer Name</th>
-                    <th>Tender Proposal</th>
-                    <th >Value (RM)</th>
-                    <th>Final Submission Value (RM)</th>
-                    <th>RequestStatus</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updatebids">View</button></td>
-                  </tr>
-                </tbody>
-              </table> -->
-              <!-- End Table with stripped rows -->
-
               <!-- New Table with stripped rows -->
               <table id="example" class="table table-striped" style="width:100%">
                 <thead>
@@ -680,32 +711,40 @@ $conn->close();
   </script>
   
   <script>
-    function toggleDarkMode() {
-      const body = document.body;
-      const darkMode = body.classList.toggle("dark-mode");
+function toggleDarkMode() {
+  const body = document.body;
+  const darkMode = body.classList.toggle("dark-mode");
 
-      // Store the current mode in local storage
-      localStorage.setItem("darkMode", darkMode ? "enabled" : "disabled");
+  // Toggle dark mode on the table and buttons as well
+  const table = document.querySelector('table');
+  const buttons = document.querySelectorAll('.btn, .viewbtn');
+  buttons.forEach(button => button.classList.toggle('dark-mode'));
+  
+  if (table) {
+    table.classList.toggle('dark-mode');
+  }
 
-      // Update the styles based on the current mode
-      if (darkMode) {
-        body.style.backgroundColor = "#121212"; // Dark background
-        body.style.color = "#ffffff"; // Light text
-        // Add more styles as needed
-      } else {
-        body.style.backgroundColor = "#ffffff"; // Light background
-        body.style.color = "#000000"; // Dark text
-        // Add more styles as needed
-      }
-    }
+  // Store the current mode in local storage
+  localStorage.setItem("darkMode", darkMode ? "enabled" : "disabled");
 
-    // Check local storage for mode on page load
-    document.addEventListener("DOMContentLoaded", () => {
-      const darkMode = localStorage.getItem("darkMode");
-      if (darkMode === "enabled") {
-        toggleDarkMode();
-      }
-    });
+  // Update the styles based on the current mode
+  if (darkMode) {
+    body.style.backgroundColor = "#121212"; // Dark background
+    body.style.color = "#ffffff"; // Light text
+  } else {
+    body.style.backgroundColor = "#ffffff"; // Light background
+    body.style.color = "#000000"; // Dark text
+  }
+}
+
+// Check local storage for mode on page load
+document.addEventListener("DOMContentLoaded", () => {
+  const darkMode = localStorage.getItem("darkMode");
+  if (darkMode === "enabled") {
+    toggleDarkMode();
+  }
+});
+
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode'); // Toggle dark mode on body
