@@ -31,8 +31,6 @@
   <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet" />
   <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet" />
   <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet" />
@@ -134,8 +132,6 @@
     header.dark-mode {
       color: #121212;
     }
-
-    
   </style>
 </head>
 
@@ -225,7 +221,7 @@
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <li class="nav-item">
-        <a class="nav-link collapsed" href="dashboard.php">
+        <a class="nav-link collapsed" href="index.html">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -245,13 +241,13 @@
           class="nav-content collapse show"
           data-bs-parent="#sidebar-nav">
           <li>
-            <a href="addbid.php" >
+            <a href="addbid.html" class="active">
               <i class="bi bi-circle"></i><span>Add</span>
             </a>
           </li>
           <li>
-            <a href="managebid.php" >
-              <i class="bi bi-circle"></i><span>Manage</span>
+            <a href="#">
+              <i class="bi bi-circle"></i><span>Bids1</span>
             </a>
           </li>
         </ul>
@@ -310,155 +306,23 @@
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Add Bid</h1>
+      <h1>View Bid</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-          <li class="breadcrumb-item">Bids</li>
-          <li class="breadcrumb-item active">Manage</li>
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
     </div>
     <!-- End Page Title -->
 
     <section class="section dashboard">
-        <div class="row text-center">
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #1e73be; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Bids</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #26a69a; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total New Request</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #039be5; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Submitted</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #e53935; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Dropped</h5>
-                </div>
-              </div>
-            </div>
-          </div>
-      
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Bids List</h5>
+      <div class="main-content">
+        <div class="container">
 
-                <!-- Table with stripped rows -->
-              <!-- <table class="table datatable">
-                <thead>
-                  <tr>
-                    <th data-type="date" data-format="YYYY/DD/MM">
-                      Latest Update
-                    </th>
-                    <th>Customer Name</th>
-                    <th>Tender Proposal</th>
-                    <th >Value (RM)</th>
-                    <th>Final Submission Value (RM)</th>
-                    <th>RequestStatus</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td>kote</td>
-                    <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updatebids">View</button></td>
-                  </tr>
-                </tbody>
-              </table> -->
-              <!-- End Table with stripped rows -->
-
-              <!-- New Table with stripped rows -->
-              <table id="example" class="table table-striped" style="width:100%" >
-                <thead>
-                    <tr>
-                      <th data-type="date" data-format="YYYY/DD/MM">
-                        Latest Update
-                      </th>
-                      <th>Customer Name</th>
-                      <th>Tender Proposal</th>
-                      <th >Value (RM)</th>
-                      <th>Final Submission Value (RM)</th>
-                      <th>RequestStatus</th>
-                      <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011-04-25</td>
-                        <td>$320,800</td>
-                        <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updatebids">View</button></td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                      <tr>
-                        <th data-type="date" data-format="YYYY/DD/MM">
-                          Latest Update
-                        </th>
-                        <th>Customer Name</th>
-                        <th>Tender Proposal</th>
-                        <th >Value (RM)</th>
-                        <th>Final Submission Value (RM)</th>
-                        <th>RequestStatus</th>
-                        <th>Action</th>
-                      </tr>
-                  </tfoot>
-              </table>
-              </div>
-            </div>
-          </div>
         </div>
-      </section>
-      
-      <div class="modal fade" id="updatebids" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Large Modal</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div><!-- End Large Modal-->
+      </div>
+    </section>
   </main>
   <!-- End #main -->
 
@@ -487,15 +351,7 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-  
-<script>new DataTable('#example');</script>
   <script>
-    
-
     function toggleDarkMode() {
       const body = document.body;
       const darkMode = body.classList.toggle("dark-mode");
@@ -530,7 +386,6 @@
         card.classList.toggle('dark-mode'); // Toggle dark mode on card
       }
     }
-
   </script>
 </body>
 

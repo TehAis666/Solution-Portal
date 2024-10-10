@@ -1,3 +1,24 @@
+<?php
+// Include the database connection file
+include 'db/db.php';
+
+try {
+  // Query to fetch all rows from 'bids' table
+  $stmt = $conn->query("SELECT * FROM bids");
+
+  // Fetch all rows
+  $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+} catch (Exception $e) {
+  // Handle any errors
+  echo "Error: " . $e->getMessage();
+}
+
+
+// Close the database connection
+$conn->close();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -135,7 +156,29 @@
       color: #121212;
     }
 
-    
+    /* Badge Styles */
+
+    .text-center {
+      text-align: center;
+    }
+
+    .align-middle {
+      vertical-align: middle;
+    }
+
+    .viewbtn {
+      background-color: blue;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      padding: 3px 15px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -245,12 +288,12 @@
           class="nav-content collapse show"
           data-bs-parent="#sidebar-nav">
           <li>
-            <a href="addbid.php" >
+            <a href="addbid.php">
               <i class="bi bi-circle"></i><span>Add</span>
             </a>
           </li>
           <li>
-            <a href="managebid.php" >
+            <a href="managebid.php">
               <i class="bi bi-circle"></i><span>Manage</span>
             </a>
           </li>
@@ -322,52 +365,52 @@
     <!-- End Page Title -->
 
     <section class="section dashboard">
-        <div class="row text-center">
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #1e73be; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Bids</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #26a69a; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total New Request</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #039be5; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Submitted</h5>
-                </div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="card">
-                <div class="card-body">
-                  <h1 class="card-title" style="color: #e53935; font-size: 48px;">0</h1>
-                  <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                  <h5 class="card-subtitle text-muted">Total Dropped</h5>
-                </div>
-              </div>
+      <div class="row text-center">
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title" style="color: #1e73be; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total Bids</h5>
             </div>
           </div>
-      
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Bids List</h5>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title" style="color: #26a69a; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total New Request</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title" style="color: #039be5; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total Submitted</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title" style="color: #e53935; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total Dropped</h5>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                <!-- Table with stripped rows -->
+      <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Bids List</h5>
+
+              <!-- Table with stripped rows -->
               <!-- <table class="table datatable">
                 <thead>
                   <tr>
@@ -397,68 +440,166 @@
               <!-- End Table with stripped rows -->
 
               <!-- New Table with stripped rows -->
-              <table id="example" class="table table-striped" style="width:100%" >
+              <table id="example" class="table table-striped" style="width:100%">
                 <thead>
-                    <tr>
-                      <th data-type="date" data-format="YYYY/DD/MM">
-                        Latest Update
-                      </th>
-                      <th>Customer Name</th>
-                      <th>Tender Proposal</th>
-                      <th >Value (RM)</th>
-                      <th>Final Submission Value (RM)</th>
-                      <th>RequestStatus</th>
-                      <th>Action</th>
-                    </tr>
+                  <tr>
+                    <th>Customer Name</th>
+                    <th>Tender Proposal</th>
+                    <th>Request Value</th>
+                    <th>Submission Value</th>
+                    <th>RequestStatus</th>
+                    <th>Action</th>
+                  </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Tiger Nixon</td>
-                        <td>System Architect</td>
-                        <td>Edinburgh</td>
-                        <td>61</td>
-                        <td>2011-04-25</td>
-                        <td>$320,800</td>
-                        <td><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updatebids">View</button></td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
+                  <?php if (!empty($bids)): ?>
+                    <?php foreach ($bids as $bid): ?>
                       <tr>
-                        <th data-type="date" data-format="YYYY/DD/MM">
-                          Latest Update
-                        </th>
-                        <th>Customer Name</th>
-                        <th>Tender Proposal</th>
-                        <th >Value (RM)</th>
-                        <th>Final Submission Value (RM)</th>
-                        <th>RequestStatus</th>
-                        <th>Action</th>
+                        <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+                        <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
+                        <td><?php echo htmlspecialchars($bid['Value']); ?></td>
+                        <td><?php echo htmlspecialchars($bid['RMValue']); ?></td>
+                        <td class="text-center align-middle">
+                          <?php
+                          $status = htmlspecialchars($bid['Status']);
+                          if ($status == 'Submitted') {
+                            echo '<span class="badge bg-success">Submitted</span>';
+                          } elseif ($status == 'Dropped') {
+                            echo '<span class="badge bg-danger">Dropped</span>';
+                          } elseif ($status == 'WIP') {
+                            echo '<span class="badge bg-warning text-dark">WIP</span>';
+                          } else {
+                            echo '<span class="badge bg-secondary">Unknown</span>';
+                          }
+                          ?>
+                        </td>
+                        <td>
+                          <!-- View Button with Data Attributes for Each Bid -->
+                          <button type="button" class="btn btn-primary viewbtn"
+                            data-bs-toggle="modal"
+                            data-bs-target="#updatebids"
+                            data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
+                            data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
+                            data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
+                            data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
+                            data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
+                            data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
+                            data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
+                            data-hmssolution="<?php echo htmlspecialchars($bid['HMS_Solution']); ?>"
+                            data-picpresales="<?php echo htmlspecialchars($bid['PIC_Presales']); ?>"
+                            data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
+                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate']); ?>"
+                            data-value="<?php echo htmlspecialchars($bid['Value']); ?>"
+                            data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
+                            data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
+                            data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
+                            data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>">
+                            View
+                          </button>
+
+                        </td>
                       </tr>
-                  </tfoot>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <tr>
+                      <td colspan="6">No bids found</td>
+                    </tr>
+                  <?php endif; ?>
+                </tbody>
               </table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="modal fade" id="updatebids" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Bid Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Customer Name:</strong></div>
+                <div class="col-sm-8" id="modalCustName"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>HMS Scope:</strong></div>
+                <div class="col-sm-8" id="modalHMSScope"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Tender Proposal:</strong></div>
+                <div class="col-sm-8" id="modalTenderProposal"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Type:</strong></div>
+                <div class="col-sm-8" id="modalType"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Business Unit:</strong></div>
+                <div class="col-sm-8" id="modalBusinessUnit"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Account Sector:</strong></div>
+                <div class="col-sm-8" id="modalAccountSector"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Account Manager:</strong></div>
+                <div class="col-sm-8" id="modalAccountManager"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>HMS Solution:</strong></div>
+                <div class="col-sm-8" id="modalHMSSolution"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>PIC Presales:</strong></div>
+                <div class="col-sm-8" id="modalPICPresales"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Request Date:</strong></div>
+                <div class="col-sm-8" id="modalRequestDate"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Submission Date:</strong></div>
+                <div class="col-sm-8" id="modalSubmissionDate"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Value (RM):</strong></div>
+                <div class="col-sm-8" id="modalValue"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>RM Value (Final):</strong></div>
+                <div class="col-sm-8" id="modalRMValue"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Status:</strong></div>
+                <div class="col-sm-8" id="modalStatus"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Tender Status:</strong></div>
+                <div class="col-sm-8" id="modalTenderStatus"></div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-4"><strong>Remarks:</strong></div>
+                <div class="col-sm-8" id="modalRemarks"></div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <div class="modal fade" id="updatebids" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Large Modal</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
           </div>
         </div>
-      </div><!-- End Large Modal-->
+      </div>
+    </div>
+
+    <!-- End Modal -->
+
+
   </main>
   <!-- End #main -->
 
@@ -491,11 +632,54 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
   <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-  
-<script>new DataTable('#example');</script>
-  <script>
-    
 
+    <!-- Data Table -->
+  <script>new DataTable('#example'); </script>
+
+    <!-- MODAL Fect Data -->
+  <script>
+    // MODAL SCRIPT//
+    // JavaScript/jQuery to dynamically fill the modal with the clicked bid data
+    $(document).on('click', '.viewbtn', function() {
+      // Get data attributes from the clicked button
+      var custName = $(this).data('custname');
+      var hmsScope = $(this).data('hmsscope');
+      var tenderProposal = $(this).data('tender');
+      var type = $(this).data('type');
+      var businessUnit = $(this).data('businessunit');
+      var accountSector = $(this).data('accountsector');
+      var accountManager = $(this).data('accountmanager');
+      var hmsSolution = $(this).data('hmssolution');
+      var picPresales = $(this).data('picpresales');
+      var requestDate = $(this).data('requestdate');
+      var submissionDate = $(this).data('submissiondate');
+      var value = $(this).data('value');
+      var rmValue = $(this).data('rmvalue');
+      var status = $(this).data('status');
+      var tenderStatus = $(this).data('tenderstatus');
+      var remarks = $(this).data('remarks');
+
+      // Update modal content with the data
+      $('#modalCustName').text(custName);
+      $('#modalHMSScope').text(hmsScope);
+      $('#modalTenderProposal').text(tenderProposal);
+      $('#modalType').text(type);
+      $('#modalBusinessUnit').text(businessUnit);
+      $('#modalAccountSector').text(accountSector);
+      $('#modalAccountManager').text(accountManager);
+      $('#modalHMSSolution').text(hmsSolution);
+      $('#modalPICPresales').text(picPresales);
+      $('#modalRequestDate').text(requestDate);
+      $('#modalSubmissionDate').text(submissionDate);
+      $('#modalValue').text(value);
+      $('#modalRMValue').text(rmValue);
+      $('#modalStatus').text(status);
+      $('#modalTenderStatus').text(tenderStatus);
+      $('#modalRemarks').text(remarks);
+    });
+  </script>
+  
+  <script>
     function toggleDarkMode() {
       const body = document.body;
       const darkMode = body.classList.toggle("dark-mode");
@@ -530,7 +714,6 @@
         card.classList.toggle('dark-mode'); // Toggle dark mode on card
       }
     }
-
   </script>
 </body>
 
