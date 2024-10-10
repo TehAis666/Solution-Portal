@@ -366,59 +366,78 @@
       /* Make the dropdown button more rounded */
     }
 
-    /* DarkModeModal */
+    .checkmark-wrapper {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto;
+      position: relative;
+    }
 
-    .dark-mode .modal-content {
-  background-color: #333; /* Dark background */
-  color: #fff; /* Light text */
-}
+    .checkmark {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #4CAF50;
+      /* Green color */
+      position: relative;
+      animation: scale 0.5s ease-in-out forwards;
+    }
 
-.dark-mode .modal-header,
-.dark-mode .modal-footer {
-  border-color: #444; /* Darker borders */
-}
+    .checkmark-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 10px solid white;
+      position: absolute;
+      top: 0;
+      left: 0;
+      animation: fill .4s ease-in-out forwards .5s;
+    }
 
-.dark-mode .btn-close {
-  background-color: #333; /* Set the background color */
-  border: none; /* Remove any border */
-  opacity: 1; /* Ensure the close button is fully opaque */
-  filter: none; /* Remove any default filter */
-}
+    .checkmark-check {
+      position: absolute;
+      width: 5px;
+      height: 20px;
+      border: solid white;
+      border-width: 0 5px 5px 0;
+      top: 15px;
+      left: 18px;
+      transform: rotate(45deg);
+      animation: draw 0.4s ease-in-out forwards .6s;
+    }
 
-.dark-mode .btn-close:hover {
-  background-color: #555; /* Slightly lighter on hover for feedback */
-}
+    @keyframes scale {
+      0% {
+        transform: scale(0);
+      }
 
-.dark-mode .btn-close::before {
-  content: '\00d7'; /* Unicode for the "×" symbol */
-  color: #fff; /* Set the color of the 'X' to white for visibility */
-  font-weight: bold;
-}
+      100% {
+        transform: scale(1);
+      }
+    }
 
-.dark-mode .btn-close::after {
-  content: none; /* Disable the default icon, keeping only the custom 'X' */
-}
+    @keyframes fill {
+      0% {
+        transform: scale(1);
+      }
 
-.dark-mode .btn-secondary {
-  background-color: #555;
-  border-color: #666;
-}
+      100% {
+        transform: scale(1.2);
+        opacity: 0;
+      }
+    }
 
-.dark-mode .btn-success {
-  background-color: #28a745;
-  border-color: #218838;
-}
+    @keyframes draw {
+      0% {
+        width: 0;
+        height: 0;
+      }
 
-.dark-mode .btn-secondary:hover {
-  background-color: #666;
-}
-
-.dark-mode .btn-success:hover {
-  background-color: #218838;
-}
-
-
-
+      100% {
+        width: 5px;
+        height: 20px;
+      }
+    }
   </style>
 </head>
 
@@ -767,6 +786,31 @@
         </div>
       </div><!-- End Confirmation Modal -->
 
+      <!-- Success Modal -->
+      <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content text-center">
+            <div class="modal-header">
+              <h5 class="modal-title">Success!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="checkmark-wrapper">
+                <div class="checkmark">
+                  <div class="checkmark-circle">
+                    <div class="checkmark-check"></div>
+                  </div>
+                </div>
+              </div>
+              <p>Bids successfully created!</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="okButton" data-bs-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- End Success Modal -->
+
 
     </section>
   </main>
@@ -922,28 +966,11 @@
       return false;
     }
 
-    document.getElementById('confirmSubmit').addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    var form = document.getElementById('addbidcont');
-    var formData = new FormData(form);
-
-    fetch('controller/addbidcont.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            window.location.href = 'managebid.html'; // Redirect on success
-        } else {
-            // Handle error
-            alert('Error submitting form');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+    // Handle form submission after confirmation
+    document.getElementById('confirmSubmit').addEventListener('click', function() {
+      // Manually submit the form
+      document.getElementById('addbidcont').submit();
     });
-});
 
 
     // Close the dropdown if the user clicks outside of it
