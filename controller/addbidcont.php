@@ -14,38 +14,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hmsSolution = htmlspecialchars($_POST['Solution']);
     $picPresales = htmlspecialchars($_POST['PIC/Presales']);
     
+    // Validate RequestDate
     if (isset($_POST['RequestDate']) && !empty($_POST['RequestDate'])) {
         $requestDate = $_POST['RequestDate'];
     } else {
         die("Error: Request Date is required.");
     }
 
+    // Validate SubmissionDate
     if (isset($_POST['SubmissionDate']) && !empty($_POST['SubmissionDate'])) {
         $submissionDate = $_POST['SubmissionDate'];
+        
+        // Compare dates (SubmissionDate should not be before RequestDate)
+        if ($submissionDate < $requestDate) {
+            echo "<script>
+                alert('Error: Submission Date cannot be before Request Date.');
+                history.back();
+            </script>";
+            exit(); // Stop further execution if date validation fails
+        }
     } else {
         die("Error: Submission Date is required.");
     }
 
-    $value = htmlspecialchars($_POST['Value']);
-    // Ensure RMValue is set, default to 0 if not
+    // Handle RMValue, if present; set default to 0
     $rmValue = isset($_POST['RMValue']) ? htmlspecialchars($_POST['RMValue']) : '0';
-    
-    // Remove "RM" from RMValue and convert to float
-    $rmValue = floatval(preg_replace('/[^\d.]/', '', $rmValue));
+    $rmValue = floatval(preg_replace('/[^\d.]/', '', $rmValue)); // Remove "RM" and convert to float
 
-    $status = htmlspecialchars($_POST['Status']);
+    // Collect remaining form fields
+    $status = htmlspecialchars($_POST['status']);  // Note: 'status' is not capitalized in the form
     $tenderStatus = htmlspecialchars($_POST['TenderStatus']);
-    $remarks = htmlspecialchars($_POST['Remarks']);
+    $remarks = htmlspecialchars($_POST['Remarks'] ?? '');  // Handle optional Remarks
 
     // Prepare SQL statement using prepared statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO bids (CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager, HMS_Solution, PIC_Presales, RequestDate, SubmissionDate, Value, RMValue, Status, TenderStatus, Remarks) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO bids (CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager, HMS_Solution, PIC_Presales, RequestDate, SubmissionDate, RMValue, Status, TenderStatus, Remarks) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    $stmt->bind_param("ssssssssssssssss", $custName, $scope, $tenderProposal, $type, $businessUnit, $accountSector, $accountManager, $hmsSolution, $picPresales, $requestDate, $submissionDate, $value, $rmValue, $status, $tenderStatus, $remarks);
+    // Bind parameters (Note: 'Value' removed as it wasn't in the form)
+    $stmt->bind_param("sssssssssssdsss", $custName, $scope, $tenderProposal, $type, $businessUnit, $accountSector, $accountManager, $hmsSolution, $picPresales, $requestDate, $submissionDate, $rmValue, $status, $tenderStatus, $remarks);
 
     // Execute the query
     if ($stmt->execute()) {
-        echo "Bid added successfully!";
+        // Redirect to managebid.php with success alert
+        echo "<script>
+            alert('Bid successfully created!');
+            window.location.href = '../managebid.php';
+        </script>";
     } else {
         echo "Error: " . $stmt->error;
     }
