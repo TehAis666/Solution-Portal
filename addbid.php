@@ -366,59 +366,85 @@
       /* Make the dropdown button more rounded */
     }
 
+    .btn-secondary,
+    .btn-success {
+      border-radius: 20px;
+      /* Adjust the value for more or less rounding */
+      padding: 10px 20px;
+      /* Adjust padding for a balanced button size */
+      min-width: 100px;
+      /* Ensure the buttons have enough width */
+    }
+
+    .btn-secondary:hover,
+    .btn-success:hover {
+      opacity: 0.8;
+      /* Optional: Slight transparency on hover for visual feedback */
+    }
+
+
+
     /* DarkModeModal */
 
     .dark-mode .modal-content {
-  background-color: #333; /* Dark background */
-  color: #fff; /* Light text */
-}
+      background-color: #333;
+      /* Dark background */
+      color: #fff;
+      /* Light text */
+    }
 
-.dark-mode .modal-header,
-.dark-mode .modal-footer {
-  border-color: #444; /* Darker borders */
-}
+    .dark-mode .modal-header,
+    .dark-mode .modal-footer {
+      border-color: #444;
+      /* Darker borders */
+    }
 
-.dark-mode .btn-close {
-  background-color: #333; /* Set the background color */
-  border: none; /* Remove any border */
-  opacity: 1; /* Ensure the close button is fully opaque */
-  filter: none; /* Remove any default filter */
-}
+    .dark-mode .btn-close {
+      background-color: #333;
+      /* Set the background color */
+      border: none;
+      /* Remove any border */
+      opacity: 1;
+      /* Ensure the close button is fully opaque */
+      filter: none;
+      /* Remove any default filter */
+    }
 
-.dark-mode .btn-close:hover {
-  background-color: #555; /* Slightly lighter on hover for feedback */
-}
+    .dark-mode .btn-close:hover {
+      background-color: #555;
+      /* Slightly lighter on hover for feedback */
+    }
 
-.dark-mode .btn-close::before {
-  content: '\00d7'; /* Unicode for the "×" symbol */
-  color: #fff; /* Set the color of the 'X' to white for visibility */
-  font-weight: bold;
-}
+    .dark-mode .btn-close::before {
+      content: '\00d7';
+      /* Unicode for the "×" symbol */
+      color: #fff;
+      /* Set the color of the 'X' to white for visibility */
+      font-weight: bold;
+    }
 
-.dark-mode .btn-close::after {
-  content: none; /* Disable the default icon, keeping only the custom 'X' */
-}
+    .dark-mode .btn-close::after {
+      content: none;
+      /* Disable the default icon, keeping only the custom 'X' */
+    }
 
-.dark-mode .btn-secondary {
-  background-color: #555;
-  border-color: #666;
-}
+    .dark-mode .btn-secondary {
+      background-color: #555;
+      border-color: #666;
+    }
 
-.dark-mode .btn-success {
-  background-color: #28a745;
-  border-color: #218838;
-}
+    .dark-mode .btn-success {
+      background-color: #28a745;
+      border-color: #218838;
+    }
 
-.dark-mode .btn-secondary:hover {
-  background-color: #666;
-}
+    .dark-mode .btn-secondary:hover {
+      background-color: #666;
+    }
 
-.dark-mode .btn-success:hover {
-  background-color: #218838;
-}
-
-
-
+    .dark-mode .btn-success:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 
@@ -923,27 +949,27 @@
     }
 
     document.getElementById('confirmSubmit').addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
+      event.preventDefault(); // Prevent default form submission
 
-    var form = document.getElementById('addbidcont');
-    var formData = new FormData(form);
+      var form = document.getElementById('addbidcont');
+      var formData = new FormData(form);
 
-    fetch('controller/addbidcont.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
+      fetch('controller/addbidcont.php', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
             window.location.href = 'managebid.html'; // Redirect on success
-        } else {
+          } else {
             // Handle error
             alert('Error submitting form');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
     });
-});
 
 
     // Close the dropdown if the user clicks outside of it
