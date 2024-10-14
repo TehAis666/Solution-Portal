@@ -245,174 +245,8 @@ $conn->close();
 </head>
 
 <body>
-  <!-- ======= Header ======= -->
-  <header id="header" class="header fixed-top d-flex align-items-center">
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="index.html" class="logo d-flex align-items-center">
-        <img src="assets/img/favicon.ico" alt="" />
-        <span class="d-none d-lg-block">Solution Portal</span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div>
-    <!-- End Logo -->
-
-    <nav class="header-nav ms-auto">
-      <ul class="d-flex align-items-center">
-        <li class="nav-item dropdown pe-3">
-          <!-- Dark/Light Nav -->
-        <li class="nav-item">
-          <button id="toggleButton" onclick="toggleDarkMode()" class="nav-link nav-icon" id="toggleTheme" style="background: none;">
-            <i class="ri-contrast-2-line" id="themeIcon"></i>
-          </button>
-        </li>
-
-        <a
-          class="nav-link nav-profile d-flex align-items-center pe-0"
-          href="#"
-          data-bs-toggle="dropdown">
-          <img
-            src="assets/img/profile-img.jpg"
-            alt="Profile"
-            class="rounded-circle" />
-          <span class="d-none d-md-block dropdown-toggle ps-2">Pipol</span> </a><!-- End Profile Iamge Icon -->
-        <!-- <button id="toggleButton" onclick="toggleDarkMode()">Toggle Dark Mode</button> -->
-        <ul
-          class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-          <li class="dropdown-header">
-            <h6>Pipol</h6>
-            <span>Position</span>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-
-          <li>
-            <a
-              class="dropdown-item d-flex align-items-center"
-              href="users-profile.html">
-              <i class="bi bi-person"></i>
-              <span>My Profile</span>
-            </a>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-
-          <li>
-            <a
-              class="dropdown-item d-flex align-items-center"
-              href="users-profile.html">
-              <i class="bi bi-gear"></i>
-              <span>Account Settings</span>
-            </a>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-
-          <li>
-            <a class="dropdown-item d-flex align-items-center" href="#">
-              <i class="bi bi-box-arrow-right"></i>
-              <span>Sign Out</span>
-            </a>
-          </li>
-        </ul>
-        <!-- End Profile Dropdown Items -->
-        </li>
-        <!-- End Profile Nav -->
-      </ul>
-    </nav>
-    <!-- End Icons Navigation -->
-  </header>
-  <!-- End Header -->
-
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
-    <ul class="sidebar-nav" id="sidebar-nav">
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="dashboard.php">
-          <i class="bi bi-grid"></i>
-          <span>Dashboard</span>
-        </a>
-      </li>
-      <!-- End Dashboard Nav -->
-
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          data-bs-target="#components-nav"
-          data-bs-toggle="collapse"
-          href="#">
-          <i class="bi bi-menu-button-wide"></i><span>Bids</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="components-nav"
-          class="nav-content collapse show"
-          data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="addbid.php">
-              <i class="bi bi-circle"></i><span>Add</span>
-            </a>
-          </li>
-          <li>
-            <a href="managebid.php">
-              <i class="bi bi-circle"></i><span>Manage</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <!-- End Components Nav -->
-
-      <li class="nav-item">
-        <a
-          class="nav-link collapsed"
-          data-bs-target="#forms-nav"
-          data-bs-toggle="collapse"
-          href="#">
-          <i class="bi bi-journal-text"></i><span>Dummy</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul
-          id="forms-nav"
-          class="nav-content collapse"
-          data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="#">
-              <i class="bi bi-circle"></i><span>Dummy1</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <!-- End Forms Nav -->
-
-      <li class="nav-heading">Pages</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#">
-          <i class="bi bi-person"></i>
-          <span>Profile</span>
-        </a>
-      </li>
-      <!-- End Profile Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="signup.html">
-          <i class="bi bi-box-arrow-in-right"></i>
-          <span>Login</span>
-        </a>
-      </li>
-      <!-- End Login Page Nav -->
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="pages-error-404.html">
-          <i class="bi bi-dash-circle"></i>
-          <span>Error 404</span>
-        </a>
-      </li>
-      <!-- End Error 404 Page Nav -->
-    </ul>
-  </aside>
-  <!-- End Sidebar-->
-
+<?php include 'layouts/navbar.php' ?>
+<?php include 'layouts/sidebar.php' ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
@@ -485,58 +319,58 @@ $conn->close();
                   </tr>
                 </thead>
                 <tbody>
-                  <?php if (!empty($bids)): ?>
-                    <?php foreach ($bids as $bid): ?>
-                      <tr>
-                        <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['Value']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['RMValue']); ?></td>
-                        <td class="text-center align-middle">
-                          <?php
-                          $status = htmlspecialchars($bid['Status']);
-                          if ($status == 'Submitted') {
-                            echo '<span class="badge bg-success">Submitted</span>';
-                          } elseif ($status == 'Dropped') {
-                            echo '<span class="badge bg-danger">Dropped</span>';
-                          } elseif ($status == 'WIP') {
-                            echo '<span class="badge bg-warning text-dark">WIP</span>';
-                          } else {
-                            echo '<span class="badge bg-secondary">Unknown</span>';
-                          }
-                          ?>
-                        </td>
-                        <td>
-                          <!-- View Button with Data Attributes for Each Bid -->
-                          <button type="button" class="btn btn-primary viewbtn"
-                      data-bs-toggle="modal" data-bs-target="#viewbids"
-                            data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
-                            data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
-                            data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
-                            data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
-                            data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
-                            data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
-                            data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
-                            data-hmssolution="<?php echo htmlspecialchars($bid['HMS_Solution']); ?>"
-                            data-picpresales="<?php echo htmlspecialchars($bid['PIC_Presales']); ?>"
-                            data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
-                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate']); ?>"
-                            data-value="<?php echo htmlspecialchars($bid['Value']); ?>"
-                            data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
-                            data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
-                            data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
-                            data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>">
-                            View
-                          </button>
+                <?php if (!empty($bids)): ?>
+    <?php foreach ($bids as $bid): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+            <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
+            <td><?php echo number_format(floatval($bid['Value']), 0, '.', ','); ?></td>
+            <td><?php echo number_format(floatval($bid['RMValue']), 0, '.', ','); ?></td>
+            <td class="text-center align-middle">
+                <?php
+                $status = htmlspecialchars($bid['Status']);
+                if ($status == 'Submitted') {
+                    echo '<span class="badge bg-success">Submitted</span>';
+                } elseif ($status == 'Dropped') {
+                    echo '<span class="badge bg-danger">Dropped</span>';
+                } elseif ($status == 'WIP') {
+                    echo '<span class="badge bg-warning text-dark">WIP</span>';
+                } else {
+                    echo '<span class="badge bg-secondary">Unknown</span>';
+                }
+                ?>
+            </td>
+            <td>
+                <!-- View Button with Data Attributes for Each Bid -->
+                <button type="button" class="btn btn-primary viewbtn"
+                    data-bs-toggle="modal" data-bs-target="#viewbids"
+                    data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
+                    data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
+                    data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
+                    data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
+                    data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
+                    data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
+                    data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
+                    data-hmssolution="<?php echo htmlspecialchars($bid['HMS_Solution']); ?>"
+                    data-picpresales="<?php echo htmlspecialchars($bid['PIC_Presales']); ?>"
+                    data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
+                    data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate']); ?>"
+                    data-value="<?php echo htmlspecialchars(number_format(floatval($bid['Value']), 0, '.', ',')); ?>"
+                    data-rmvalue="<?php echo htmlspecialchars(number_format(floatval($bid['RMValue']), 0, '.', ',')); ?>"
+                    data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
+                    data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
+                    data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>">
+                    View
+                </button>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="6">No bids found</td>
+    </tr>
+<?php endif; ?>
 
-                        </td>
-                      </tr>
-                    <?php endforeach; ?>
-                  <?php else: ?>
-                    <tr>
-                      <td colspan="6">No bids found</td>
-                    </tr>
-                  <?php endif; ?>
                 </tbody>
               </table>
 
@@ -851,50 +685,6 @@ $conn->close();
 });
 </script>
   
-  <script>
-function toggleDarkMode() {
-  const body = document.body;
-  const darkMode = body.classList.toggle("dark-mode");
-
-  // Toggle dark mode on the table and buttons as well
-  const table = document.querySelector('table');
-  const buttons = document.querySelectorAll('.btn, .viewbtn');
-  buttons.forEach(button => button.classList.toggle('dark-mode'));
-  
-  if (table) {
-    table.classList.toggle('dark-mode');
-  }
-
-  // Store the current mode in local storage
-  localStorage.setItem("darkMode", darkMode ? "enabled" : "disabled");
-
-  // Update the styles based on the current mode
-  if (darkMode) {
-    body.style.backgroundColor = "#121212"; // Dark background
-    body.style.color = "#ffffff"; // Light text
-  } else {
-    body.style.backgroundColor = "#ffffff"; // Light background
-    body.style.color = "#000000"; // Dark text
-  }
-}
-
-// Check local storage for mode on page load
-document.addEventListener("DOMContentLoaded", () => {
-  const darkMode = localStorage.getItem("darkMode");
-  if (darkMode === "enabled") {
-    toggleDarkMode();
-  }
-});
-
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode'); // Toggle dark mode on body
-      const card = document.querySelector('.card'); // Get the card element
-      if (card) {
-        card.classList.toggle('dark-mode'); // Toggle dark mode on card
-      }
-    }
-  </script>
 </body>
 
 </html>

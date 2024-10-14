@@ -291,27 +291,41 @@
     background-color: #45a049;
   }
 
-  /* Styling Checkox */
   /* Hide the dropdown content by default */
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  padding: 10px; /* Add some padding inside the dropdown */
+}
 
-  /* Show the dropdown when it is toggled open */
-  .dropdown-content.show {
-    display: block;
-  }
+/* Show the dropdown when it is toggled open */
+.dropdown-content.show {
+  display: block;
+}
 
-  /* Style the dropdown checkboxes */
-  .dropdown-checkbox label {
-    display: block;
-    padding: 8px;
-  }
+/* Style the dropdown checkboxes */
+.dropdown-checkbox label {
+  display: flex;  /* Use flex to align the checkbox and text */
+  align-items: center;
+  padding: 5px 8px; /* Reduce padding to make it more compact */
+  font-size: 14px; /* Slightly smaller font size */
+  cursor: pointer; /* Add a pointer cursor for better usability */
+}
+
+/* Add some margin between the checkbox and the label text */
+.dropdown-checkbox label input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+/* Optional: Add hover effect for better visual feedback */
+.dropdown-checkbox label:hover {
+  background-color: #f1f1f1;
+}
+
 
   .dropbtn {
     background-color: #fff;

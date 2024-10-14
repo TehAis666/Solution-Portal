@@ -44,7 +44,7 @@
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Add Bid</h1>
+      <h1>Add Bid Request</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Home</a></li>
@@ -143,54 +143,30 @@
                     <button type="button" class="dropbtn" id="dropdownButton" onclick="toggleDropdown()">Select HMS Solution</button>
                     <div id="solutionDropdown" class="dropdown-content">
                       <label onclick="event.stopPropagation()">
+                        <input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech
+                      </label><br>
+                      <label onclick="event.stopPropagation()">
                         <input type="checkbox" name="solution[]" value="PaduNet"> PaduNet
                       </label><br>
                       <label onclick="event.stopPropagation()">
                         <input type="checkbox" name="solution[]" value="Secure-X"> Secure-X
                       </label><br>
                       <label onclick="event.stopPropagation()">
-                        <input type="checkbox" name="solution[]" value="AwanHeiTech"> AwanHeiTech
-                      </label><br>
-                      <label onclick="event.stopPropagation()">
-                        <input type="checkbox" name="solution[]" value="i-Sentric"> i-Sentric
+                        <input type="checkbox" name="solution[]" value="i-Sentrix"> i-Sentrix
                       </label><br>
                     </div>
                   </div>
                   <input type="hidden" name="Solution" id="finalSolution" required>
+                  <p id="checkboxError" style="color: red; display: none;">Please select at least one HMS Solution</p>
                 </div>
-                <div class="form-group">
-                  <label for="PIC/Presales">PIC/Presales:</label>
-                  <input type="text" id="PIC/Presales" name="PIC/Presales" placeholder="Enter PIC/Presales name" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="submissionDate">Submission Date:</label>
-                  <div class="">
-                    <input type="date" class="form-control" name="SubmissionDate" id="submissionDate" required>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="tenderStatus">Tender Status:</label>
-                  <select id="tenderStatus" name="TenderStatus" required>
-                    <option value="">Select tender status</option>
-                    <option value="Clarification">Clarification</option>
-                    <option value="Close">Close</option>
-                    <option value="Intro">Intro</option>
-                    <option value="KIV">KIV</option>
-                    <option value="Lose">Lose</option>
-                    <option value="Unknown">Unknown</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
                 <div class="form-group">
                   <label for="remarks">Remarks:</label>
                   <input type="text" id="remarks" name="Remarks" placeholder="Enter remarks (optional)">
                 </div>
               </div>
+              <div class="form-row">
+              </div>
               <div class="form-group">
-                <p id="checkboxError" style="color: red; display: none;">Please select at least one HMS Solution</p>
                 <input type="submit" value="Submit" id="submitBtn" class="submit-btn">
               </div>
             </form>
@@ -200,23 +176,23 @@
 
       <!-- Confirmation Modal -->
       <div class="modal fade" id="smallModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Confirm Your Submission</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Your Submission</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please confirm the following information:</p>
+                        <div class="row" id="confirmationList"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="confirmSubmit">Confirm</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-              <p>Please confirm the following information:</p>
-              <div class="row" id="confirmationList"></div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-success" id="confirmSubmit">Confirm</button>
-            </div>
-          </div>
-        </div>
-      </div><!-- End Confirmation Modal -->
+        </div><!-- End Confirmation Modal -->
 
 
     </section>
@@ -245,139 +221,101 @@
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!--  JS File -->
   <script src="assets/js/main.js"></script>
   <script>
-    // Listen for checkbox changes
-document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
-      const selected = [];
-      document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(selectedCheckbox) {
-        selected.push(selectedCheckbox.value);
-      });
+            // Listen for checkbox changes
+            document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const selected = [];
+                    document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(selectedCheckbox) {
+                        selected.push(selectedCheckbox.value);
+                    });
 
-      // Set the hidden input value based on selected checkboxes
-      if (selected.length > 1) {
-        document.getElementById('finalSolution').value = "Mix Solution";
-      } else {
-        document.getElementById('finalSolution').value = selected[0] || "";
-      }
+                    // Set the hidden input value based on selected checkboxes
+                    document.getElementById('finalSolution').value = selected.join(', ');
 
-      // Update the dropdown button text to show selected options
-      const button = document.getElementById('dropdownButton');
-      button.innerText = selected.length > 0 ? `Selected: ${selected.join(', ')}` : 'Select HMS Solution';
-    });
-  });
+                    // Update the dropdown button text to show selected options
+                    const button = document.getElementById('dropdownButton');
+                    button.innerText = selected.length > 0 ? `Selected: ${selected.join(', ')}` : 'Select HMS Solution';
+                });
+            });
 
-  function toggleDropdown() {
-    document.getElementById("solutionDropdown").classList.toggle("show");
-  }
+            function toggleDropdown() {
+                document.getElementById("solutionDropdown").classList.toggle("show");
+            }
 
-  // Function to validate the form and show modal
-  function validateForm() {
-    // Get all checkboxes within the solution group
-    const checkboxes = document.querySelectorAll('input[name="solution[]"]');
+            // Function to validate the form and show modal
+            function validateForm() {
+                // Get all checkboxes within the solution group
+                const checkboxes = document.querySelectorAll('input[name="solution[]"]');
 
-    // Check if at least one checkbox is checked
-    let isChecked = false;
-    for (const checkbox of checkboxes) {
-      if (checkbox.checked) {
-        isChecked = true;
-        break;
-      }
-    }
+                // Check if at least one checkbox is checked
+                let isChecked = false;
+                for (const checkbox of checkboxes) {
+                    if (checkbox.checked) {
+                        isChecked = true;
+                        break;
+                    }
+                }
 
-    // If no checkbox is checked, show an alert and return false to prevent submission
-    if (!isChecked) {
-      alert("Please select at least one HMS Solution.");
-      return false; // Prevent form submission
-    }
+                // If no checkbox is checked, show an alert and return false to prevent submission
+                if (!isChecked) {
+                    alert('Please select at least one HMS Solution.');
+                    return false; // Prevent form submission
+                }
 
-    // Gather form data to display in the modal
-    const requestDate = document.getElementById('requestDate').value;
-    const status = document.getElementById('status').value;
-    const custName = document.getElementById('custName').value;
-    const scope = document.getElementById('scope').value;
-    const tender = document.getElementById('tender').value;
-    const type = document.getElementById('type').value;
-    const businessUnit = document.getElementById('businessUnit').value;
-    const accountSector = document.getElementById('accountSector').value;
-    const am = document.getElementById('AM').value;
-    const finalSolution = Array.from(checkboxes)
-      .filter(checkbox => checkbox.checked)
-      .map(checkbox => checkbox.value)
-      .join(', ');
-    const submissionDate = document.getElementById('submissionDate').value;
-    const tenderStatus = document.getElementById('tenderStatus').value;
-    const remarks = document.getElementById('remarks').value;
+                // If the form is valid, show the modal
+                const modal = new bootstrap.Modal(document.getElementById('smallModal'));
+                const confirmationList = document.getElementById('confirmationList');
+                confirmationList.innerHTML = ''; // Clear previous content
 
-    // Display the gathered data in the modal with formatted output
-    const confirmationList = document.getElementById('confirmationList');
-    confirmationList.innerHTML = `
-      <div class="col-6 mb-2"><b>Request Date:</b> ${requestDate}</div>
-      <div class="col-6 mb-2"><b>Status:</b> ${status}</div>
-      <div class="col-6 mb-2"><b>Customer Name:</b> ${custName}</div>
-      <div class="col-6 mb-2"><b>HMS Scope:</b> ${scope}</div>
-      <div class="col-6 mb-2"><b>Tender/Proposal:</b> ${tender}</div>
-      <div class="col-6 mb-2"><b>Bid Type:</b> ${type}</div>
-      <div class="col-6 mb-2"><b>Business Unit:</b> ${businessUnit}</div>
-      <div class="col-6 mb-2"><b>Account Sector:</b> ${accountSector}</div>
-      <div class="col-6 mb-2"><b>Account Manager:</b> ${am}</div>
-      <div class="col-6 mb-2"><b>HMS Solution:</b> ${finalSolution}</div>
-      <div class="col-6 mb-2"><b>Submission Date:</b> ${submissionDate}</div>
-      <div class="col-6 mb-2"><b>Tender Status:</b> ${tenderStatus}</div>
-      <div class="col-6 mb-2"><b>Remarks:</b> ${remarks}</div>
-  `;
+                // Create confirmation list from form values
+                const formData = new FormData(document.getElementById('addbidcont'));
+                formData.forEach((value, key) => {
+                    if (key !== 'solution[]') {
+                        confirmationList.innerHTML += `<div class="col-12">${key}: ${value}</div>`;
+                    }
+                });
 
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('smallModal'));
-    modal.show();
+                // Show the modal
+                modal.show();
 
-    // Prevent the form from submitting for now
-    return false;
-  }
+                // Prevent the form from submitting for now
+                return false; 
+            }
 
-  document.getElementById('confirmSubmit').addEventListener('click', function(event) {
-    event.preventDefault(); // Prevent default form submission
+            // Confirm submission
+            document.getElementById('confirmSubmit').addEventListener('click', function() {
+                document.getElementById('addbidcont').submit(); // Submit the form
+            });
 
-    var form = document.getElementById('addbidcont');
-    var formData = new FormData(form);
+            // Close the dropdown if the user clicks outside of it
+            window.onclick = function(event) {
+                if (!event.target.matches('.dropbtn')) {
+                    var dropdowns = document.getElementsByClassName("dropdown-content");
+                    for (var i = 0; i < dropdowns.length; i++) {
+                        var openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            };
 
-    fetch('controller/addbidcont.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => {
-        if (response.ok) {
-          window.location.href = 'managebid.php'; // Redirect on success
-        } else {
-          // Handle error
-          alert('Error submitting form');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  });
-
-
-  // Close the dropdown if the user clicks outside of it
-  window.onclick = function(event) {
-    if (!event.target.matches('.dropbtn')) {
-      var dropdowns = document.getElementsByClassName("dropdown-content");
-      for (var i = 0; i < dropdowns.length; i++) {
-        var openDropdown = dropdowns[i];
-        if (openDropdown.classList.contains('show')) {
-          openDropdown.classList.remove('show');
-        }
-      }
-    }
-  }
-
-  // Set the current date for the requestDate input
-  document.getElementById('requestDate').value = new Date().toISOString().slice(0, 10);
-  </script>
+            // Set the request date to today's date on page load
+window.onload = function() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const yyyy = today.getFullYear();
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    
+    document.getElementById('requestDate').value = formattedDate;
+};
+        </script>
     
 </body>
 
