@@ -57,6 +57,7 @@ $conn->close();
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet" />
+  
 
   <!--New Css Added-->
   <style>
@@ -244,9 +245,174 @@ $conn->close();
 </head>
 
 <body>
-  
-<?php include 'layouts/navbar.php' ?>
-<?php include 'layouts/sidebar.php' ?>
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center">
+        <img src="assets/img/favicon.ico" alt="" />
+        <span class="d-none d-lg-block">Solution Portal</span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
+    </div>
+    <!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item dropdown pe-3">
+          <!-- Dark/Light Nav -->
+        <li class="nav-item">
+          <button id="toggleButton" onclick="toggleDarkMode()" class="nav-link nav-icon" id="toggleTheme" style="background: none;">
+            <i class="ri-contrast-2-line" id="themeIcon"></i>
+          </button>
+        </li>
+
+        <a
+          class="nav-link nav-profile d-flex align-items-center pe-0"
+          href="#"
+          data-bs-toggle="dropdown">
+          <img
+            src="assets/img/profile-img.jpg"
+            alt="Profile"
+            class="rounded-circle" />
+          <span class="d-none d-md-block dropdown-toggle ps-2">Pipol</span> </a><!-- End Profile Iamge Icon -->
+        <!-- <button id="toggleButton" onclick="toggleDarkMode()">Toggle Dark Mode</button> -->
+        <ul
+          class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6>Pipol</h6>
+            <span>Position</span>
+          </li>
+          <li>
+            <hr class="dropdown-divider" />
+          </li>
+
+          <li>
+            <a
+              class="dropdown-item d-flex align-items-center"
+              href="users-profile.html">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li>
+            <hr class="dropdown-divider" />
+          </li>
+
+          <li>
+            <a
+              class="dropdown-item d-flex align-items-center"
+              href="users-profile.html">
+              <i class="bi bi-gear"></i>
+              <span>Account Settings</span>
+            </a>
+          </li>
+          <li>
+            <hr class="dropdown-divider" />
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="#">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+        </ul>
+        <!-- End Profile Dropdown Items -->
+        </li>
+        <!-- End Profile Nav -->
+      </ul>
+    </nav>
+    <!-- End Icons Navigation -->
+  </header>
+  <!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="dashboard.php">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <!-- End Dashboard Nav -->
+
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          data-bs-target="#components-nav"
+          data-bs-toggle="collapse"
+          href="#">
+          <i class="bi bi-menu-button-wide"></i><span>Bids</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul
+          id="components-nav"
+          class="nav-content collapse show"
+          data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="addbid.php">
+              <i class="bi bi-circle"></i><span>Add</span>
+            </a>
+          </li>
+          <li>
+            <a href="managebid.php">
+              <i class="bi bi-circle"></i><span>Manage</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <!-- End Components Nav -->
+
+      <li class="nav-item">
+        <a
+          class="nav-link collapsed"
+          data-bs-target="#forms-nav"
+          data-bs-toggle="collapse"
+          href="#">
+          <i class="bi bi-journal-text"></i><span>Dummy</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul
+          id="forms-nav"
+          class="nav-content collapse"
+          data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="#">
+              <i class="bi bi-circle"></i><span>Dummy1</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <!-- End Forms Nav -->
+
+      <li class="nav-heading">Pages</li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#">
+          <i class="bi bi-person"></i>
+          <span>Profile</span>
+        </a>
+      </li>
+      <!-- End Profile Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="signup.html">
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Login</span>
+        </a>
+      </li>
+      <!-- End Login Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="pages-error-404.html">
+          <i class="bi bi-dash-circle"></i>
+          <span>Error 404</span>
+        </a>
+      </li>
+      <!-- End Error 404 Page Nav -->
+    </ul>
+  </aside>
+  <!-- End Sidebar-->
+
 
   <main id="main" class="main">
     <div class="pagetitle">
@@ -343,8 +509,7 @@ $conn->close();
                         <td>
                           <!-- View Button with Data Attributes for Each Bid -->
                           <button type="button" class="btn btn-primary viewbtn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#updatebids"
+                      data-bs-toggle="modal" data-bs-target="#viewbids"
                             data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
                             data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
                             data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
@@ -381,13 +546,13 @@ $conn->close();
       </div>
     </section>
 
-    <div class="modal fade" id="updatebids" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Bid Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
+    <div class="modal fade" id="viewbids" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Bid Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
           <div class="modal-body">
             <div class="container">
               <div class="row mb-3">
@@ -457,12 +622,108 @@ $conn->close();
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
+          <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
+
+      </div>
         </div>
       </div>
     </div>
+
+   <!-- Update Bids Modal -->
+   <div class="modal" id="editModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Bid Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="updateBidForm">
+          <div class="container">
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Customer Name:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateCustName" class="form-control" name="CustName"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>HMS Scope:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateHMSScope" class="form-control" name="HMS_Scope"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Tender Proposal:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateTenderProposal" class="form-control" name="Tender_Proposal"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Type:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateType" class="form-control" name="Type"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Business Unit:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateBusinessUnit" class="form-control" name="BusinessUnit"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Account Sector:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateAccountSector" class="form-control" name="AccountSector"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Account Manager:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateAccountManager" class="form-control" name="AccountManager"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>HMS Solution:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateHMSSolution" class="form-control" name="HMS_Solution"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>PIC Presales:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updatePICPresales" class="form-control" name="PIC_Presales"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Request Date:</strong></div>
+              <div class="col-sm-8"><input type="date" id="updateRequestDate" class="form-control" name="RequestDate"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Submission Date:</strong></div>
+              <div class="col-sm-8"><input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Value (RM):</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateValue" class="form-control" name="Value"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>RM Value (Final):</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateRMValue" class="form-control" name="RMValue"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Status:</strong></div>
+              <div class="col-sm-8">
+                <select id="updateStatus" class="form-select" name="Status">
+                  <option value="Submitted">Submitted</option>
+                  <option value="Dropped">Dropped</option>
+                  <option value="WIP">WIP</option>
+                  <option value="Unknown">Unknown</option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Tender Status:</strong></div>
+              <div class="col-sm-8"><input type="text" id="updateTenderStatus" class="form-control" name="TenderStatus"></div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-sm-4"><strong>Remarks:</strong></div>
+              <div class="col-sm-8"><textarea id="updateRemarks" class="form-control" name="Remarks"></textarea></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
     <!-- End Modal -->
 
@@ -504,47 +765,91 @@ $conn->close();
   <script>new DataTable('#example'); </script>
 
     <!-- MODAL Fect Data -->
-  <script>
-    // MODAL SCRIPT//
-    // JavaScript/jQuery to dynamically fill the modal with the clicked bid data
-    $(document).on('click', '.viewbtn', function() {
-      // Get data attributes from the clicked button
-      var custName = $(this).data('custname');
-      var hmsScope = $(this).data('hmsscope');
-      var tenderProposal = $(this).data('tender');
-      var type = $(this).data('type');
-      var businessUnit = $(this).data('businessunit');
-      var accountSector = $(this).data('accountsector');
-      var accountManager = $(this).data('accountmanager');
-      var hmsSolution = $(this).data('hmssolution');
-      var picPresales = $(this).data('picpresales');
-      var requestDate = $(this).data('requestdate');
-      var submissionDate = $(this).data('submissiondate');
-      var value = $(this).data('value');
-      var rmValue = $(this).data('rmvalue');
-      var status = $(this).data('status');
-      var tenderStatus = $(this).data('tenderstatus');
-      var remarks = $(this).data('remarks');
+    <script>
+  $(document).on('click', '.viewbtn', function() {
+    var custName = $(this).data('custname');
+    var hmsScope = $(this).data('hmsscope');
+    var tenderProposal = $(this).data('tender');
+    var type = $(this).data('type');
+    var businessUnit = $(this).data('businessunit');
+    var accountSector = $(this).data('accountsector');
+    var accountManager = $(this).data('accountmanager');
+    var hmsSolution = $(this).data('hmssolution');
+    var picPresales = $(this).data('picpresales');
+    var requestDate = $(this).data('requestdate');
+    var submissionDate = $(this).data('submissiondate');
+    var value = $(this).data('value');
+    var rmValue = $(this).data('rmvalue');
+    var status = $(this).data('status');
+    var tenderStatus = $(this).data('tenderstatus');
+    var remarks = $(this).data('remarks');
 
-      // Update modal content with the data
-      $('#modalCustName').text(custName);
-      $('#modalHMSScope').text(hmsScope);
-      $('#modalTenderProposal').text(tenderProposal);
-      $('#modalType').text(type);
-      $('#modalBusinessUnit').text(businessUnit);
-      $('#modalAccountSector').text(accountSector);
-      $('#modalAccountManager').text(accountManager);
-      $('#modalHMSSolution').text(hmsSolution);
-      $('#modalPICPresales').text(picPresales);
-      $('#modalRequestDate').text(requestDate);
-      $('#modalSubmissionDate').text(submissionDate);
-      $('#modalValue').text(value);
-      $('#modalRMValue').text(rmValue);
-      $('#modalStatus').text(status);
-      $('#modalTenderStatus').text(tenderStatus);
-      $('#modalRemarks').text(remarks);
+    $('#modalCustName').text(custName);
+    $('#modalHMSScope').text(hmsScope);
+    $('#modalTenderProposal').text(tenderProposal);
+    $('#modalType').text(type);
+    $('#modalBusinessUnit').text(businessUnit);
+    $('#modalAccountSector').text(accountSector);
+    $('#modalAccountManager').text(accountManager);
+    $('#modalHMSSolution').text(hmsSolution);
+    $('#modalPICPresales').text(picPresales);
+    $('#modalRequestDate').text(requestDate);
+    $('#modalSubmissionDate').text(submissionDate);
+    $('#modalValue').text(value);
+    $('#modalRMValue').text(rmValue);
+    $('#modalStatus').text(status);
+    $('#modalTenderStatus').text(tenderStatus);
+    $('#modalRemarks').text(remarks);
+
+    // Fill update modal with data
+    $('#updateCustName').val(custName);
+    $('#updateHMSScope').val(hmsScope);
+    $('#updateTenderProposal').val(tenderProposal);
+    $('#updateType').val(type);
+    $('#updateBusinessUnit').val(businessUnit);
+    $('#updateAccountSector').val(accountSector);
+    $('#updateAccountManager').val(accountManager);
+    $('#updateHMSSolution').val(hmsSolution);
+    $('#updatePICPresales').val(picPresales);
+    $('#updateRequestDate').val(requestDate);
+    $('#updateSubmissionDate').val(submissionDate);
+    $('#updateValue').val(value);
+    $('#updateRMValue').val(rmValue);
+    $('#updateStatus').val(status);
+    $('#updateTenderStatus').val(tenderStatus);
+    $('#updateRemarks').val(remarks);
+
+    $('#updatebids').modal('show');
+  });
+
+  $('#saveChangesBtn').click(function() {
+    var formData = $('#updateBidForm').serialize();
+
+    $.ajax({
+      url: 'controller/updatebidcont.php',
+      type: 'POST',
+      data: formData,
+      success: function(response) {
+        alert('Bid updated successfully!');
+        $('#updatebids').modal('hide');
+        location.reload();
+      }
     });
-  </script>
+  });
+
+  $(document).ready(function(){
+    // Trigger View Modal
+    $('.view-btn').on('click', function(){
+        $('#viewModal').modal('show');
+    });
+
+    // Trigger Edit Modal and ensure View Modal is closed
+    $('.edit-btn').on('click', function(){
+        $('#viewModal').modal('hide');  // Close View Modal
+        $('#editModal').modal('show');  // Show Edit Modal
+    });
+});
+</script>
   
   <script>
 function toggleDarkMode() {
