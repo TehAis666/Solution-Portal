@@ -38,20 +38,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Handle RMValue, if present; set default to 0
-    $rmValue = isset($_POST['RMValue']) ? htmlspecialchars($_POST['RMValue']) : '0';
+    $rmValue = isset($_POST['RMValue']) ? htmlspecialchars($_POST['RMValue']) : '0.0';
     $rmValue = floatval(preg_replace('/[^\d.]/', '', $rmValue)); // Remove "RM" and convert to float
+
+    // Set default for Value
+    $value = '0'; // You can modify this to set another default if needed.
 
     // Collect remaining form fields
     $status = htmlspecialchars($_POST['status']);  // Note: 'status' is not capitalized in the form
     $tenderStatus = htmlspecialchars($_POST['TenderStatus']);
     $remarks = htmlspecialchars($_POST['Remarks'] ?? '');  // Handle optional Remarks
 
-    // Prepare SQL statement using prepared statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO bids (CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager, HMS_Solution, PIC_Presales, RequestDate, SubmissionDate, RMValue, Status, TenderStatus, Remarks) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    // Set UpdateDate to current date and time
+    $updateDate = date('Y-m-d H:i:s'); // Current date and time in the format YYYY-MM-DD HH:MM:SS
 
-    // Bind parameters (Note: 'Value' removed as it wasn't in the form)
-    $stmt->bind_param("sssssssssssdsss", $custName, $scope, $tenderProposal, $type, $businessUnit, $accountSector, $accountManager, $hmsSolution, $picPresales, $requestDate, $submissionDate, $rmValue, $status, $tenderStatus, $remarks);
+    // Prepare SQL statement using prepared statements to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO bids (CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager, HMS_Solution, PIC_Presales, RequestDate, SubmissionDate, Value, RMValue, Status, TenderStatus, Remarks, UpdateDate) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    // Bind parameters, including 'Value' and 'UpdateDate'
+    $stmt->bind_param("sssssssssssddss", $custName, $scope, $tenderProposal, $type, $businessUnit, $accountSector, $accountManager, $hmsSolution, $picPresales, $requestDate, $submissionDate, $value, $rmValue, $status, $tenderStatus, $remarks, $updateDate);
 
     // Execute the query
     if ($stmt->execute()) {
