@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Redirect to managebid.php with success alert
         echo "<script>
             alert('Bid successfully created!');
-            window.location.href = '../managebid.html';
+            window.location.href = '../managebid.php';
         </script>";
     } else {
         echo "Error: " . $stmt->error;

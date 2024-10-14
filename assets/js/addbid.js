@@ -1,6 +1,5 @@
-
-  // Listen for checkbox changes
-  document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
+// Listen for checkbox changes
+document.querySelectorAll('input[type="checkbox"]').forEach(function(checkbox) {
     checkbox.addEventListener('change', function() {
       const selected = [];
       document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(selectedCheckbox) {
@@ -100,7 +99,7 @@
       })
       .then(response => {
         if (response.ok) {
-          window.location.href = 'managebid.html'; // Redirect on success
+          window.location.href = 'managebid.php'; // Redirect on success
         } else {
           // Handle error
           alert('Error submitting form');

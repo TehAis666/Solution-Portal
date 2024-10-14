@@ -30,7 +30,7 @@
               </a>
             </li>
             <li>
-              <a href="#">
+              <a href="managebid.php">
                 <i class="bi bi-circle"></i><span>Manage</span>
               </a>
             </li>
