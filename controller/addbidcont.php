@@ -1,77 +1,72 @@
 <?php
-// Include the database connection
+// Include your database connection file
 include '../db/db.php';
 
+// Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Collect and sanitize input data
-    $custName = htmlspecialchars($_POST['Name']);
-    $scope = htmlspecialchars($_POST['Scope']);
-    $tenderProposal = htmlspecialchars($_POST['Tender']);
-    $type = htmlspecialchars($_POST['Type']);
-    $businessUnit = htmlspecialchars($_POST['BusinessUnit']);
-    $accountSector = htmlspecialchars($_POST['AccountSector']);
-    $accountManager = htmlspecialchars($_POST['AM']);
-    $hmsSolution = htmlspecialchars($_POST['Solution']);
-    $picPresales = htmlspecialchars($_POST['PIC/Presales']);
-    
-    // Validate RequestDate
-    if (isset($_POST['RequestDate']) && !empty($_POST['RequestDate'])) {
-        $requestDate = $_POST['RequestDate'];
+    // Retrieve form data
+    $requestDate = $_POST['RequestDate'];
+    $status = $_POST['status'];
+    $customerName = $_POST['Name'];
+    $scope = $_POST['Scope'];
+    $tender = $_POST['Tender'];
+    $type = $_POST['Type'];
+    $businessUnit = $_POST['BusinessUnit'];
+    $accountSector = $_POST['AccountSector'];
+    $accountManager = $_POST['AM'];
+    $remarks = $_POST['Remarks']; // For tender table
+    $finalSolution = $_POST['Solution']; // Comma-separated values for solutions
+
+    // Explode the solutions into an array
+    $solutions = explode(', ', $finalSolution);
+
+    // Insert data into bids table
+    $sql_bids = "INSERT INTO bids (RequestDate, Status, CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt_bids = $conn->prepare($sql_bids);
+    $stmt_bids->bind_param("sssssssss", $requestDate, $status, $customerName, $scope, $tender, $type, $businessUnit, $accountSector, $accountManager);
+
+    // Execute bids insertion and check for errors
+    if ($stmt_bids->execute()) {
+        // Get the last inserted bid ID
+        $bidID = $conn->insert_id;
     } else {
-        die("Error: Request Date is required.");
+        die("Error inserting bid: " . $stmt_bids->error);
     }
 
-    // Validate SubmissionDate
-    if (isset($_POST['SubmissionDate']) && !empty($_POST['SubmissionDate'])) {
-        $submissionDate = $_POST['SubmissionDate'];
-        
-        // Compare dates (SubmissionDate should not be before RequestDate)
-        if ($submissionDate < $requestDate) {
-            echo "<script>
-                alert('Error: Submission Date cannot be before Request Date.');
-                history.back();
-            </script>";
-            exit(); // Stop further execution if date validation fails
-        }
-    } else {
-        die("Error: Submission Date is required.");
-    }
+    // Prepare the SQL for inserting into the tender table
+    $sql_tender = "INSERT INTO tender (BidID, Solution1, Solution2, Solution3, Solution4, Remarks) 
+                   VALUES (?, ?, ?, ?, ?, ?)";
 
-    // Handle RMValue, if present; set default to 0
-    $rmValue = isset($_POST['RMValue']) ? htmlspecialchars($_POST['RMValue']) : '0.0';
-    $rmValue = floatval(preg_replace('/[^\d.]/', '', $rmValue)); // Remove "RM" and convert to float
+    // Prepare the statement
+    $stmt_tender = $conn->prepare($sql_tender);
 
-    // Set default for Value
-    $value = '0'; // You can modify this to set another default if needed.
+    // Initialize solution variables
+    $solution1 = in_array("AwanHeiTech", $solutions) ? "AwanHeiTech" : null;
+    $solution2 = in_array("PaduNet", $solutions) ? "PaduNet" : null;
+    $solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : null;
+    $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : null;
 
-    // Collect remaining form fields
-    $status = htmlspecialchars($_POST['status']);  // Note: 'status' is not capitalized in the form
-    $tenderStatus = htmlspecialchars($_POST['TenderStatus']);
-    $remarks = htmlspecialchars($_POST['Remarks'] ?? '');  // Handle optional Remarks
+    // Bind parameters
+    $stmt_tender->bind_param("isssss", $bidID, $solution1, $solution2, $solution3, $solution4, $remarks);
 
-    // Set UpdateDate to current date and time
-    $updateDate = date('Y-m-d H:i:s'); // Current date and time in the format YYYY-MM-DD HH:MM:SS
-
-    // Prepare SQL statement using prepared statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO bids (CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager, HMS_Solution, PIC_Presales, RequestDate, SubmissionDate, Value, RMValue, Status, TenderStatus, Remarks, UpdateDate) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    // Bind parameters, including 'Value' and 'UpdateDate'
-    $stmt->bind_param("sssssssssssddss", $custName, $scope, $tenderProposal, $type, $businessUnit, $accountSector, $accountManager, $hmsSolution, $picPresales, $requestDate, $submissionDate, $value, $rmValue, $status, $tenderStatus, $remarks, $updateDate);
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect to managebid.php with success alert
+    // Execute tender insertion and check for errors
+    if ($stmt_tender->execute()) {
+        // On successful insertion, redirect with an alert
         echo "<script>
-            alert('Bid successfully created!');
-            window.location.href = '../managebid.php';
-        </script>";
+                alert('Bids successfully created.');
+                window.location.href = '../managebid.php';
+              </script>";
     } else {
-        echo "Error: " . $stmt->error;
+        die("Error inserting tender: " . $stmt_tender->error);
     }
 
-    // Close the statement and connection
-    $stmt->close();
+    // Close the statements and connection
+    $stmt_bids->close();
+    $stmt_tender->close();
     $conn->close();
+} else {
+    echo "No POST data received.";
 }
 ?>
