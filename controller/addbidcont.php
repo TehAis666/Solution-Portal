@@ -42,11 +42,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Prepare the statement
     $stmt_tender = $conn->prepare($sql_tender);
 
-    // Initialize solution variables
-    $solution1 = in_array("AwanHeiTech", $solutions) ? "AwanHeiTech" : null;
-    $solution2 = in_array("PaduNet", $solutions) ? "PaduNet" : null;
-    $solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : null;
-    $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : null;
+    $solution1 = in_array("AwanHeiTech", $solutions) ? "AwanHeiTech" : "";
+$solution2 = in_array("PaduNet", $solutions) ? "PaduNet" : "";
+$solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : "";
+$solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
 
     // Bind parameters
     $stmt_tender->bind_param("isssss", $bidID, $solution1, $solution2, $solution3, $solution4, $remarks);

@@ -340,20 +340,6 @@ try {
     .row {
       margin-bottom: 1rem;
     }
-
-    .clickable {
-      cursor: pointer;
-      /* Change cursor to pointer */
-      transition: transform 0.2s;
-      /* Add transition for smooth effect */
-    }
-
-    .clickable:hover {
-      transform: scale(1.1);
-      /* Scale up slightly on hover */
-      color: #ffcc00;
-      /* Change color on hover if you want */
-    }
   </style>
 </head>
 
@@ -363,7 +349,7 @@ try {
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Manage Bid</h1>
+      <h1>Add Bid</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -374,49 +360,48 @@ try {
     </div>
     <!-- End Page Title -->
 
-    <!-- Dashboard -->
     <section class="section dashboard">
-      <div class="row text-center">
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-bids clickable" style="color: #1e73be; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Bids</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total New Request</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-submitted clickable" style="color: #039be5; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Submitted</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-dropped clickable" style="color: #e53935; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Dropped</h5>
-            </div>
-          </div>
-        </div>
+    <div class="row text-center">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title total-bids" style="color: #1e73be; font-size: 48px;">0</h1>
+        <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+        <h5 class="card-subtitle text-muted">Total Bids</h5>
       </div>
-      <!-- End Dashboard -->
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title total-new-request" style="color: #26a69a; font-size: 48px;">0</h1>
+        <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+        <h5 class="card-subtitle text-muted">Total New Request</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title total-submitted" style="color: #039be5; font-size: 48px;">0</h1>
+        <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+        <h5 class="card-subtitle text-muted">Total Submitted</h5>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="card-title total-dropped" style="color: #e53935; font-size: 48px;">0</h1>
+        <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+        <h5 class="card-subtitle text-muted">Total Dropped</h5>
+      </div>
+    </div>
+  </div>
+</div>
 
-      <!-- Data Table -->
+
+
       <div class="row">
         <div class="col-12">
           <div class="card">
@@ -504,10 +489,9 @@ try {
           </div>
         </div>
       </div>
+
     </section>
-    <!-- End Data Table -->
-     
-<!-- View Modal -->
+
     <div class="modal fade" id="viewbids" tabindex="-1" aria-labelledby="viewbidsLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -630,7 +614,7 @@ try {
         </div>
       </div>
     </div>
-    <!-- End View Modal -->
+
 
     <!-- Update Bids Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -638,7 +622,7 @@ try {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Update Bid Details</h5>
-            <button type="button" class="btn-close"  data-bs-toggle="modal" data-bs-target="#viewbids" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="updateBidForm">
@@ -770,8 +754,8 @@ try {
                     <div class="col-md-4">
                       <label for="updateSolution1" class="form-label"><strong>Solution 1:</strong></label>
                       <select id="updateSolution1" class="form-select" name="Solution1">
-                        <option value="">Select tender status</option>
-                        <option value="AwanHeiTech">AwanHeiTech</option>
+                      <option value="">Select tender status</option>
+                      <option value="AwanHeiTech">AwanHeiTech</option>
                       </select>
                     </div>
                     <div class="col-md-4">
@@ -787,8 +771,8 @@ try {
                     <div class="col-md-4">
                       <label for="updateSolution2" class="form-label"><strong>Solution 2:</strong></label>
                       <select id="updateSolution2" class="form-select" name="Solution2">
-                        <option value="">Select tender status</option>
-                        <option value="PaduNet">PaduNet</option>
+                      <option value="">Select tender status</option>
+                      <option value="PaduNet">PaduNet</option>
                       </select>
                     </div>
                     <div class="col-md-4">
@@ -804,8 +788,8 @@ try {
                     <div class="col-md-4">
                       <label for="updateSolution3" class="form-label"><strong>Solution 3:</strong></label>
                       <select id="updateSolution3" class="form-select" name="Solution3">
-                        <option value="">Select tender status</option>
-                        <option value="Secure-X">Secure-X</option>
+                      <option value="">Select tender status</option>
+                      <option value="Secure-X">Secure-X</option>
                       </select>
                     </div>
                     <div class="col-md-4">
@@ -821,8 +805,8 @@ try {
                     <div class="col-md-4">
                       <label for="updateSolution4" class="form-label"><strong>Solution 4:</strong></label>
                       <select id="updateSolution4" class="form-select" name="Solution4">
-                        <option value="">Select tender status</option>
-                        <option value="i-Sentrix">i-Sentrix</option>
+                      <option value="">Select tender status</option>
+                      <option value="i-Sentrix">i-Sentrix</option>
                       </select>
                     </div>
                     <div class="col-md-4">
@@ -854,7 +838,7 @@ try {
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"  data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
               </div>
             </form>
@@ -877,8 +861,9 @@ try {
 
   <a
     href="#"
-    class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i>
-  </a>
+    class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
@@ -923,7 +908,7 @@ try {
       const value4 = parseFloat(document.getElementById('updateValue4').value) || 0;
 
       // Calculate the Total Value
-      const totalValue = value1 + value2 + value3 + value4;
+      const totalValue =  value1 + value2 + value3 + value4;
 
       // Set the Total Value in the Total Value input
       document.getElementById('updateTotalValue').value = totalValue.toFixed(2); // Format to two decimal places
@@ -934,93 +919,62 @@ try {
   <!-- <script>
     new DataTable('#example');
   </script> -->
+<!-- DataTable Script Initialization -->
 
-  <!-- DataTable Script Initialization -->
-  <script>
-    $(document).ready(function() {
-      // Initialize DataTable
-      const table = $('#example').DataTable({
-        paging: true,
-        searching: true,
-        info: true,
-        lengthChange: true,
-      });
+<script>
+$(document).ready(function() {
+  // Initialize DataTable
+  const table = $('#example').DataTable({
+    // Enable all rows to be retrieved
+    paging: true, // or false if you don't want pagination
+    searching: true,
+    info: true,
+    lengthChange: true,
+  });
 
-      // Function to calculate the dashboard counts
-      function calculateDashboard() {
-        // Get all rows from the original unfiltered dataset
-        const allRows = table.rows().nodes(); // Use table.rows() to include all rows in the DataTable, not just the current view
+  // Function to filter bids and update the dashboard
+  function updateDashboard() {
+    // Get all rows from the DataTable, regardless of pagination
+    const allRows = table.rows({ search: 'applied' }).nodes(); // This fetches all rows based on the current search/filter state
 
-        let totalBids = 0;
-        let totalNewRequest = 0;
-        let totalSubmitted = 0;
-        let totalDropped = 0;
+    let totalBids = 0;
+    let totalNewRequest = 0;
+    let totalSubmitted = 0;
+    let totalDropped = 0;
 
-        // Loop through all rows and update counts
-        $(allRows).each(function() {
-          const statusElement = $(this).find('td:nth-child(5) .badge');
-          if (statusElement.length > 0) {
-            const status = statusElement.text().trim();
-            totalBids++; // Count every row as a bid
+    // Loop through all rows and update counts
+    $(allRows).each(function() {
+      const statusElement = $(this).find('td:nth-child(5) .badge');
+      if (statusElement.length > 0) {
+        const status = statusElement.text().trim();
+        totalBids++; // Count every row as a bid
 
-            // Count based on the status
-            if (status === 'WIP') {
-              totalNewRequest++;
-            } else if (status === 'Submitted') {
-              totalSubmitted++;
-            } else if (status === 'Dropped') {
-              totalDropped++;
-            }
-          }
-        });
-
-        // Set the calculated totals to the dashboard elements
-        document.querySelector('.total-bids').textContent = totalBids;
-        document.querySelector('.total-new-request').textContent = totalNewRequest;
-        document.querySelector('.total-submitted').textContent = totalSubmitted;
-        document.querySelector('.total-dropped').textContent = totalDropped;
-      }
-
-      // Function to filter the DataTable based on status
-      function filterByStatus(status) {
-        table.search(''); // Clear any existing search
-
-        if (status === 'all') {
-          // Show all rows if 'Total Bids' is clicked
-          table.column(4).search('').draw();
-        } else {
-          // Filter by the specific status
-          table.column(4).search(status).draw();
+        // Count based on the status
+        if (status === 'WIP') {
+          totalNewRequest++;
+        } else if (status === 'Submitted') {
+          totalSubmitted++;
+        } else if (status === 'Dropped') {
+          totalDropped++;
         }
       }
-
-      // Wait until the table is fully initialized before calculating dashboard counts
-      table.on('draw', function() {
-        calculateDashboard(); // Recalculate dashboard counts after every DataTable draw event
-      });
-
-      // Event listeners for filtering based on the clicked dashboard element
-      document.querySelector('.total-bids').addEventListener('click', function() {
-        filterByStatus('all'); // Show all rows when 'Total Bids' is clicked
-      });
-
-      document.querySelector('.total-new-request').addEventListener('click', function() {
-        filterByStatus('WIP'); // Show only 'WIP' rows when 'Total New Request' is clicked
-      });
-
-      document.querySelector('.total-submitted').addEventListener('click', function() {
-        filterByStatus('Submitted'); // Show only 'Submitted' rows when 'Total Submitted' is clicked
-      });
-
-      document.querySelector('.total-dropped').addEventListener('click', function() {
-        filterByStatus('Dropped'); // Show only 'Dropped' rows when 'Total Dropped' is clicked
-      });
-
-      // Call the function once the document is ready and the table is fully loaded
-      calculateDashboard();
     });
-  </script>
 
+    // Update the dashboard
+    document.querySelector('.total-bids').textContent = totalBids;
+    document.querySelector('.total-new-request').textContent = totalNewRequest;
+    document.querySelector('.total-submitted').textContent = totalSubmitted;
+    document.querySelector('.total-dropped').textContent = totalDropped;
+  }
+
+  // Update dashboard when the DataTable is first initialized and every time the table is drawn (page change, search, etc.)
+  updateDashboard();
+  table.on('draw', function() {
+    updateDashboard();
+  });
+});
+
+</script>
   <!-- MODAL Fect Data -->
   <script>
     $(document).ready(function() {
@@ -1148,6 +1102,10 @@ try {
       // Handle Save Changes Button Click
       $('#saveChangesBtn').click(function() {
         var formData = $('#updateBidForm').serialize();
+
+        // Debugging: alert all form data before sending
+        alert('Form Data: ' + formData); // Display all serialized form data in alert
+
         $.ajax({
           url: 'controller/updatebidcont.php',
           type: 'POST',
