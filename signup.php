@@ -21,7 +21,7 @@
             font-family: "Fira Sans", Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-color: lightblue;
+            background-color: #2C3E50;
         }
 
         .form-structor {
@@ -394,32 +394,34 @@
             background-color: #f1f1f1;
         }
 
-#roleDisplay {
-    cursor: pointer;
-}
-  </style>
+        #roleDisplay {
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
     <div class="form-structor">
+
         <div class="login">
             <div class="logo-container">
                 <img src="images/logo3.png" alt="Logo 2" class="logo" />
                 <span class="logo-text"> Solution Portal</span>
             </div>
-
             <h2 class="form-title" id="login"><span>or</span>Log In</h2>
-            <div class="form-holder">
-                <input type="email" class="input" placeholder="Email" />
-                <input type="password" class="input" placeholder="Password" />
-            </div>
-            <button class="submit-btn">Login</button>
+            <form id="logincont" action="controller/logincont.php" method="POST">
+                <div class="form-holder">
+                    <input type="email" name="email" class="input" placeholder="Email" required />
+                    <input type="password" name="password" class="input" placeholder="Password" required />
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
         </div>
         <div class="singup slide-up">
             <div class="center">
                 <h2 class="form-title" id="singup"><span>or</span>Sign Up</h2>
                 <form id="signupcont" action="controller/signupcont.php" method="POST">
-                <div class="form-holder">
+                    <div class="form-holder">
                         <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
                         <input type="text" name="name" class="input" placeholder="Name" required />
                         <input type="email" name="email" class="input" placeholder="Email" required />
@@ -444,8 +446,8 @@
                             required
                             pattern="0\d{9,11}"
                             title="Phone number must start with '0' followed by 9 to 11 digits." />
-                </div>
-                <button type="submit" class="submit-btn">Sign Up</button>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign Up</button>
                 </form>
             </div>
         </div>

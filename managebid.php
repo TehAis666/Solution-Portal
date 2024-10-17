@@ -440,8 +440,8 @@ try {
                       <tr>
                         <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
                         <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['TotalValue']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['RMValue']); ?></td>
+                        <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
+                        <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
                         <td class="text-center align-middle">
                           <?php
                           $status = htmlspecialchars($bid['Status']);
@@ -768,79 +768,79 @@ try {
                   <!-- Solutions, Presales, and Values -->
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <label for="updateSolution1" class="form-label"><strong>Solution 1:</strong></label>
+                      <label for="updateSolution1" class="form-label"><strong>HMS Solution Owner:</strong></label>
                       <select id="updateSolution1" class="form-select" name="Solution1">
-                        <option value="">Select tender status</option>
+                        <option value="">Select solution</option>
                         <option value="AwanHeiTech">AwanHeiTech</option>
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label for="updatePresales1" class="form-label"><strong>Presales 1:</strong></label>
+                      <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
                       <input type="text" id="updatePresales1" class="form-control" name="Presales1">
                     </div>
                     <div class="col-md-4">
-                      <label for="updateValue1" class="form-label"><strong>Value 1:</strong></label>
+                      <label for="updateValue1" class="form-label"><strong>Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateValue1" class="form-control" name="Value1">
                     </div>
                   </div>
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <label for="updateSolution2" class="form-label"><strong>Solution 2:</strong></label>
+                      <label for="updateSolution2" class="form-label"><strong>HMS Solution Owner:</strong></label>
                       <select id="updateSolution2" class="form-select" name="Solution2">
-                        <option value="">Select tender status</option>
+                        <option value="">Select solution</option>
                         <option value="PaduNet">PaduNet</option>
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label for="updatePresales2" class="form-label"><strong>Presales 2:</strong></label>
+                      <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
                       <input type="text" id="updatePresales2" class="form-control" name="Presales2">
                     </div>
                     <div class="col-md-4">
-                      <label for="updateValue2" class="form-label"><strong>Value 2:</strong></label>
+                      <label for="updateValue2" class="form-label"><strong>Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateValue2" class="form-control" name="Value2">
                     </div>
                   </div>
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <label for="updateSolution3" class="form-label"><strong>Solution 3:</strong></label>
+                      <label for="updateSolution3" class="form-label"><strong>HMS Solution Owner:</strong></label>
                       <select id="updateSolution3" class="form-select" name="Solution3">
-                        <option value="">Select tender status</option>
+                        <option value="">Select solution</option>
                         <option value="Secure-X">Secure-X</option>
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label for="updatePresales3" class="form-label"><strong>Presales 3:</strong></label>
+                      <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
                       <input type="text" id="updatePresales3" class="form-control" name="Presales3">
                     </div>
                     <div class="col-md-4">
-                      <label for="updateValue3" class="form-label"><strong>Value 3:</strong></label>
+                      <label for="updateValue3" class="form-label"><strong>Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateValue3" class="form-control" name="Value3">
                     </div>
                   </div>
                   <div class="row mb-3">
                     <div class="col-md-4">
-                      <label for="updateSolution4" class="form-label"><strong>Solution 4:</strong></label>
+                      <label for="updateSolution4" class="form-label"><strong>HMS Solution Owner:</strong></label>
                       <select id="updateSolution4" class="form-select" name="Solution4">
-                        <option value="">Select tender status</option>
+                        <option value="">Select solution</option>
                         <option value="i-Sentrix">i-Sentrix</option>
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label for="updatePresales4" class="form-label"><strong>Presales 4:</strong></label>
+                      <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
                       <input type="text" id="updatePresales4" class="form-control" name="Presales4">
                     </div>
                     <div class="col-md-4">
-                      <label for="updateValue4" class="form-label"><strong>Value 4:</strong></label>
+                      <label for="updateValue4" class="form-label"><strong>Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateValue4" class="form-control" name="Value4">
                     </div>
                   </div>
                   <div class="row mb-3">
                     <div class="col-md-6">
-                      <label for="updateTotalValue" class="form-label"><strong>Total Value:</strong></label>
+                      <label for="updateTotalValue" class="form-label"><strong>Total Request Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateTotalValue" class="form-control" name="TotalValue">
                     </div>
                     <div class="col-md-6">
-                      <label for="updateRMValue" class="form-label"><strong>RM Value:</strong></label>
+                      <label for="updateRMValue" class="form-label"><strong>Submission Value Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateRMValue" class="form-control" name="RMValue">
                     </div>
                   </div>
@@ -849,7 +849,7 @@ try {
                   </div>
                   <!-- Button Slide & calculate -->
                   <div class="text-center">
-                    <button type="button" class="btn btn-secondary" id="backSlideButton">Back</button>
+                    <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
                   </div>
                 </div>
               </div>
@@ -910,6 +910,85 @@ try {
     });
   </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.getElementById("updateStatus");
+    const secondSlide = document.getElementById("secondSlide");
+    const secondSlideInputs = secondSlide.querySelectorAll("input[type='text'], input[type='number']");
+    const secondSlideSelects = secondSlide.querySelectorAll("select");
+
+    function toggleSecondSlideInputs() {
+        const isDropped = statusSelect.value === "Dropped";
+
+        // Set text and number inputs to read-only
+        secondSlideInputs.forEach(input => {
+            input.readOnly = isDropped; // Set to readonly for text and number inputs
+        });
+
+        // Disable select elements if status is "Dropped"
+        secondSlideSelects.forEach(select => {
+            if (isDropped) {
+                select.setAttribute("style", "pointer-events: none;");
+                select.setAttribute("onclick", "return false;");
+                select.setAttribute("onkeydown", "return false;");
+            } else {
+                select.removeAttribute("style");
+                select.removeAttribute("onclick");
+                select.removeAttribute("onkeydown");
+            }
+        });
+
+        // Always make TotalValue read-only
+        const totalValueInput = document.getElementById("updateTotalValue");
+        totalValueInput.readOnly = true; // Always read-only
+    }
+
+    // Check the status when the modal opens
+    $('#editModal').on('shown.bs.modal', function () {
+        toggleSecondSlideInputs(); // Run when the modal is shown
+    });
+
+    // Check the status on change
+    statusSelect.addEventListener("change", toggleSecondSlideInputs);
+
+    // Save Changes button logic
+    document.getElementById("saveChangesBtn").addEventListener("click", function() {
+        // Implement your save logic here.
+        console.log("Save Changes clicked!");
+
+        // Optionally show a success message or handle the save operation.
+        $('#editModal').modal('hide'); // Close the modal
+    });
+});
+
+let originalValues = {}; // Store original values for select elements
+
+// Modify the toggle function to save original values
+function toggleSecondSlideInputs() {
+    const isDropped = statusSelect.value === "Dropped";
+
+    secondSlideInputs.forEach(input => {
+        input.readOnly = isDropped; // Set to readonly for text and number inputs
+    });
+
+    secondSlideSelects.forEach(select => {
+        if (isDropped) {
+            // Store the original value if not stored
+            if (!originalValues[select.id]) {
+                originalValues[select.id] = select.value;
+            }
+            select.value = originalValues[select.id]; // Reset to original value
+        } else {
+            delete originalValues[select.id]; // Clear stored value when not dropped
+        }
+    });
+
+    // Always make TotalValue read-only
+    const totalValueInput = document.getElementById("updateTotalValue");
+    totalValueInput.readOnly = true; // Always read-only
+}
+
+</script>
   <!-- Calculate -->
   <script>
     document.getElementById('calculateButton').addEventListener('click', function() {
