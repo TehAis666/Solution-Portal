@@ -73,7 +73,7 @@
         <!-- End Profile Page Nav -->
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="signup.html">
+          <a class="nav-link collapsed" href="signup.php">
             <i class="bi bi-box-arrow-in-right"></i>
             <span>Login</span>
           </a>

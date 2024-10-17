@@ -426,6 +426,7 @@ try {
               <table id="example" class="table table-striped" style="width:100%">
                 <thead>
                   <tr>
+                    <th>Last Update</th>
                     <th>Customer Name</th>
                     <th>Tender Proposal</th>
                     <th>Request Value (RM)</th>
@@ -438,6 +439,7 @@ try {
                   <?php if (!empty($bids)): ?>
                     <?php foreach ($bids as $bid): ?>
                       <tr>
+                        <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
                         <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
                         <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                         <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
@@ -460,6 +462,7 @@ try {
                           <!-- View Button with Data Attributes for Each Bid -->
                           <button type="button" class="btn btn-primary viewbtn"
                             data-bs-toggle="modal" data-bs-target="#viewbids"
+                            data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
                             data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
                             data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
                             data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
@@ -476,7 +479,8 @@ try {
                             data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
                             data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
                             data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
-                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? ''); ?>"
+                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
+
                             data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
                             data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
                             data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
@@ -506,8 +510,8 @@ try {
       </div>
     </section>
     <!-- End Data Table -->
-     
-<!-- View Modal -->
+
+    <!-- View Modal -->
     <div class="modal fade" id="viewbids" tabindex="-1" aria-labelledby="viewbidsLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -638,7 +642,7 @@ try {
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Update Bid Details</h5>
-            <button type="button" class="btn-close"  data-bs-toggle="modal" data-bs-target="#viewbids" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#viewbids" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form id="updateBidForm">
@@ -683,7 +687,7 @@ try {
                       <select id="updateAccountSector" class="form-select" name="AccountSector">
                         <option value="">Select acccount sector</option>
                         <option value="Enterprise">Enterprise</option>
-                        <option value="Goverment">Goverment</option>
+                        <option value="Government">Government</option>
                         <option value="FSI">FSI</option>
                         <option value="eGLC">eGLC</option>
                         <option value="sGLC">sGLC</option>
@@ -720,11 +724,11 @@ try {
                   <div class="row mb-3">
                     <div class="col-md-6">
                       <label for="updateRequestDate" class="form-label"><strong>Request Date:</strong></label>
-                      <input type="date" id="updateRequestDate" class="form-control" name="RequestDate">
+                      <input type="date" id="updateRequestDate" class="form-control" name="RequestDate" >
                     </div>
                     <div class="col-md-6">
                       <label for="updateSubmissionDate" class="form-label"><strong>Submission Date:</strong></label>
-                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate">
+                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate" >
                     </div>
                   </div>
                   <!-- Status and Tender Status -->
@@ -844,17 +848,14 @@ try {
                       <input type="number" step="0.01" id="updateRMValue" class="form-control" name="RMValue">
                     </div>
                   </div>
-                  <div class="text-center">
-                    <button type="button" class="btn btn-primary" id="calculateButton">Calculate</button>
-                  </div>
                   <!-- Button Slide & calculate -->
                   <div class="text-center">
-                    <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
+                  <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
+                    <button type="button" class="btn btn-primary" id="calculateButton">Calculate</button>
                   </div>
-                </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"  data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
                 <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
               </div>
             </form>
@@ -910,86 +911,87 @@ try {
     });
   </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const statusSelect = document.getElementById("updateStatus");
-    const secondSlide = document.getElementById("secondSlide");
-    const secondSlideInputs = secondSlide.querySelectorAll("input[type='text'], input[type='number']");
-    const secondSlideSelects = secondSlide.querySelectorAll("select");
+  <!-- ReadOnly And Disable -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const statusSelect = document.getElementById("updateStatus");
+      const secondSlide = document.getElementById("secondSlide");
+      const secondSlideInputs = secondSlide.querySelectorAll("input[type='text'], input[type='number']");
+      const secondSlideSelects = secondSlide.querySelectorAll("select");
 
-    function toggleSecondSlideInputs() {
+      function toggleSecondSlideInputs() {
         const isDropped = statusSelect.value === "Dropped";
 
         // Set text and number inputs to read-only
         secondSlideInputs.forEach(input => {
-            input.readOnly = isDropped; // Set to readonly for text and number inputs
+          input.readOnly = isDropped; // Set to readonly for text and number inputs
         });
 
         // Disable select elements if status is "Dropped"
         secondSlideSelects.forEach(select => {
-            if (isDropped) {
-                select.setAttribute("style", "pointer-events: none;");
-                select.setAttribute("onclick", "return false;");
-                select.setAttribute("onkeydown", "return false;");
-            } else {
-                select.removeAttribute("style");
-                select.removeAttribute("onclick");
-                select.removeAttribute("onkeydown");
-            }
+          if (isDropped) {
+            select.setAttribute("style", "pointer-events: none;");
+            select.setAttribute("onclick", "return false;");
+            select.setAttribute("onkeydown", "return false;");
+          } else {
+            select.removeAttribute("style");
+            select.removeAttribute("onclick");
+            select.removeAttribute("onkeydown");
+          }
         });
 
         // Always make TotalValue read-only
         const totalValueInput = document.getElementById("updateTotalValue");
         totalValueInput.readOnly = true; // Always read-only
-    }
+      }
 
-    // Check the status when the modal opens
-    $('#editModal').on('shown.bs.modal', function () {
+      // Check the status when the modal opens
+      $('#editModal').on('shown.bs.modal', function() {
         toggleSecondSlideInputs(); // Run when the modal is shown
-    });
+      });
 
-    // Check the status on change
-    statusSelect.addEventListener("change", toggleSecondSlideInputs);
+      // Check the status on change
+      statusSelect.addEventListener("change", toggleSecondSlideInputs);
 
-    // Save Changes button logic
-    document.getElementById("saveChangesBtn").addEventListener("click", function() {
+      // Save Changes button logic
+      document.getElementById("saveChangesBtn").addEventListener("click", function() {
         // Implement your save logic here.
         console.log("Save Changes clicked!");
 
         // Optionally show a success message or handle the save operation.
         $('#editModal').modal('hide'); // Close the modal
+      });
     });
-});
 
-let originalValues = {}; // Store original values for select elements
+    let originalValues = {}; // Store original values for select elements
 
-// Modify the toggle function to save original values
-function toggleSecondSlideInputs() {
-    const isDropped = statusSelect.value === "Dropped";
+    // Modify the toggle function to save original values
+    function toggleSecondSlideInputs() {
+      const isDropped = statusSelect.value === "Dropped";
 
-    secondSlideInputs.forEach(input => {
+      secondSlideInputs.forEach(input => {
         input.readOnly = isDropped; // Set to readonly for text and number inputs
-    });
+      });
 
-    secondSlideSelects.forEach(select => {
+      secondSlideSelects.forEach(select => {
         if (isDropped) {
-            // Store the original value if not stored
-            if (!originalValues[select.id]) {
-                originalValues[select.id] = select.value;
-            }
-            select.value = originalValues[select.id]; // Reset to original value
+          // Store the original value if not stored
+          if (!originalValues[select.id]) {
+            originalValues[select.id] = select.value;
+          }
+          select.value = originalValues[select.id]; // Reset to original value
         } else {
-            delete originalValues[select.id]; // Clear stored value when not dropped
+          delete originalValues[select.id]; // Clear stored value when not dropped
         }
-    });
+      });
 
-    // Always make TotalValue read-only
-    const totalValueInput = document.getElementById("updateTotalValue");
-    totalValueInput.readOnly = true; // Always read-only
-}
+      // Always make TotalValue read-only
+      const totalValueInput = document.getElementById("updateTotalValue");
+      totalValueInput.readOnly = true; // Always read-only
+    }
+  </script>
 
-</script>
-  <!-- Calculate -->
+  <!-- Calculate Total Value-->
   <script>
     document.getElementById('calculateButton').addEventListener('click', function() {
       // Get the value from the RM Value input
@@ -1037,7 +1039,7 @@ function toggleSecondSlideInputs() {
 
         // Loop through all rows and update counts
         $(allRows).each(function() {
-          const statusElement = $(this).find('td:nth-child(5) .badge');
+          const statusElement = $(this).find('td:nth-child(6) .badge');
           if (statusElement.length > 0) {
             const status = statusElement.text().trim();
             totalBids++; // Count every row as a bid
@@ -1066,10 +1068,10 @@ function toggleSecondSlideInputs() {
 
         if (status === 'all') {
           // Show all rows if 'Total Bids' is clicked
-          table.column(4).search('').draw();
+          table.column(5).search('').draw();
         } else {
           // Filter by the specific status
-          table.column(4).search(status).draw();
+          table.column(5).search(status).draw();
         }
       }
 
@@ -1106,6 +1108,7 @@ function toggleSecondSlideInputs() {
       // Handle View Button Click
       $(document).on('click', '.viewbtn', function() {
         // Fetch data attributes
+        var custName = $(this).data('updatedate');
         var custName = $(this).data('custname');
         var hmsScope = $(this).data('hmsscope');
         var tenderProposal = $(this).data('tender');
@@ -1188,7 +1191,7 @@ function toggleSecondSlideInputs() {
         $('#updatePresales3').val(presales3);
         $('#updatePresales4').val(presales4);
         $('#updateRequestDate').val(requestDate);
-        $('#updateSubmissionDate').val(submissionDate);
+        $('#updateSubmissionDate').val(submissionDate ? submissionDate : null);
         $('#updateValue1').val(value1);
         $('#updateValue2').val(value2);
         $('#updateValue3').val(value3);
@@ -1227,6 +1230,9 @@ function toggleSecondSlideInputs() {
       // Handle Save Changes Button Click
       $('#saveChangesBtn').click(function() {
         var formData = $('#updateBidForm').serialize();
+        // Debugging: alert all form data before sending
+        alert('Form Data: ' + formData); // Display all serialized form data in alert
+
         $.ajax({
           url: 'controller/updatebidcont.php',
           type: 'POST',
@@ -1245,6 +1251,7 @@ function toggleSecondSlideInputs() {
     });
   </script>
 
+<!-- DarkMode Toggle -->
   <script>
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode'); // Toggle dark mode on body
