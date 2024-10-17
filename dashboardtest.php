@@ -12,10 +12,6 @@ $bidCountsJson = json_encode($bidCounts);
 // Convert the counts array to a JSON string
 $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
-// Debugging: Check JSON outputs
-echo $monthsJson; // Temporary debug statement
-echo $totalBidsJson; // Temporary debug statement
-echo $totalRevenueJson; // Temporary debug statement
 ?>
 
 <!DOCTYPE html>
@@ -81,22 +77,8 @@ echo $totalRevenueJson; // Temporary debug statement
             <!-- Bids Card -->
             <div class="col">
               <div class="card info-card sales-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">Month</a></li>
-                    <li><a class="dropdown-item" href="#">Year</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Total Bids <span>| Today</span></h5>
+                  <h5 class="card-title">Total Bids</h5>
 
                   <div class="d-flex align-items-center">
                     <div
@@ -115,23 +97,10 @@ echo $totalRevenueJson; // Temporary debug statement
             <!-- Revenue Card -->
             <div class="col">
               <div class="card info-card revenue-card">
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">Month</a></li>
-                    <li><a class="dropdown-item" href="#">Year</a></li>
-                  </ul>
-                </div>
 
                 <div class="card-body">
                   <h5 class="card-title">
-                    Total Bids Revenue <span>| Month</span>
+                    Total Bids Revenue
                   </h5>
 
                   <div class="d-flex align-items-center">
@@ -151,39 +120,6 @@ echo $totalRevenueJson; // Temporary debug statement
             <!-- Reports -->
             <div class="col-12">
               <div class="card" style="padding: 10px">
-                <div class="filter">
-                  <a
-                    class="icon"
-                    href="#"
-                    data-bs-toggle="dropdown"
-                    style="font-size: 12px">
-                    <i class="bi bi-three-dots"></i>
-                  </a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6 style="font-size: 12px">Filter</h6>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Today</a>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Month</a>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Year</a>
-                    </li>
-                  </ul>
-                </div>
 
                 <div class="card-body" style="padding: 10px">
                   <h5 class="card-title" style="font-size: 14px">
@@ -302,44 +238,9 @@ echo $totalRevenueJson; // Temporary debug statement
               <div
                 class="card recent-sales overflow-auto"
                 style="padding: 10px">
-                <div class="filter">
-                  <a
-                    class="icon"
-                    href="#"
-                    data-bs-toggle="dropdown"
-                    style="font-size: 12px">
-                    <i class="bi bi-three-dots"></i>
-                  </a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6 style="font-size: 12px">Filter</h6>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Today</a>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Month</a>
-                    </li>
-                    <li>
-                      <a
-                        class="dropdown-item"
-                        href="#"
-                        style="font-size: 12px">Year</a>
-                    </li>
-                  </ul>
-                </div>
-
                 <div class="card-body" style="padding: 10px">
                   <h5 class="card-title" style="font-size: 14px">
                     Infra Solution
-                    <span style="font-size: 12px">| Today</span>
                   </h5>
 
                   <!-- Stacked Bar Chart -->
@@ -449,29 +350,10 @@ echo $totalRevenueJson; // Temporary debug statement
         <div class="col-lg-4">
           <!-- Start Status Columns -->
           <div class="card" style="max-width: 600px">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6 style="font-size: 12px">Filter</h6>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#" style="font-size: 12px">Today</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#" style="font-size: 12px">Month</a>
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#" style="font-size: 12px">Year</a>
-                </li>
-              </ul>
-            </div>
 
             <div class="card-body pb-0">
               <h5 class="card-title" style="font-size: 14px">
-                Status <span style="font-size: 12px">| Today</span>
+                Status
               </h5>
 
               <table class="table tables-general" style="font-size: 12px">
@@ -504,25 +386,11 @@ echo $totalRevenueJson; // Temporary debug statement
           <!-- Start Bids Sector -->
 
           <div class="card" style="max-width: 600px">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">Month</a></li>
-                <li><a class="dropdown-item" href="#">Year</a></li>
-              </ul>
-            </div>
 
             <div class="card-body pb-0">
               <h5 class="card-title" style="font-size: 14px">
                 Bids By Market Sector
-                <span style="font-size: 12px">| Today</span>
+
               </h5>
 
               <div
@@ -530,210 +398,13 @@ echo $totalRevenueJson; // Temporary debug statement
                 style="min-height: 250px"
                 class="echart"></div>
 
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  // Parse the PHP variable directly into a JavaScript variable
-                  const bidCounts = <?php echo $bidCountsJson; ?>;
-
-                  var pieChart = echarts.init(document.querySelector("#sectorChart"));
-
-                  var pieOption = {
-                    tooltip: {
-                      trigger: "item",
-                    },
-                    legend: {
-                      top: "5%",
-                      left: "center",
-                      itemGap: 5,
-                      textStyle: {
-                        fontSize: 10,
-                      },
-                    },
-                    series: [{
-                      name: "Bids",
-                      type: "pie",
-                      radius: ["30%", "60%"],
-                      avoidLabelOverlap: false,
-                      label: {
-                        show: false,
-                        position: "center",
-                      },
-                      emphasis: {
-                        itemStyle: {
-                          shadowBlur: 10,
-                          shadowOffsetX: 0,
-                          shadowColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        label: {
-                          show: true,
-                          fontSize: "14",
-                          fontWeight: "bold",
-                        },
-                      },
-                      labelLine: {
-                        show: false,
-                      },
-                      data: [{
-                          value: bidCounts["TMG (Private Sector)"],
-                          name: "TMG (Private Sector)"
-                        },
-                        {
-                          value: bidCounts["TMG (Public Sector)"],
-                          name: "TMG (Public Sector)"
-                        },
-                        {
-                          value: bidCounts["NMG"],
-                          name: "NMG"
-                        },
-                        {
-                          value: bidCounts["IMG"],
-                          name: "IMG"
-                        },
-                        {
-                          value: bidCounts["Channel"],
-                          name: "Channel"
-                        },
-                      ],
-                    }, ],
-                  };
-
-                  // Track the last clicked sector
-                  let lastClickedSector = null;
-
-                  // Set initial chart options
-                  pieChart.setOption(pieOption);
-                  barChart.setOption(barOption);
-
-                  // Add click event to pie chart
-                  pieChart.on("click", function(params) {
-                    var sectorName = params.name; // Get the clicked sector's name
-
-                    // Toggle between hiding others and resetting all datasets
-                    if (lastClickedSector === sectorName) {
-                      resetStackedBarChart(); // Reset stacked bar chart
-                      resetHorizontalBarChart(); // Reset horizontal bar chart
-                      resetPieChart(); // Reset pie chart
-                      lastClickedSector = null; // Clear the last clicked sector
-                    } else {
-                      updateStackedBarChart(sectorName); // Show only the clicked sector in stacked bar chart
-                      updateHorizontalBarChart(sectorName); // Highlight corresponding sector in horizontal bar chart
-                      updatePieChart(sectorName); // Highlight corresponding sector in pie chart
-                      lastClickedSector = sectorName; // Set the last clicked sector
-                    }
-                  });
-
-                  // Function to show only the dataset that corresponds to the clicked sector in stacked bar chart
-                  function updateStackedBarChart(sectorName) {
-                    const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
-
-                    // Update the visibility of each dataset in the stacked bar chart
-                    chart.data.datasets.forEach(function(dataset) {
-                      dataset.hidden = dataset.label !== sectorName; // Show only the clicked sector
-                    });
-
-                    // Re-render the chart to reflect changes
-                    chart.update();
-                  }
-
-                  // Function to reset the stacked bar chart to show all datasets
-                  function resetStackedBarChart() {
-                    const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
-
-                    // Reset the visibility of all datasets to show them all
-                    chart.data.datasets.forEach(function(dataset) {
-                      dataset.hidden = false;
-                    });
-
-                    // Re-render the chart to reflect changes
-                    chart.update();
-                  }
-
-                  // Function to update horizontal bar chart by highlighting the clicked sector
-                  function updateHorizontalBarChart(sectorName) {
-                    // Update the bar chart's itemStyle to highlight only the selected sector
-                    barOption.series[0].itemStyle = {
-                      color: function(param) {
-                        return param.name === sectorName ?
-                          "#FF0000" :
-                          "#3398DB"; // Red for the highlighted sector, blue for others
-                      },
-                    };
-
-                    // Update the series label to show the value for the clicked sector
-                    barOption.series[0].label = {
-                      show: true,
-                      formatter: function(param) {
-                        return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
-                      },
-                    };
-
-                    // Refresh the horizontal bar chart
-                    barChart.setOption(barOption);
-                  }
-
-                  // Function to reset the horizontal bar chart to its default state
-                  function resetHorizontalBarChart() {
-                    // Reset the horizontal bar chart's itemStyle to default colors for all sectors
-                    barOption.series[0].itemStyle = {
-                      color: "#3398DB", // Reset color to blue for all bars
-                    };
-
-                    // Hide the labels for all sectors again
-                    barOption.series[0].label = {
-                      show: false,
-                    };
-
-                    // Refresh the horizontal bar chart
-                    barChart.setOption(barOption);
-                  }
-
-                  // Function to highlight only the clicked sector in the pie chart
-                  function updatePieChart(sectorName) {
-                    // Update the pie chart's data to hide other sectors
-                    pieOption.series[0].data.forEach(function(item) {
-                      item.itemStyle = {
-                        opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
-                      };
-                    });
-
-                    // Refresh the pie chart to reflect changes
-                    pieChart.setOption(pieOption);
-                  }
-
-                  // Function to reset the pie chart to its default state
-                  function resetPieChart() {
-                    // Reset the pie chart's data to show all sectors
-                    pieOption.series[0].data.forEach(function(item) {
-                      item.itemStyle = {
-                        opacity: 1, // Reset opacity for all sectors
-                      };
-                    });
-
-                    // Refresh the pie chart to reflect changes
-                    pieChart.setOption(pieOption);
-                  }
-                });
-              </script>
             </div>
           </div>
           <!-- End Bid Sector Column -->
 
           <!-- Sector Chart Section -->
           <div class="card" style="max-width: 600px">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
 
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
 
             <div class="card-body pb-0">
               <!-- Sector Bar Chart -->
@@ -742,200 +413,6 @@ echo $totalRevenueJson; // Temporary debug statement
                 style="min-height: 200px"
                 class="echart"></div>
 
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-
-                  // Use PHP to inject the bidCounts directly into JavaScript
-                  var bidCountsJson = {
-                    "TMG (Private Sector)": <?php echo $bidCounts["TMG (Private Sector)"]; ?>,
-                    "TMG (Public Sector)": <?php echo $bidCounts["TMG (Public Sector)"]; ?>,
-                    "NMG": <?php echo $bidCounts["NMG"]; ?>,
-                    "IMG": <?php echo $bidCounts["IMG"]; ?>,
-                    "Channel": <?php echo $bidCounts["Channel"]; ?>
-                  };
-
-                  // Convert the bidCountsJson values to an array
-                  var bidCountsArray = [
-                    bidCountsJson["TMG (Private Sector)"],
-                    bidCountsJson["TMG (Public Sector)"],
-                    bidCountsJson["NMG"],
-                    bidCountsJson["IMG"],
-                    bidCountsJson["Channel"]
-                  ];
-
-                  // Initialize horizontal bar chart
-                  var barChart = echarts.init(document.querySelector("#horizontalBarChart"));
-                  var barOption = {
-                    tooltip: {
-                      trigger: "axis",
-                      axisPointer: {
-                        type: "shadow"
-                      }
-                    },
-                    grid: {
-                      left: "5%",
-                      right: "5%",
-                      bottom: "5%",
-                      top: "10%",
-                      containLabel: true
-                    },
-                    xAxis: {
-                      type: "value",
-                      boundaryGap: [0, 0.01],
-                      axisLabel: {
-                        fontSize: 10
-                      },
-                    },
-                    yAxis: {
-                      type: "category",
-                      data: [
-                        "TMG (Private Sector)",
-                        "TMG (Public Sector)",
-                        "NMG",
-                        "IMG",
-                        "Channel"
-                      ],
-                      axisLabel: {
-                        fontSize: 10
-                      },
-                    },
-                    series: [{
-                      name: "Bids",
-                      type: "bar",
-                      data: bidCountsArray, // Use bidCountsArray here
-                      barWidth: "40%",
-                      itemStyle: {
-                        color: "#3398DB"
-                      },
-                      label: {
-                        show: false, // Initially hide the labels
-                        position: "insideRight",
-                        fontSize: 12,
-                        fontWeight: "bold",
-                      },
-                    }, ],
-                  };
-                  barChart.setOption(barOption);
-
-                  // Track the last clicked sector
-                  let lastClickedSector = null;
-
-                  // Add click event to pie chart
-                  pieChart.on("click", function(params) {
-                    var sectorName = params.name; // Get the clicked sector's name
-                    handleSectorClick(sectorName);
-                  });
-
-                  // Add click event to horizontal bar chart
-                  barChart.on("click", function(params) {
-                    var sectorName = params.name; // Get the clicked sector's name
-                    handleSectorClick(sectorName);
-                  });
-
-                  function handleSectorClick(sectorName) {
-                    // Toggle between hiding others and resetting all datasets
-                    if (lastClickedSector === sectorName) {
-                      resetCharts(); // Reset all charts
-                      lastClickedSector = null; // Clear the last clicked sector
-                    } else {
-                      updateCharts(sectorName); // Update all charts to reflect the clicked sector
-                      lastClickedSector = sectorName; // Set the last clicked sector
-                    }
-                  }
-
-                  // Function to update all charts by highlighting the clicked sector
-                  function updateCharts(sectorName) {
-                    updatePieChart(sectorName);
-                    updateHorizontalBarChart(sectorName);
-                    updateStackedBarChart(sectorName);
-                  }
-
-                  // Function to update pie chart by highlighting the clicked sector
-                  function updatePieChart(sectorName) {
-                    pieOption.series[0].data.forEach(function(item) {
-                      item.itemStyle = {
-                        opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
-                      };
-                    });
-                    pieChart.setOption(pieOption);
-                  }
-
-                  // Function to reset the pie chart to its default state
-                  function resetPieChart() {
-                    pieOption.series[0].data.forEach(function(item) {
-                      item.itemStyle = {
-                        opacity: 1
-                      }; // Reset opacity for all sectors
-                    });
-                    pieChart.setOption(pieOption);
-                  }
-
-                  // Function to update horizontal bar chart by highlighting the clicked sector
-                  function updateHorizontalBarChart(sectorName) {
-                    // Update the bar chart's itemStyle to highlight only the selected sector
-                    barOption.series[0].itemStyle = {
-                      color: function(param) {
-                        return param.name === sectorName ? "#FF0000" : "#3398DB"; // Red for the highlighted sector, blue for others
-                      },
-                    };
-
-                    // Update the series label to show the value for the clicked sector
-                    barOption.series[0].label = {
-                      show: true,
-                      formatter: function(param) {
-                        return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
-                      },
-                    };
-
-                    // Refresh the horizontal bar chart
-                    barChart.setOption(barOption);
-                  }
-
-                  // Function to reset the horizontal bar chart to its default state
-                  function resetHorizontalBarChart() {
-                    barOption.series[0].itemStyle = {
-                      color: "#3398DB"
-                    }; // Reset color to blue for all bars
-                    barOption.series[0].label = {
-                      show: false
-                    }; // Hide the labels for all sectors again
-                    barChart.setOption(barOption);
-                  }
-
-                  // Function to show only the dataset that corresponds to the clicked sector in stacked bar chart
-                  function updateStackedBarChart(sectorName) {
-                    const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
-
-                    // Update the visibility of each dataset in the stacked bar chart
-                    chart.data.datasets.forEach(function(dataset) {
-                      dataset.hidden = dataset.label !== sectorName; // Show only the clicked sector
-                    });
-
-                    // Re-render the chart to reflect changes
-                    chart.update();
-                  }
-
-                  // Function to reset the stacked bar chart to show all datasets
-                  function resetStackedBarChart() {
-                    const chart = Chart.getChart("stakedBarChart"); // Get the stacked bar chart instance
-
-                    // Reset the visibility of all datasets to show them all
-                    chart.data.datasets.forEach(function(dataset) {
-                      dataset.hidden = false;
-                    });
-
-                    // Re-render the chart to reflect changes
-                    chart.update();
-                  }
-
-                  // Function to reset all charts to their default state
-                  function resetCharts() {
-                    resetPieChart();
-                    resetHorizontalBarChart();
-                    resetStackedBarChart();
-                  }
-                });
-              </script>
             </div>
           </div>
           <!-- End Sector Chart Section -->
@@ -943,19 +420,7 @@ echo $totalRevenueJson; // Temporary debug statement
           <!-- Company Total Section -->
           <div class="card" style="max-width: 600px">
             <!-- Increased width for better spacing -->
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots"></i>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
+
 
             <div class="card-body pb-0">
               <!-- Bar Chart -->
@@ -1043,21 +508,11 @@ echo $totalRevenueJson; // Temporary debug statement
 
       <!-- Responsive Bid Types and Pipelines -->
       <div class="card top-selling overflow-auto">
-        <div class="filter">
-          <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <li class="dropdown-header text-start">
-              <h6>Filter</h6>
-            </li>
-            <li><a class="dropdown-item" href="#">Today</a></li>
-            <li><a class="dropdown-item" href="#">This Month</a></li>
-            <li><a class="dropdown-item" href="#">This Year</a></li>
-          </ul>
-        </div>
+
 
         <div class="card-body pb-0">
           <h5 class="card-title">
-            Bid Types and Pipelines <span>| Today</span>
+            Bid Types and Pipelines
           </h5>
 
           <!-- Responsive container for Bid Types and Pipelines Bar Charts -->
@@ -1220,6 +675,272 @@ echo $totalRevenueJson; // Temporary debug statement
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Parse the PHP variable directly into a JavaScript variable
+    const bidCounts = <?php echo $bidCountsJson; ?>;
+
+    // Initialize pie chart
+    var pieChart = echarts.init(document.querySelector("#sectorChart"));
+
+    var pieOption = {
+      tooltip: {
+        trigger: "item",
+      },
+      legend: {
+        top: "5%",
+        left: "center",
+        itemGap: 5,
+        textStyle: {
+          fontSize: 10,
+        },
+      },
+      series: [{
+        name: "Bids",
+        type: "pie",
+        radius: ["30%", "60%"],
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: "center",
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: "rgba(0, 0, 0, 0.5)",
+          },
+          label: {
+            show: true,
+            fontSize: "14",
+            fontWeight: "bold",
+          },
+        },
+        labelLine: {
+          show: false,
+        },
+        data: [{
+            value: bidCounts["TMG (Private Sector)"],
+            name: "TMG (Private Sector)"
+          },
+          {
+            value: bidCounts["TMG (Public Sector)"],
+            name: "TMG (Public Sector)"
+          },
+          {
+            value: bidCounts["NMG"],
+            name: "NMG"
+          },
+          {
+            value: bidCounts["IMG"],
+            name: "IMG"
+          },
+          {
+            value: bidCounts["Channel"],
+            name: "Channel"
+          },
+        ],
+      }],
+    };
+
+    // Initialize horizontal bar chart
+    var barChart = echarts.init(document.querySelector("#horizontalBarChart"));
+
+    var barOption = {
+      tooltip: {
+        trigger: "axis",
+        axisPointer: {
+          type: "shadow"
+        }
+      },
+      grid: {
+        left: "5%",
+        right: "5%",
+        bottom: "5%",
+        top: "10%",
+        containLabel: true
+      },
+      xAxis: {
+        type: "value",
+        boundaryGap: [0, 0.01],
+        axisLabel: {
+          fontSize: 10
+        },
+      },
+      yAxis: {
+        type: "category",
+        data: [
+          "TMG (Private Sector)",
+          "TMG (Public Sector)",
+          "NMG",
+          "IMG",
+          "Channel"
+        ],
+        axisLabel: {
+          fontSize: 10
+        },
+      },
+      series: [{
+        name: "Bids",
+        type: "bar",
+        data: [
+          bidCounts["TMG (Private Sector)"],
+          bidCounts["TMG (Public Sector)"],
+          bidCounts["NMG"],
+          bidCounts["IMG"],
+          bidCounts["Channel"]
+        ],
+        barWidth: "40%",
+        itemStyle: {
+          color: "#3398DB"
+        },
+        label: {
+          show: false, // Initially hide the labels
+          position: "insideRight",
+          fontSize: 12,
+          fontWeight: "bold",
+        },
+      }],
+    };
+
+    // Set initial options for both charts
+    pieChart.setOption(pieOption);
+    barChart.setOption(barOption);
+
+    // Track the last clicked sector
+    let lastClickedSector = null;
+
+    // Add click event to pie chart
+    pieChart.on("click", function(params) {
+      var sectorName = params.name; // Get the clicked sector's name
+
+      // Toggle between highlighting the sector and resetting
+      if (lastClickedSector === sectorName) {
+        resetAllCharts(); // Reset all charts
+        lastClickedSector = null; // Clear the last clicked sector
+      } else {
+        updateAllCharts(sectorName); // Highlight only the clicked sector in all charts
+        lastClickedSector = sectorName; // Set the last clicked sector
+      }
+    });
+
+    // Add click event listener to the bar chart
+    barChart.on('click', function(params) {
+      var sectorName = params.name; // Get the clicked sector's name
+
+      // Toggle between highlighting the sector and resetting
+      if (lastClickedSector === sectorName) {
+        resetAllCharts(); // Reset all charts
+        lastClickedSector = null; // Clear the last clicked sector
+      } else {
+        updateAllCharts(sectorName); // Highlight only the clicked sector in all charts
+        lastClickedSector = sectorName; // Set the last clicked sector
+      }
+    });
+
+    // Function to update all charts when a sector is clicked
+    function updateAllCharts(sectorName) {
+      // Update horizontal bar chart
+      updateHorizontalBarChart(sectorName);
+      // Update pie chart
+      updatePieChart(sectorName);
+      // Update stacked bar chart
+      updateStackedBarChart(sectorName);
+    }
+
+    // Function to highlight only the clicked sector in the horizontal bar chart
+    function updateHorizontalBarChart(sectorName) {
+      barOption.series[0].itemStyle = {
+        color: function(param) {
+          return param.name === sectorName ? "#FF0000" : "#A9A9A9"; // Red for the highlighted sector, gray for others
+        },
+      };
+
+      // Update the series label to show the value for the clicked sector
+      barOption.series[0].label = {
+        show: true,
+        formatter: function(param) {
+          return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
+        },
+      };
+
+      // Refresh the horizontal bar chart
+      barChart.setOption(barOption);
+    }
+
+    // Function to reset the bar chart to its default state
+    function resetHorizontalBarChart() {
+      barOption.series[0].itemStyle = {
+        color: "#3398DB", // Reset color to blue for all bars
+      };
+
+      barOption.series[0].label = {
+        show: false, // Hide labels for all sectors
+      };
+
+      // Refresh the horizontal bar chart
+      barChart.setOption(barOption);
+    }
+
+    // Function to update pie chart based on sector clicked
+    function updatePieChart(sectorName) {
+      pieOption.series[0].data.forEach(function(item) {
+        item.itemStyle = {
+          opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
+        };
+      });
+
+      // Refresh the pie chart to reflect changes
+      pieChart.setOption(pieOption);
+    }
+
+    // Function to reset the pie chart to default state
+    function resetPieChart() {
+      pieOption.series[0].data.forEach(function(item) {
+        item.itemStyle = {
+          opacity: 1, // Reset opacity for all sectors
+        };
+      });
+
+      pieChart.setOption(pieOption);
+    }
+
+    // Update Stacked Bar Chart
+    function updateStackedBarChart(sectorName) {
+      const chart = Chart.getChart("stakedBarChart");
+
+      chart.data.datasets.forEach(function(dataset) {
+        dataset.hidden = dataset.label !== sectorName; // Show only clicked sector
+      });
+
+      chart.update();
+    }
+
+    // Function to reset the stacked bar chart to default state
+    function resetStackedBarChart() {
+      const chart = Chart.getChart("stakedBarChart");
+
+      chart.data.datasets.forEach(function(dataset) {
+        dataset.hidden = false; // Show all datasets
+      });
+
+      chart.update();
+    }
+
+    // Reset all charts to default state
+    function resetAllCharts() {
+      resetHorizontalBarChart();
+      resetPieChart();
+      resetStackedBarChart();
+    }
+
+    // Set initial chart options
+    pieChart.setOption(pieOption);
+    barChart.setOption(barOption);
+  });
+</script>
+
 </body>
 
 </html>
