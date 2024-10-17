@@ -3,7 +3,7 @@ include_once 'db/db.php';
 
 // Fetch total number of bids submitted today
 $today = date('Y-m-d'); // Get today's date
-$totalBidsSql = "SELECT COUNT(*) as total_bids FROM bids WHERE Status = 'Submitted'";
+$totalBidsSql = "SELECT COUNT(*) as total_bids FROM bids";
 $totalBidsResult = $conn->query($totalBidsSql);
 $totalBids = $totalBidsResult->fetch_assoc()['total_bids'];
 
