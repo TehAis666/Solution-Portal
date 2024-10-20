@@ -2,7 +2,12 @@
 // Include the database connection file
 include_once 'db/db.php';
 
-// Updated query to join 'tender' and 'bid' tables and only select rows where status is 'submitted'
+// Initialize filter variables
+$year = isset($_GET['year']) ? $_GET['year'] : '';
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+
+// Build the base query
 $sql = "
     SELECT t.Solution1, t.Solution2, t.Solution3, t.Solution4, t.Value1, t.Value2, t.Value3, t.Value4 
     FROM tender t
@@ -10,6 +15,21 @@ $sql = "
     WHERE b.Status = 'Submitted'
 ";
 
+// Append year filter if set
+if (!empty($year)) {
+    $sql .= " AND YEAR(t.SubmissionDate) = $year"; // Adjust as necessary if you have a SubmissionDate column
+}
+
+// Append date range filter if set
+if (!empty($startDate) && !empty($endDate)) {
+    $sql .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'";
+} elseif (!empty($startDate)) {
+    $sql .= " AND t.SubmissionDate >= '$startDate'";
+} elseif (!empty($endDate)) {
+    $sql .= " AND t.SubmissionDate <= '$endDate'";
+}
+
+// Execute the query
 $result = $conn->query($sql);
 
 // Initialize variables to hold totals

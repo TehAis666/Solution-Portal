@@ -318,8 +318,8 @@
 
 })();
 
-// Function to apply dark mode
-function applyDarkMode(isDark) {
+ // Function to apply dark mode
+ function applyDarkMode(isDark) {
   const body = document.body;
   const icon = document.getElementById("themeIcon");
 

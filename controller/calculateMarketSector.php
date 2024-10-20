@@ -2,14 +2,37 @@
 // Include your database connection file
 include_once 'db/db.php'; // Assuming this file sets up the $conn variable
 
-// Query to get the count of bids by BusinessUnit
+// Initialize filter variables
+$year = isset($_GET['year']) ? $_GET['year'] : '';
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+
+// Build the base query
 $sql = "
-    SELECT BusinessUnit, COUNT(*) as bid_count 
-    FROM bids
-    WHERE Status = 'Submitted' 
-    GROUP BY BusinessUnit
+    SELECT b.BusinessUnit, COUNT(*) as bid_count 
+    FROM bids b
+    JOIN tender t ON b.BidID = t.BidID
+    WHERE b.Status = 'Submitted'
 ";
 
+// Append year filter if set
+if (!empty($year)) {
+    $sql .= " AND YEAR(t.SubmissionDate) = $year"; // Filter by year
+}
+
+// Append date range filter if set
+if (!empty($startDate) && !empty($endDate)) {
+    $sql .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'";
+} elseif (!empty($startDate)) {
+    $sql .= " AND t.SubmissionDate >= '$startDate'";
+} elseif (!empty($endDate)) {
+    $sql .= " AND t.SubmissionDate <= '$endDate'";
+}
+
+// Group by BusinessUnit
+$sql .= " GROUP BY b.BusinessUnit";
+
+// Execute the query
 $result = $conn->query($sql);
 
 // Initialize an array to hold the bid counts by BusinessUnit

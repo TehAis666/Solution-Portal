@@ -1,13 +1,33 @@
 <?php
-include_once 'db/db.php';
+include_once 'db/db.php'; // Assuming this file sets up the $conn variable
+
+// Get filter inputs from the URL (GET method)
+$year = isset($_GET['year']) ? $_GET['year'] : '';
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
 
 // Fetch Bid Types from the `bids` table where Status is 'Submitted'
 $sqlBidTypes = "
     SELECT Type, COUNT(*) as type_count 
-    FROM bids
-    WHERE Status = 'Submitted'
-    GROUP BY Type
+    FROM bids b
+    JOIN tender t ON t.BidID = b.BidID
+    WHERE b.Status = 'Submitted'
 ";
+
+// Apply filters based on the selected year, start date, and end date
+if (!empty($year)) {
+    $sqlBidTypes .= " AND YEAR(t.SubmissionDate) = $year"; // Filter by year
+}
+if (!empty($startDate) && !empty($endDate)) {
+    $sqlBidTypes .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
+} elseif (!empty($startDate)) {
+    $sqlBidTypes .= " AND t.SubmissionDate >= '$startDate'"; // Filter from start date
+} elseif (!empty($endDate)) {
+    $sqlBidTypes .= " AND t.SubmissionDate <= '$endDate'"; // Filter up to end date
+}
+
+$sqlBidTypes .= " GROUP BY Type"; // Group by bid Type
+
 $resultBidTypes = $conn->query($sqlBidTypes);
 
 // Initialize an array to hold the counts for bid types
@@ -35,8 +55,22 @@ $sqlPipelines = "
     FROM tender t
     JOIN bids b ON t.BidID = b.BidID
     WHERE b.Status = 'Submitted'
-    GROUP BY t.TenderStatus
 ";
+
+// Apply filters based on the selected year, start date, and end date
+if (!empty($year)) {
+    $sqlPipelines .= " AND YEAR(t.SubmissionDate) = $year"; // Filter by year
+}
+if (!empty($startDate) && !empty($endDate)) {
+    $sqlPipelines .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
+} elseif (!empty($startDate)) {
+    $sqlPipelines .= " AND t.SubmissionDate >= '$startDate'"; // Filter from start date
+} elseif (!empty($endDate)) {
+    $sqlPipelines .= " AND t.SubmissionDate <= '$endDate'"; // Filter up to end date
+}
+
+$sqlPipelines .= " GROUP BY t.TenderStatus"; // Group by tender status
+
 $resultPipelines = $conn->query($sqlPipelines);
 
 // Initialize an array to hold the pipeline counts

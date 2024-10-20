@@ -1,15 +1,35 @@
 <?php
 include_once 'db/db.php';
 
-// Fetch total number of bids and total RMValue by month where Status is 'Submitted'
+// Initialize filter inputs
+$year = isset($_GET['year']) ? $_GET['year'] : '';
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+
+// Start building the SQL query
 $sql = "
     SELECT
-    DATE_FORMAT(MAX(t.SubmissionDate), '%M %Y') as month,
-    COUNT(t.BidID) as total_bids,
-    SUM(t.RMValue) as total_revenue
+    DATE_FORMAT(t.SubmissionDate, '%M %Y') AS month,
+    COUNT(t.BidID) AS total_bids,
+    SUM(t.RMValue) AS total_revenue
     FROM tender t
     JOIN bids b ON t.BidID = b.BidID
     WHERE b.Status = 'Submitted'
+";
+
+// Add conditions based on filter inputs
+if (!empty($year)) {
+    $sql .= " AND YEAR(t.SubmissionDate) = '$year'";
+}
+if (!empty($startDate)) {
+    $sql .= " AND t.SubmissionDate >= '$startDate'";
+}
+if (!empty($endDate)) {
+    $sql .= " AND t.SubmissionDate <= '$endDate'";
+}
+
+// Group by month and order the results
+$sql .= "
     GROUP BY DATE_FORMAT(t.SubmissionDate, '%M %Y')
     ORDER BY YEAR(MAX(t.SubmissionDate)), MONTH(MAX(t.SubmissionDate))
 ";
@@ -29,9 +49,11 @@ if ($result->num_rows > 0) {
     }
 }
 
+// Optionally close the database connection
 // $conn->close();
 
 // Encode the data for use in JavaScript
 $monthsJson = json_encode($months);
 $totalBidsJson = json_encode($totalBids);
 $totalRevenueJson = json_encode($totalRevenue);
+?>
