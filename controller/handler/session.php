@@ -3,7 +3,7 @@
 session_start();
 
 // Set session timeout duration (in seconds)
-$timeout_duration = 900; // 15 minutes (900 seconds)
+$timeout_duration = 1800; // 15 minutes (900 seconds)
 
 // Check if the last activity session variable is set
 if (isset($_SESSION['last_activity'])) {
@@ -31,7 +31,7 @@ $_SESSION['last_activity'] = time();
 include_once 'db/db.php';
 
 // Check if the user is not logged in
-if (!isset($_SESSION['staff_id'])) {
+if (!isset($_SESSION['user_id'])) {
     // If the user is not logged in, redirect to the login page
     echo "<script>
         alert('You must log in first!');

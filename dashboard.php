@@ -1,4 +1,5 @@
 <?php
+include_once 'controller/handler/session.php';
 include_once 'controller/calculateSumSolution.php';
 include_once 'controller/calculateMarketSector.php';
 include_once 'controller/calculateInfraSolution.php';
@@ -514,262 +515,272 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
   <!-- HorizontalBarChart and StackedBarChart -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Store the currently selected label
-      let currentSelectedLabel = null;
+  document.addEventListener("DOMContentLoaded", () => {
+    // Store the currently selected label
+    let currentSelectedLabel = null;
 
-      // Bar Chart Code
-      const barChart = new Chart(document.querySelector("#barChart"), {
-        type: "bar",
-        data: {
-          labels: ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"], // Labels
-          datasets: [{
-            label: "Bid Value", // Chart label
-            data: [
-              <?php echo $mixSolutionTotal; ?>, // Mix Solution
-              <?php echo $paduNetTotal; ?>, // PaduNet
-              <?php echo $secureXTotal; ?>, // Secure-X
-              <?php echo $awanHeiTechTotal; ?>, // AwanHeiTech
-              <?php echo $iSentrixTotal; ?> // i-Sentrix
-            ],
-            backgroundColor: "#4668E6", // Background color
-            borderColor: "#4668E6", // Border color
-            borderWidth: 1
-          }]
+    // Bar Chart Code
+    const barChart = new Chart(document.querySelector("#barChart"), {
+      type: "bar",
+      data: {
+        labels: ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"], // Labels
+        datasets: [{
+          label: "Bid Value", // Chart label
+          data: [
+            <?php echo $mixSolutionTotal; ?>, // Mix Solution
+            <?php echo $paduNetTotal; ?>, // PaduNet
+            <?php echo $secureXTotal; ?>, // Secure-X
+            <?php echo $awanHeiTechTotal; ?>, // AwanHeiTech
+            <?php echo $iSentrixTotal; ?> // i-Sentrix
+          ],
+          backgroundColor: "#4668E6", // Background color
+          borderColor: "#4668E6", // Border color
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                if (value >= 1000000) {
+                  return (value / 1000000).toFixed(2) + "M"; // Display in millions
+                } else if (value >= 1000) {
+                  return (value / 1000).toFixed(1) + "K"; // Display in thousands
+                } else {
+                  return value; // Display as is if less than 1000
+                }
+              }
+            }
+          },
+          x: {
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            },
+            barPercentage: 0.4,
+            categoryPercentage: 0.6
+          }
         },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                // Dynamically format y-axis labels
-                callback: function(value) {
-                  if (value >= 1000000) {
-                    return (value / 1000000).toFixed(2) + "M"; // Display in millions
-                  } else if (value >= 1000) {
-                    return (value / 1000).toFixed(1) + "K"; // Display in thousands
-                  } else {
-                    return value; // Display as is if less than 1000
-                  }
-                }
-              }
-            },
-            x: {
-              ticks: {
-                autoSkip: false,
-                maxRotation: 0,
-                minRotation: 0
-              },
-              barPercentage: 0.4,
-              categoryPercentage: 0.6
-            }
-          },
-          responsive: true,
-          maintainAspectRatio: false,
-          onClick: (e) => {
-            const elements = barChart.getElementsAtEventForMode(e, 'nearest', {
-              intersect: true
-            }, true);
-            if (elements.length > 0) {
-              const clickedLabel = barChart.data.labels[elements[0].index]; // Get the clicked label
+        responsive: true,
+        maintainAspectRatio: false,
+        onClick: (e) => {
+          const elements = barChart.getElementsAtEventForMode(e, 'nearest', {
+            intersect: true
+          }, true);
+          if (elements.length > 0) {
+            const clickedLabel = barChart.data.labels[elements[0].index]; // Get the clicked label
 
-              if (currentSelectedLabel === clickedLabel) {
-                // If the same label is clicked again, reset the charts
-                resetCharts();
-                currentSelectedLabel = null; // Reset current selection
-              } else {
-                // Update the charts based on the clicked label
-                currentSelectedLabel = clickedLabel; // Update current selection
-                updateCharts(clickedLabel);
-              }
-            }
-          },
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  let value = context.raw;
-                  if (value >= 1000000) {
-                    return context.dataset.label + ": " + (value / 1000000).toFixed(2) + "M";
-                  } else if (value >= 1000) {
-                    return context.dataset.label + ": " + (value / 1000).toFixed(1) + "K";
-                  } else {
-                    return context.dataset.label + ": " + value;
-                  }
-                }
-              }
-            },
-            legend: {
-              display: true,
-              position: "top"
+            if (currentSelectedLabel === clickedLabel) {
+              // If the same label is clicked again, reset the charts
+              resetCharts();
+              currentSelectedLabel = null; // Reset current selection
+            } else {
+              // Update the charts based on the clicked label
+              currentSelectedLabel = clickedLabel; // Update current selection
+              updateCharts(clickedLabel);
             }
           }
-        }
-      });
-
-      // Stacked Bar Chart Code
-      var solutionCounts = <?php echo $solutionCountsJson; ?>;
-      var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"];
-
-      var datasets = [{
-          label: "Channel",
-          data: [
-            solutionCounts['PaduNet']['Channel'],
-            solutionCounts['SecureX']['Channel'],
-            solutionCounts['AwanHeiTech']['Channel'],
-            solutionCounts['iSentrix']['Channel'],
-            solutionCounts['MixSolution']['Channel']
-          ],
-          backgroundColor: "#6CC3DF" // Color for Channel
         },
-        {
-          label: "IMG",
-          data: [
-            solutionCounts['PaduNet']['IMG'],
-            solutionCounts['SecureX']['IMG'],
-            solutionCounts['AwanHeiTech']['IMG'],
-            solutionCounts['iSentrix']['IMG'],
-            solutionCounts['MixSolution']['IMG']
-          ],
-          backgroundColor: "#FF6B6B" // Color for IMG
-        },
-        {
-          label: "NMG",
-          data: [
-            solutionCounts['PaduNet']['NMG'],
-            solutionCounts['SecureX']['NMG'],
-            solutionCounts['AwanHeiTech']['NMG'],
-            solutionCounts['iSentrix']['NMG'],
-            solutionCounts['MixSolution']['NMG']
-          ],
-          backgroundColor: "#F9D266" // Color for NMG
-        },
-        {
-          label: "TMG (Private Sector)",
-          data: [
-            solutionCounts['PaduNet']['TMG (Private Sector)'],
-            solutionCounts['SecureX']['TMG (Private Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-            solutionCounts['iSentrix']['TMG (Private Sector)'],
-            solutionCounts['MixSolution']['TMG (Private Sector)']
-          ],
-          backgroundColor: "#4668E6" // Color for TMG (Private Sector)
-        },
-        {
-          label: "TMG (Public Sector)",
-          data: [
-            solutionCounts['PaduNet']['TMG (Public Sector)'],
-            solutionCounts['SecureX']['TMG (Public Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-            solutionCounts['iSentrix']['TMG (Public Sector)'],
-            solutionCounts['MixSolution']['TMG (Public Sector)']
-          ],
-          backgroundColor: "#7EC968" // Color for TMG (Public Sector)
-        }
-      ];
-
-      const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
-        type: "bar",
-        data: {
-          labels: labels, // Labels for the solutions
-          datasets: datasets // Data for each business sector per solution
-        },
-        options: {
-          plugins: {
-            title: {
-              display: false, // Hiding the chart title to save space
-            },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let value = context.raw;
+                if (value >= 1000000) {
+                  return context.dataset.label + ": " + (value / 1000000).toFixed(2) + "M";
+                } else if (value >= 1000) {
+                  return context.dataset.label + ": " + (value / 1000).toFixed(1) + "K";
+                } else {
+                  return context.dataset.label + ": " + value;
+                }
+              }
+            }
           },
-          responsive: true,
-          scales: {
-            x: {
-              stacked: true, // Enable stacking on X-axis
-            },
-            y: {
-              stacked: true, // Enable stacking on Y-axis
-              beginAtZero: true, // Start Y-axis at 0
-            },
-          },
-        },
-      });
-
-      // Function to update both charts based on the clicked label
-      function updateCharts(clickedLabel) {
-        const allLabels = ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"];
-        const newBarData = [];
-        const newStackedData = datasets.map(dataset => {
-          return {
-            label: dataset.label,
-            data: Array(allLabels.length).fill(0), // Initialize with zeros
-            backgroundColor: dataset.backgroundColor
-          };
-        });
-
-        if (clickedLabel === "All") {
-          // If 'All' is clicked, show all data in both charts
-          newBarData.push(
-            <?php echo $mixSolutionTotal; ?>,
-            <?php echo $paduNetTotal; ?>,
-            <?php echo $secureXTotal; ?>,
-            <?php echo $awanHeiTechTotal; ?>,
-            <?php echo $iSentrixTotal; ?>
-          );
-
-          // Fill stacked chart data for all solutions
-          newStackedData.forEach((dataset, index) => {
-            dataset.data = [
-              solutionCounts['PaduNet'][dataset.label],
-              solutionCounts['SecureX'][dataset.label],
-              solutionCounts['AwanHeiTech'][dataset.label],
-              solutionCounts['iSentrix'][dataset.label],
-              solutionCounts['MixSolution'][dataset.label]
-            ];
-          });
-        } else {
-          // For other cases, show only the clicked label in both charts
-          const index = allLabels.indexOf(clickedLabel);
-
-          newBarData.push(
-            index === 0 ? <?php echo $mixSolutionTotal; ?> : 0,
-            index === 1 ? <?php echo $paduNetTotal; ?> : 0,
-            index === 2 ? <?php echo $secureXTotal; ?> : 0,
-            index === 3 ? <?php echo $awanHeiTechTotal; ?> : 0,
-            index === 4 ? <?php echo $iSentrixTotal; ?> : 0
-          );
-
-          newStackedData.forEach((dataset, datasetIndex) => {
-            dataset.data[index] = solutionCounts[clickedLabel][dataset.label]; // Only show data for the clicked label
-          });
+          legend: {
+            display: true,
+            position: "top"
+          }
         }
-
-        // Update bar chart data
-        barChart.data.datasets[0].data = newBarData;
-        barChart.update();
-
-        // Update stacked chart data
-        stackedBarChart.data.datasets = newStackedData;
-        stackedBarChart.update();
       }
+    });
 
-      // Function to reset both charts to their original state
-      function resetCharts() {
-        // Reset bar chart data to original state
-        barChart.data.datasets[0].data = [
+    // Stacked Bar Chart Code
+    var solutionCounts = <?php echo $solutionCountsJson; ?>;
+    var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"];
+
+    var datasets = [{
+        label: "Channel",
+        data: [
+          solutionCounts['PaduNet']['Channel'],
+          solutionCounts['SecureX']['Channel'],
+          solutionCounts['AwanHeiTech']['Channel'],
+          solutionCounts['iSentrix']['Channel'],
+          solutionCounts['MixSolution']['Channel']
+        ],
+        backgroundColor: "#6CC3DF" // Color for Channel
+      },
+      {
+        label: "IMG",
+        data: [
+          solutionCounts['PaduNet']['IMG'],
+          solutionCounts['SecureX']['IMG'],
+          solutionCounts['AwanHeiTech']['IMG'],
+          solutionCounts['iSentrix']['IMG'],
+          solutionCounts['MixSolution']['IMG']
+        ],
+        backgroundColor: "#FF6B6B" // Color for IMG
+      },
+      {
+        label: "NMG",
+        data: [
+          solutionCounts['PaduNet']['NMG'],
+          solutionCounts['SecureX']['NMG'],
+          solutionCounts['AwanHeiTech']['NMG'],
+          solutionCounts['iSentrix']['NMG'],
+          solutionCounts['MixSolution']['NMG']
+        ],
+        backgroundColor: "#F9D266" // Color for NMG
+      },
+      {
+        label: "TMG (Private Sector)",
+        data: [
+          solutionCounts['PaduNet']['TMG (Private Sector)'],
+          solutionCounts['SecureX']['TMG (Private Sector)'],
+          solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
+          solutionCounts['iSentrix']['TMG (Private Sector)'],
+          solutionCounts['MixSolution']['TMG (Private Sector)']
+        ],
+        backgroundColor: "#4668E6" // Color for TMG (Private Sector)
+      },
+      {
+        label: "TMG (Public Sector)",
+        data: [
+          solutionCounts['PaduNet']['TMG (Public Sector)'],
+          solutionCounts['SecureX']['TMG (Public Sector)'],
+          solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
+          solutionCounts['iSentrix']['TMG (Public Sector)'],
+          solutionCounts['MixSolution']['TMG (Public Sector)']
+        ],
+        backgroundColor: "#7EC968" // Color for TMG (Public Sector)
+      }
+    ];
+
+    const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
+      type: "bar",
+      data: {
+        labels: labels, // Labels for the solutions
+        datasets: datasets // Data for each business sector per solution
+      },
+      options: {
+        plugins: {
+          title: {
+            display: false, // Hiding the chart title to save space
+          },
+        },
+        responsive: true,
+        scales: {
+          x: {
+            stacked: true, // Enable stacking on X-axis
+          },
+          y: {
+            stacked: true, // Enable stacking on Y-axis
+            beginAtZero: true, // Start Y-axis at 0
+          },
+        },
+      },
+    });
+
+    // Function to update both charts based on the clicked label
+    function updateCharts(clickedLabel) {
+      const allLabels = ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"];
+      const newBarData = [];
+      const newStackedData = datasets.map(dataset => {
+        return {
+          label: dataset.label,
+          data: Array(allLabels.length).fill(0), // Initialize with zeros
+          backgroundColor: dataset.backgroundColor
+        };
+      });
+
+      // Update the bar data
+      if (clickedLabel === "All") {
+        newBarData.push(
           <?php echo $mixSolutionTotal; ?>,
           <?php echo $paduNetTotal; ?>,
           <?php echo $secureXTotal; ?>,
           <?php echo $awanHeiTechTotal; ?>,
           <?php echo $iSentrixTotal; ?>
-        ];
-        barChart.update();
+        );
 
-        // Reset stacked bar chart data to original state
-        stackedBarChart.data.datasets = datasets;
-        stackedBarChart.update();
+        // Fill stacked chart data for all solutions
+        newStackedData.forEach((dataset, index) => {
+          dataset.data = [
+            solutionCounts['PaduNet'][dataset.label],
+            solutionCounts['SecureX'][dataset.label],
+            solutionCounts['AwanHeiTech'][dataset.label],
+            solutionCounts['iSentrix'][dataset.label],
+            solutionCounts['MixSolution'][dataset.label]
+          ];
+        });
+      } else {
+        // Get the index of the clicked label
+        const index = allLabels.indexOf(clickedLabel);
+        
+        // Update bar chart data
+        newBarData.push(
+          index === 0 ? <?php echo $mixSolutionTotal; ?> : 0,
+          index === 1 ? <?php echo $paduNetTotal; ?> : 0,
+          index === 2 ? <?php echo $secureXTotal; ?> : 0,
+          index === 3 ? <?php echo $awanHeiTechTotal; ?> : 0,
+          index === 4 ? <?php echo $iSentrixTotal; ?> : 0
+        );
+
+        // Update stacked data for the clicked label only
+        newStackedData.forEach((dataset, datasetIndex) => {
+          dataset.data[index] = solutionCounts[clickedLabel][dataset.label] || 0; // Handle undefined cases
+        });
       }
-    });
-  </script>
 
+      // Update the bar chart data
+      barChart.data.datasets[0].data = newBarData;
+      barChart.update();
+
+      // Update stacked chart data
+      stackedBarChart.data.datasets = newStackedData;
+      stackedBarChart.update();
+    }
+
+    // Function to reset both charts to their original state
+    function resetCharts() {
+      // Reset bar chart data to original state
+      barChart.data.datasets[0].data = [
+        <?php echo $mixSolutionTotal; ?>,
+        <?php echo $paduNetTotal; ?>,
+        <?php echo $secureXTotal; ?>,
+        <?php echo $awanHeiTechTotal; ?>,
+        <?php echo $iSentrixTotal; ?>
+      ];
+      barChart.update();
+
+      // Reset stacked chart data to original state
+      datasets.forEach((dataset, index) => {
+        dataset.data = [
+          solutionCounts['PaduNet'][dataset.label],
+          solutionCounts['SecureX'][dataset.label],
+          solutionCounts['AwanHeiTech'][dataset.label],
+          solutionCounts['iSentrix'][dataset.label],
+          solutionCounts['MixSolution'][dataset.label]
+        ];
+      });
+
+      stackedBarChart.data.datasets = datasets;
+      stackedBarChart.update();
+    }
+  });
+</script>
   <!-- PieChart and VerticalBarChart -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
