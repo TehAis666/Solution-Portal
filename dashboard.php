@@ -185,7 +185,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <!-- Filter Button -->
               <div class="col-md-2 d-flex align-items-center justify-content">
                 <button type="submit" class="btn btn-primary">Filter</button>
-                <button type="button" class="btn btn-light">Export to PDF</button>
+                <!-- <button type="button" class="btn btn-light">Export to PDF</button> -->
               </div>
             </div>
           </form>
