@@ -125,7 +125,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
 <body>
   <?php include 'layouts/navbar.php' ?>
-  <?php include 'layouts/sidebar.php' ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
