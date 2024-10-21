@@ -5,6 +5,7 @@ include '../db/db.php';
 // Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
+    $staffID = $_POST['staffID'];
     $requestDate = $_POST['RequestDate'];
     $status = $_POST['status'];
     $customerName = $_POST['Name'];
@@ -21,11 +22,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $solutions = explode(', ', $finalSolution);
 
     // Insert data into bids table
-    $sql_bids = "INSERT INTO bids (RequestDate, Status, CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql_bids = "INSERT INTO bids (staffID,RequestDate, Status, CustName, HMS_Scope, Tender_Proposal, Type, BusinessUnit, AccountSector, AccountManager) 
+                 VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt_bids = $conn->prepare($sql_bids);
-    $stmt_bids->bind_param("sssssssss", $requestDate, $status, $customerName, $scope, $tender, $type, $businessUnit, $accountSector, $accountManager);
+    $stmt_bids->bind_param("ssssssssss",$staffID, $requestDate, $status, $customerName, $scope, $tender, $type, $businessUnit, $accountSector, $accountManager);
 
     // Execute bids insertion and check for errors
     if ($stmt_bids->execute()) {

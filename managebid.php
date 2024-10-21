@@ -1,3 +1,6 @@
+<?php include_once 'controller/handler/session.php'; ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
