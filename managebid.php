@@ -1,3 +1,5 @@
+<?php include_once 'controller/handler/session.php' ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +7,7 @@
 
 <?php
 // Include the database connection file
-include 'db/db.php';
+include_once 'db/db.php';
 
 try {
   // Modify the query to calculate TotalValue by summing Value1 to Value4
@@ -358,8 +360,7 @@ try {
 </head>
 
 <body>
-  <?php include 'layouts/navbar.php' ?>
-  <?php include 'layouts/sidebar.php' ?>
+  <?php include_once 'layouts/navbar.php' ?>
 
   <main id="main" class="main">
     <div class="pagetitle">
