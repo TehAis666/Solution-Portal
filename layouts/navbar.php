@@ -33,7 +33,7 @@
                 class="rounded-circle"
               />
               <span class="d-none d-md-block dropdown-toggle ps-2"
-                >Pipol</span
+                ><?php echo $_SESSION['user_name']; ?></span
               > </a
             ><!-- End Profile Iamge Icon -->
 
@@ -41,8 +41,8 @@
               class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile"
             >
               <li class="dropdown-header">
-                <h6>Pipol</h6>
-                <span>Position</span>
+                <h6><?php echo $_SESSION['user_name']; ?></h6>
+                <span><?php echo $_SESSION['user_role']; ?></span>
               </li>
               <li>
                 <hr class="dropdown-divider" />

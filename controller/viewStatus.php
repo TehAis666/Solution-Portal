@@ -87,5 +87,5 @@ $statusData['Submitted'] = $statusData['Submitted'] ?? 0;
 $statusData['Dropped'] = $statusData['Dropped'] ?? 0;
 
 // Close the database connection
-$conn->close();
+// $conn->close();
 ?>
