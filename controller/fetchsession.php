@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
     // If the user is not logged in, redirect to the login page
     echo "<script>
         alert('You must log in first!');
-        window.location.href = '../login.php';
+        window.location.href = '../singup.php';
         </script>";
     exit();
 }
