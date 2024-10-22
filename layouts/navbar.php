@@ -1,6 +1,6 @@
 <?php include_once 'controller/handler/session.php';
 
-$profile_picture = include 'controller/handler/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
+$profile_picture = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
 $role = $_SESSION['user_role']; // Get the role from the session
 
 ?>
