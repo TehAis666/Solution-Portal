@@ -123,10 +123,27 @@
             </li>
             <li>
               <a href="managebid.php">
-                <i class="bi bi-circle"></i><span>Manage</span>
+                <i class="bi bi-circle"></i><span>ManageBid</span>
+              </a>
+            </li>
+            <li>
+              <a href="userbid.php">
+                <i class="bi bi-circle"></i><span>UserBid</span>
+              </a>
+            </li>
+            <li>
+              <a href="bossbid.php">
+                <i class="bi bi-circle"></i><span>BossBid</span>
               </a>
             </li>
           </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="verification.php">
+            <i class="bi bi-person"></i>
+            <span>Verification</span>
+          </a>
         </li>
         <!-- End Components Nav -->
          

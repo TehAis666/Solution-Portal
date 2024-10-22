@@ -59,7 +59,7 @@
           <div class="card-body">
             <h5 class="card-title">Bid Management</h5>
             <form id="addbidcont" action="controller/addbidcont.php" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <input type="hidden" name="staffID" id="staffID" value="<?php echo $_SESSION['staff_id']; ?>">
+            <input type="hidden" name="staffID" id="staffID" value="<?php echo $_SESSION['user_id']; ?>">
               <div class="form-row">
                 <div class="form-group">
                   <label for="requestDate">Request Date:</label>

@@ -11,22 +11,40 @@
 include_once 'db/db.php';
 
 try {
-  // Modify the query to calculate TotalValue by summing Value1 to Value4
-  $stmt = $conn->query("
+    // Assuming staffID is stored in the session
+    $staffID = intval($_SESSION['user_id']);
+
+    // Get the list of staffIDs for the manager, including their own
+    $staffIDs = [$staffID];
+
+    // Check if the logged-in user is a manager (i.e., if they have staff reporting to them)
+    $result = $conn->query("SELECT staffID FROM user WHERE managerID = $staffID");
+    while ($row = $result->fetch_assoc()) {
+        $staffIDs[] = $row['staffID']; // Add each subordinate's staffID
+    }
+
+    // Convert the array of staffIDs into a comma-separated string for the SQL query
+    $staffIDsList = implode(',', $staffIDs);
+
+    // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID or their subordinates
+    $stmt = $conn->query("
         SELECT 
             b.*, 
             t.*, 
             (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
+        WHERE b.staffID IN ($staffIDsList)
     ");
 
-  // Fetch all rows as an associative array
-  $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+    // Fetch all rows as an associative array
+    $bids = $stmt->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
-  // Handle any errors
-  echo "Error: " . $e->getMessage();
+    // Handle any errors
+    echo "Error: " . $e->getMessage();
 }
+
+
 ?>
 
 <!DOCTYPE html>

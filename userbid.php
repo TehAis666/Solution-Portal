@@ -11,7 +11,10 @@
 include_once 'db/db.php';
 
 try {
-  // Modify the query to calculate TotalValue by summing Value1 to Value4
+  // Assuming staffID is stored in the session
+  $staffID = $_SESSION['user_id'];
+
+  // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
   $stmt = $conn->query("
         SELECT 
             b.*, 
@@ -19,6 +22,7 @@ try {
             (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
+        WHERE b.staffID = $staffID
     ");
 
   // Fetch all rows as an associative array

@@ -2,6 +2,8 @@
 // Include the database connection file
 include '../db/db.php';
 
+$loggedInStaffID = intval($_SESSION['user_id']);  // Retrieve the staff ID from session
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $debugMessages = []; // Array to collect debug messages
 
