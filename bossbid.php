@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-</html>
+
 
 <?php
 // Include the database connection file
@@ -46,11 +46,6 @@ try {
 
 
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-</html>
 
 <head>
   <meta charset="utf-8" />
