@@ -55,73 +55,83 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
   <!-- Custom Styles -->
   <style>
-  /* Adjust form input boxes */
-  .form-control,
-  .form-select {
-    border-radius: 20px;
-    height: 28px;
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
-    margin: 0; /* Ensure no margin */
-  }
+    /* Adjust form input boxes */
+    .form-control,
+    .form-select {
+      border-radius: 20px;
+      height: 28px;
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+      margin: 0;
+      /* Ensure no margin */
+    }
 
-  /* Smaller Card (less padding) */
-  .filtering {
-    border-radius: 10px;
-    padding: 8px 12px;
-    min-height: 50px;
-    font-size: 0.8rem;
-  }
+    /* Smaller Card (less padding) */
+    .filtering {
+      border-radius: 10px;
+      padding: 8px 12px;
+      min-height: 50px;
+      font-size: 0.8rem;
+    }
 
-  /* Compact Rounded Buttons */
-  .btn {
-    border-radius: 20px;
-    padding: 0.2rem 0.8rem;
-    font-size: 0.8rem;
-    margin: 0; /* Remove margin */
-    white-space: nowrap; /* Prevent wrapping */
-  }
+    /* Compact Rounded Buttons */
+    .btn {
+      border-radius: 20px;
+      padding: 0.2rem 0.8rem;
+      font-size: 0.8rem;
+      margin: 0;
+      /* Remove margin */
+      white-space: nowrap;
+      /* Prevent wrapping */
+    }
 
-  /* Reduce spacing between form-group elements */
-  .form-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0;
-    margin-right: 5px; /* Reduce space between input fields */
-    gap: 4px; /* Reduce gap between label and input */
-  }
+    /* Reduce spacing between form-group elements */
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+      margin-right: 5px;
+      /* Reduce space between input fields */
+      gap: 4px;
+      /* Reduce gap between label and input */
+    }
 
-  /* Align labels to the left and adjust label spacing */
-  .form-group label {
-    margin-right: 5px;
-    margin-bottom: 0;
-    width: 60px; /* Adjust width to reduce space */
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
+    /* Align labels to the left and adjust label spacing */
+    .form-group label {
+      margin-right: 5px;
+      margin-bottom: 0;
+      width: 60px;
+      /* Adjust width to reduce space */
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
 
-  /* Reduce padding and margin between input fields */
-  .row.g-2 {
-    gap: 0.5rem; /* Reduce the gap between columns */
-  }
+    /* Reduce padding and margin between input fields */
+    .row.g-2 {
+      gap: 0.5rem;
+      /* Reduce the gap between columns */
+    }
 
-  /* Ensure Filter and Export buttons stay on the same line */
-  .col-md-2.d-flex {
-    padding-left: 0; /* Remove left padding */
-    gap: 4px; /* Reduce space between buttons */
-    white-space: nowrap; /* Prevent wrapping */
-  }
+    /* Ensure Filter and Export buttons stay on the same line */
+    .col-md-2.d-flex {
+      padding-left: 0;
+      /* Remove left padding */
+      gap: 4px;
+      /* Reduce space between buttons */
+      white-space: nowrap;
+      /* Prevent wrapping */
+    }
 
-  /* Ensure no margins around the card */
-  .card-body {
-    padding: 8px 12px;
-  }
+    /* Ensure no margins around the card */
+    .card-body {
+      padding: 8px 12px;
+    }
 
-  /* Reduce padding inside the card */
-  .card.filtering {
-    margin-bottom: 15px;
-  }
-</style>
+    /* Reduce padding inside the card */
+    .card.filtering {
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
 
 <body>
@@ -152,16 +162,16 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   <select id="year" name="year" class="form-select">
                     <option value="">Select Year</option>
                     <?php
-            // Get the selected year from the GET parameters
-            $selectedYear = isset($_GET['year']) ? $_GET['year'] : '';
+                    // Get the selected year from the GET parameters
+                    $selectedYear = isset($_GET['year']) ? $_GET['year'] : '';
 
-            // Generate dropdown options dynamically
-            foreach ($years as $year) {
-                // Check if the current year is the selected year
-                $selected = ($year == $selectedYear) ? 'selected' : '';
-                echo "<option value=\"$year\" $selected>$year</option>";
-            }
-            ?>
+                    // Generate dropdown options dynamically
+                    foreach ($years as $year) {
+                      // Check if the current year is the selected year
+                      $selected = ($year == $selectedYear) ? 'selected' : '';
+                      echo "<option value=\"$year\" $selected>$year</option>";
+                    }
+                    ?>
                   </select>
                 </div>
               </div>
@@ -242,6 +252,24 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             <!-- Reports -->
             <div class="col-12">
               <div class="card" style="padding: 10px">
+                <div class="filter">
+                  <a
+                    class="icon"
+                    href="#"
+                    data-bs-toggle="dropdown"
+                    style="font-size: 12px">
+                    <i class="bi bi-three-dots"></i>
+                  </a>
+                  <ul
+                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6 style="font-size: 12px">Action</h6>
+                    </li>
+                    <li>
+                    <a class="dropdown-item" href="#" style="font-size: 12px" id="resetZoom">Reset</a>
+                    </li>
+                  </ul>
+                </div>
 
                 <div class="card-body" style="padding: 10px">
                   <h5 class="card-title" style="font-size: 14px">
@@ -250,104 +278,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
                   <!-- Line Chart -->
                   <div id="reportsChart" style="height: 250px"></div>
-
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      // Get the JSON-encoded data from PHP
-                      var months = <?php echo $monthsJson; ?>;
-                      var totalBids = <?php echo $totalBidsJson; ?>;
-                      var totalRevenue = <?php echo $totalRevenueJson; ?>;
-
-                      // Line chart using ApexCharts
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                            name: "Number of Bids",
-                            data: totalBids.map(function(val) {
-                              return parseInt(val);
-                            }), // Ensure bids are integers
-                            type: "area",
-                          },
-                          {
-                            name: "Total Revenue of Bids",
-                            data: totalRevenue,
-                            type: "line",
-                          },
-                        ],
-                        chart: {
-                          height: 250,
-                          type: "line",
-                          toolbar: {
-                            show: false,
-                          },
-                        },
-                        markers: {
-                          size: 4, // Smaller markers
-                        },
-                        stroke: {
-                          curve: "smooth",
-                          width: 2, // Thinner lines
-                          dashArray: [0, 5], // Solid line for bids, dashed for revenue
-                        },
-                        colors: ["#4154f1", "#ff771d"], // Blue for bids, orange for revenue
-                        xaxis: {
-                          categories: months, // Month names
-                        },
-                        yaxis: [{
-                            title: {
-                              text: "Number of Bids",
-                            },
-                            min: 0,
-                            tickAmount: 5, // Adjusted for better visualization
-                            labels: {
-                              formatter: function(val) {
-                                return parseInt(val); // Convert to integer
-                              }
-                            }
-                          },
-                          {
-                            opposite: true, // Show revenue axis on the right
-                            title: {
-                              text: "Total Revenue (Mil)",
-                            },
-                            min: 0,
-                            tickAmount: 5, // Adjusted to suit the revenue scale
-                            labels: {
-                              formatter: function(val) {
-                                if (val >= 1) {
-                                  return val + "M"; // If 1 million or more, append 'M'
-                                } else {
-                                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
-                                }
-                              }
-                            }
-                          },
-                        ],
-                        tooltip: {
-                          x: {
-                            format: "MMMM", // Format the month
-                          },
-                          y: {
-                            formatter: function(val, opts) {
-                              if (opts.seriesIndex === 1) { // For the revenue series
-                                if (val >= 1) {
-                                  return val + "M"; // If 1 million or more, append 'M'
-                                } else {
-                                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
-                                }
-                              } else {
-                                return val; // Return number of bids as is
-                              }
-                            }
-                          }
-                        },
-                        fill: {
-                          type: "solid",
-                          opacity: [0.3, 1], // Reduced opacity for area
-                        },
-                      }).render();
-                    });
-                  </script>
-
 
                   <!-- End Line Chart -->
                 </div>
@@ -367,7 +297,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   <!-- Stacked Bar Chart -->
                   <canvas
                     id="stakedBarChart"
-                    style="max-height: 280px"></canvas>
+                    style="max-height: 310px"></canvas>
                 </div>
               </div>
             </div>
@@ -515,208 +445,275 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
   <!-- HorizontalBarChart and StackedBarChart -->
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Store the currently selected label
-    let currentSelectedLabel = null;
+    document.addEventListener("DOMContentLoaded", () => {
+      // Store the currently selected label
+      let currentSelectedLabel = null;
 
-    // Bar Chart Code
-    const barChart = new Chart(document.querySelector("#barChart"), {
-      type: "bar",
-      data: {
-        labels: ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"], // Labels
-        datasets: [{
-          label: "Bid Value", // Chart label
-          data: [
-            <?php echo $mixSolutionTotal; ?>, // Mix Solution
-            <?php echo $paduNetTotal; ?>, // PaduNet
-            <?php echo $secureXTotal; ?>, // Secure-X
-            <?php echo $awanHeiTechTotal; ?>, // AwanHeiTech
-            <?php echo $iSentrixTotal; ?> // i-Sentrix
-          ],
-          backgroundColor: "#4668E6", // Background color
-          borderColor: "#4668E6", // Border color
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: function(value) {
-                if (value >= 1000000) {
-                  return (value / 1000000).toFixed(2) + "M"; // Display in millions
-                } else if (value >= 1000) {
-                  return (value / 1000).toFixed(1) + "K"; // Display in thousands
-                } else {
-                  return value; // Display as is if less than 1000
+      // Bar Chart Code
+      const barChart = new Chart(document.querySelector("#barChart"), {
+        type: "bar",
+        data: {
+          labels: ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"], // Labels
+          datasets: [{
+            label: "Bid Value", // Chart label
+            data: [
+              <?php echo $paduNetTotal; ?>, // PaduNet
+              <?php echo $secureXTotal; ?>, // Secure-X
+              <?php echo $awanHeiTechTotal; ?>, // AwanHeiTech
+              <?php echo $iSentrixTotal; ?>, // i-Sentrix
+              <?php echo $mixSolutionTotal; ?> // Mix Solution
+            ],
+            backgroundColor: "#4668E6", // Background color
+            borderColor: "#4668E6", // Border color
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  if (value >= 1000000) {
+                    return (value / 1000000).toFixed(2) + "M"; // Display in millions
+                  } else if (value >= 1000) {
+                    return (value / 1000).toFixed(1) + "K"; // Display in thousands
+                  } else {
+                    return value; // Display as is if less than 1000
+                  }
                 }
               }
-            }
-          },
-          x: {
-            ticks: {
-              autoSkip: false,
-              maxRotation: 0,
-              minRotation: 0
             },
-            barPercentage: 0.4,
-            categoryPercentage: 0.6
-          }
-        },
-        responsive: true,
-        maintainAspectRatio: false,
-        onClick: (e) => {
-          const elements = barChart.getElementsAtEventForMode(e, 'nearest', {
-            intersect: true
-          }, true);
-          if (elements.length > 0) {
-            const clickedLabel = barChart.data.labels[elements[0].index]; // Get the clicked label
-
-            if (currentSelectedLabel === clickedLabel) {
-              // If the same label is clicked again, reset the charts
-              resetCharts();
-              currentSelectedLabel = null; // Reset current selection
-            } else {
-              // Update the charts based on the clicked label
-              currentSelectedLabel = clickedLabel; // Update current selection
-              updateCharts(clickedLabel);
+            x: {
+              ticks: {
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0
+              },
+              barPercentage: 0.4,
+              categoryPercentage: 0.6
             }
-          }
-        },
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                let value = context.raw;
-                if (value >= 1000000) {
-                  return context.dataset.label + ": " + (value / 1000000).toFixed(2) + "M";
-                } else if (value >= 1000) {
-                  return context.dataset.label + ": " + (value / 1000).toFixed(1) + "K";
-                } else {
-                  return context.dataset.label + ": " + value;
-                }
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (e) => {
+            const elements = barChart.getElementsAtEventForMode(e, 'nearest', {
+              intersect: true
+            }, true);
+            if (elements.length > 0) {
+              const clickedLabel = barChart.data.labels[elements[0].index]; // Get the clicked label
+
+              if (currentSelectedLabel === clickedLabel) {
+                // If the same label is clicked again, reset the charts
+                resetCharts();
+                currentSelectedLabel = null; // Reset current selection
+              } else {
+                // Update the charts based on the clicked label
+                currentSelectedLabel = clickedLabel; // Update current selection
+                updateCharts(clickedLabel);
               }
             }
           },
-          legend: {
-            display: true,
-            position: "top"
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let value = context.raw;
+                  if (value >= 1000000) {
+                    return context.dataset.label + ": " + (value / 1000000).toFixed(2) + "M";
+                  } else if (value >= 1000) {
+                    return context.dataset.label + ": " + (value / 1000).toFixed(1) + "K";
+                  } else {
+                    return context.dataset.label + ": " + value;
+                  }
+                }
+              }
+            },
+            legend: {
+              display: true,
+              position: "top"
+            }
           }
         }
-      }
-    });
-
-    // Stacked Bar Chart Code
-    var solutionCounts = <?php echo $solutionCountsJson; ?>;
-    var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"];
-
-    var datasets = [{
-        label: "Channel",
-        data: [
-          solutionCounts['PaduNet']['Channel'],
-          solutionCounts['SecureX']['Channel'],
-          solutionCounts['AwanHeiTech']['Channel'],
-          solutionCounts['iSentrix']['Channel'],
-          solutionCounts['MixSolution']['Channel']
-        ],
-        backgroundColor: "#6CC3DF" // Color for Channel
-      },
-      {
-        label: "IMG",
-        data: [
-          solutionCounts['PaduNet']['IMG'],
-          solutionCounts['SecureX']['IMG'],
-          solutionCounts['AwanHeiTech']['IMG'],
-          solutionCounts['iSentrix']['IMG'],
-          solutionCounts['MixSolution']['IMG']
-        ],
-        backgroundColor: "#FF6B6B" // Color for IMG
-      },
-      {
-        label: "NMG",
-        data: [
-          solutionCounts['PaduNet']['NMG'],
-          solutionCounts['SecureX']['NMG'],
-          solutionCounts['AwanHeiTech']['NMG'],
-          solutionCounts['iSentrix']['NMG'],
-          solutionCounts['MixSolution']['NMG']
-        ],
-        backgroundColor: "#F9D266" // Color for NMG
-      },
-      {
-        label: "TMG (Private Sector)",
-        data: [
-          solutionCounts['PaduNet']['TMG (Private Sector)'],
-          solutionCounts['SecureX']['TMG (Private Sector)'],
-          solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-          solutionCounts['iSentrix']['TMG (Private Sector)'],
-          solutionCounts['MixSolution']['TMG (Private Sector)']
-        ],
-        backgroundColor: "#4668E6" // Color for TMG (Private Sector)
-      },
-      {
-        label: "TMG (Public Sector)",
-        data: [
-          solutionCounts['PaduNet']['TMG (Public Sector)'],
-          solutionCounts['SecureX']['TMG (Public Sector)'],
-          solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-          solutionCounts['iSentrix']['TMG (Public Sector)'],
-          solutionCounts['MixSolution']['TMG (Public Sector)']
-        ],
-        backgroundColor: "#7EC968" // Color for TMG (Public Sector)
-      }
-    ];
-
-    const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
-      type: "bar",
-      data: {
-        labels: labels, // Labels for the solutions
-        datasets: datasets // Data for each business sector per solution
-      },
-      options: {
-        plugins: {
-          title: {
-            display: false, // Hiding the chart title to save space
-          },
-        },
-        responsive: true,
-        scales: {
-          x: {
-            stacked: true, // Enable stacking on X-axis
-          },
-          y: {
-            stacked: true, // Enable stacking on Y-axis
-            beginAtZero: true, // Start Y-axis at 0
-          },
-        },
-      },
-    });
-
-    // Function to update both charts based on the clicked label
-    function updateCharts(clickedLabel) {
-      const allLabels = ["Mix Solution", "PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix"];
-      const newBarData = [];
-      const newStackedData = datasets.map(dataset => {
-        return {
-          label: dataset.label,
-          data: Array(allLabels.length).fill(0), // Initialize with zeros
-          backgroundColor: dataset.backgroundColor
-        };
       });
 
-      // Update the bar data
-      if (clickedLabel === "All") {
-        newBarData.push(
-          <?php echo $mixSolutionTotal; ?>,
+      // Stacked Bar Chart Code
+      var solutionCounts = <?php echo $solutionCountsJson; ?>;
+      var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"]; // Same labels as bar chart
+
+      var datasets = [{
+          label: "Channel",
+          data: [
+            solutionCounts['PaduNet']['Channel'],
+            solutionCounts['SecureX']['Channel'],
+            solutionCounts['AwanHeiTech']['Channel'],
+            solutionCounts['iSentrix']['Channel'],
+            solutionCounts['MixSolution']['Channel']
+          ],
+          backgroundColor: "#6CC3DF" // Color for Channel
+        },
+        {
+          label: "IMG",
+          data: [
+            solutionCounts['PaduNet']['IMG'],
+            solutionCounts['SecureX']['IMG'],
+            solutionCounts['AwanHeiTech']['IMG'],
+            solutionCounts['iSentrix']['IMG'],
+            solutionCounts['MixSolution']['IMG']
+          ],
+          backgroundColor: "#FF6B6B" // Color for IMG
+        },
+        {
+          label: "NMG",
+          data: [
+            solutionCounts['PaduNet']['NMG'],
+            solutionCounts['SecureX']['NMG'],
+            solutionCounts['AwanHeiTech']['NMG'],
+            solutionCounts['iSentrix']['NMG'],
+            solutionCounts['MixSolution']['NMG']
+          ],
+          backgroundColor: "#F9D266" // Color for NMG
+        },
+        {
+          label: "TMG (Private Sector)",
+          data: [
+            solutionCounts['PaduNet']['TMG (Private Sector)'],
+            solutionCounts['SecureX']['TMG (Private Sector)'],
+            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
+            solutionCounts['iSentrix']['TMG (Private Sector)'],
+            solutionCounts['MixSolution']['TMG (Private Sector)']
+          ],
+          backgroundColor: "#4668E6" // Color for TMG (Private Sector)
+        },
+        {
+          label: "TMG (Public Sector)",
+          data: [
+            solutionCounts['PaduNet']['TMG (Public Sector)'],
+            solutionCounts['SecureX']['TMG (Public Sector)'],
+            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
+            solutionCounts['iSentrix']['TMG (Public Sector)'],
+            solutionCounts['MixSolution']['TMG (Public Sector)']
+          ],
+          backgroundColor: "#7EC968" // Color for TMG (Public Sector)
+        }
+      ];
+
+      const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
+        type: "bar",
+        data: {
+          labels: labels, // Same labels as bar chart
+          datasets: datasets // Data for each business sector per solution
+        },
+        options: {
+          plugins: {
+            title: {
+              display: false, // Hiding the chart title to save space
+            },
+          },
+          responsive: true,
+          scales: {
+            x: {
+              stacked: true, // Enable stacking on X-axis
+            },
+            y: {
+              stacked: true, // Enable stacking on Y-axis
+              beginAtZero: true, // Start Y-axis at 0
+            },
+          },
+        },
+      });
+
+      // Function to update both charts based on the clicked label
+      // Function to update both charts based on the clicked label
+      function updateCharts(clickedLabel) {
+        const labelKeyMapping = {
+          "PaduNet": "PaduNet",
+          "Secure-X": "SecureX", // Correct mapping for Secure-X
+          "AwanHeiTech": "AwanHeiTech",
+          "i-Sentrix": "iSentrix", // Correct mapping for i-Sentrix
+          "Mix Solution": "MixSolution"
+        };
+
+        const allLabels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"];
+        const newBarData = [];
+        const newStackedData = datasets.map(dataset => {
+          return {
+            label: dataset.label,
+            data: Array(allLabels.length).fill(0), // Initialize with zeros
+            backgroundColor: dataset.backgroundColor
+          };
+        });
+
+        if (clickedLabel === "All") {
+          newBarData.push(
+            <?php echo $paduNetTotal; ?>,
+            <?php echo $secureXTotal; ?>,
+            <?php echo $awanHeiTechTotal; ?>,
+            <?php echo $iSentrixTotal; ?>,
+            <?php echo $mixSolutionTotal; ?>
+          );
+
+          // Fill stacked chart data for all solutions
+          newStackedData.forEach((dataset, index) => {
+            dataset.data = [
+              solutionCounts['PaduNet'][dataset.label],
+              solutionCounts['SecureX'][dataset.label], // Ensure SecureX is used here
+              solutionCounts['AwanHeiTech'][dataset.label],
+              solutionCounts['iSentrix'][dataset.label], // Ensure iSentrix is used here
+              solutionCounts['MixSolution'][dataset.label]
+            ];
+          });
+        } else {
+          // Get the correct key for the clicked label
+          const solutionKey = labelKeyMapping[clickedLabel];
+
+          if (!solutionKey || !solutionCounts[solutionKey]) {
+            console.error(`No data found for the selected solution: ${clickedLabel}`);
+            return; // Exit if no data is found for the clicked label
+          }
+
+          // Get the index of the clicked label
+          const index = allLabels.indexOf(clickedLabel);
+
+          // Update bar chart data
+          newBarData.push(
+            index === 0 ? <?php echo $paduNetTotal; ?> : 0,
+            index === 1 ? <?php echo $secureXTotal; ?> : 0,
+            index === 2 ? <?php echo $awanHeiTechTotal; ?> : 0,
+            index === 3 ? <?php echo $iSentrixTotal; ?> : 0,
+            index === 4 ? <?php echo $mixSolutionTotal; ?> : 0
+          );
+
+          // Update stacked data for the clicked label only
+          newStackedData.forEach((dataset, datasetIndex) => {
+            dataset.data[index] = solutionCounts[solutionKey][dataset.label] || 0; // Handle undefined cases
+          });
+        }
+
+        // Update the bar chart data
+        barChart.data.datasets[0].data = newBarData;
+        barChart.update();
+
+        // Update stacked chart data
+        stackedBarChart.data.datasets = newStackedData;
+        stackedBarChart.update();
+      }
+
+
+      // Function to reset both charts to their original state
+      function resetCharts() {
+        // Reset bar chart data to original state
+        barChart.data.datasets[0].data = [
           <?php echo $paduNetTotal; ?>,
           <?php echo $secureXTotal; ?>,
           <?php echo $awanHeiTechTotal; ?>,
-          <?php echo $iSentrixTotal; ?>
-        );
+          <?php echo $iSentrixTotal; ?>,
+          <?php echo $mixSolutionTotal; ?>
+        ];
+        barChart.update();
 
-        // Fill stacked chart data for all solutions
-        newStackedData.forEach((dataset, index) => {
+        // Reset stacked bar chart data to original state
+        stackedBarChart.data.datasets.forEach((dataset, datasetIndex) => {
           dataset.data = [
             solutionCounts['PaduNet'][dataset.label],
             solutionCounts['SecureX'][dataset.label],
@@ -725,62 +722,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             solutionCounts['MixSolution'][dataset.label]
           ];
         });
-      } else {
-        // Get the index of the clicked label
-        const index = allLabels.indexOf(clickedLabel);
-        
-        // Update bar chart data
-        newBarData.push(
-          index === 0 ? <?php echo $mixSolutionTotal; ?> : 0,
-          index === 1 ? <?php echo $paduNetTotal; ?> : 0,
-          index === 2 ? <?php echo $secureXTotal; ?> : 0,
-          index === 3 ? <?php echo $awanHeiTechTotal; ?> : 0,
-          index === 4 ? <?php echo $iSentrixTotal; ?> : 0
-        );
-
-        // Update stacked data for the clicked label only
-        newStackedData.forEach((dataset, datasetIndex) => {
-          dataset.data[index] = solutionCounts[clickedLabel][dataset.label] || 0; // Handle undefined cases
-        });
+        stackedBarChart.update();
       }
+    });
+  </script>
 
-      // Update the bar chart data
-      barChart.data.datasets[0].data = newBarData;
-      barChart.update();
 
-      // Update stacked chart data
-      stackedBarChart.data.datasets = newStackedData;
-      stackedBarChart.update();
-    }
-
-    // Function to reset both charts to their original state
-    function resetCharts() {
-      // Reset bar chart data to original state
-      barChart.data.datasets[0].data = [
-        <?php echo $mixSolutionTotal; ?>,
-        <?php echo $paduNetTotal; ?>,
-        <?php echo $secureXTotal; ?>,
-        <?php echo $awanHeiTechTotal; ?>,
-        <?php echo $iSentrixTotal; ?>
-      ];
-      barChart.update();
-
-      // Reset stacked chart data to original state
-      datasets.forEach((dataset, index) => {
-        dataset.data = [
-          solutionCounts['PaduNet'][dataset.label],
-          solutionCounts['SecureX'][dataset.label],
-          solutionCounts['AwanHeiTech'][dataset.label],
-          solutionCounts['iSentrix'][dataset.label],
-          solutionCounts['MixSolution'][dataset.label]
-        ];
-      });
-
-      stackedBarChart.data.datasets = datasets;
-      stackedBarChart.update();
-    }
-  });
-</script>
   <!-- PieChart and VerticalBarChart -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -1164,6 +1111,104 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             barWidth: "50%",
           }],
         });
+    });
+  </script>
+
+  <!-- Bids by Month Charts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Get the JSON-encoded data from PHP
+      var months = <?php echo $monthsJson; ?>;
+      var totalBids = <?php echo $totalBidsJson; ?>;
+      var totalRevenue = <?php echo $totalRevenueJson; ?>;
+
+      // Line chart using ApexCharts
+      new ApexCharts(document.querySelector("#reportsChart"), {
+        series: [{
+            name: "Number of Bids",
+            data: totalBids.map(function(val) {
+              return parseInt(val);
+            }), // Ensure bids are integers
+            type: "area",
+          },
+          {
+            name: "Total Revenue of Bids",
+            data: totalRevenue,
+            type: "line",
+          },
+        ],
+        chart: {
+          height: 250,
+          type: "line",
+          toolbar: {
+            show: false,
+          },
+        },
+        markers: {
+          size: 4, // Smaller markers
+        },
+        stroke: {
+          curve: "smooth",
+          width: 2, // Thinner lines
+          dashArray: [0, 5], // Solid line for bids, dashed for revenue
+        },
+        colors: ["#4154f1", "#ff771d"], // Blue for bids, orange for revenue
+        xaxis: {
+          categories: months, // Month names
+        },
+        yaxis: [{
+            title: {
+              text: "Number of Bids",
+            },
+            min: 0,
+            tickAmount: 5, // Adjusted for better visualization
+            labels: {
+              formatter: function(val) {
+                return parseInt(val); // Convert to integer
+              }
+            }
+          },
+          {
+            opposite: true, // Show revenue axis on the right
+            title: {
+              text: "Total Revenue (Mil)",
+            },
+            min: 0,
+            tickAmount: 5, // Adjusted to suit the revenue scale
+            labels: {
+              formatter: function(val) {
+                if (val >= 1) {
+                  return val + "M"; // If 1 million or more, append 'M'
+                } else {
+                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
+                }
+              }
+            }
+          },
+        ],
+        tooltip: {
+          x: {
+            format: "MMMM", // Format the month
+          },
+          y: {
+            formatter: function(val, opts) {
+              if (opts.seriesIndex === 1) { // For the revenue series
+                if (val >= 1) {
+                  return val + "M"; // If 1 million or more, append 'M'
+                } else {
+                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
+                }
+              } else {
+                return val; // Return number of bids as is
+              }
+            }
+          }
+        },
+        fill: {
+          type: "solid",
+          opacity: [0.3, 1], // Reduced opacity for area
+        },
+      }).render();
     });
   </script>
 
