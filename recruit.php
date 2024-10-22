@@ -391,8 +391,8 @@ try {
         <!-- Dashboard -->
         <section class="section">
     <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
+        <div class="col-lg-6 d-flex align-items-stretch">
+            <div class="card flex-fill">
                 <div class="card-body">
                     <h5 class="card-title">Team Members</h5>
 
@@ -417,8 +417,8 @@ try {
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card">
+        <div class="col-lg-6 d-flex align-items-stretch">
+            <div class="card flex-fill">
                 <div class="card-body">
                     <h5 class="card-title">Members Without Manager</h5>
 
@@ -432,6 +432,9 @@ try {
                                         <strong>Email:</strong> <?php echo $nullUser['email']; ?><br>
                                         <strong>Phone:</strong> <?php echo $nullUser['phonenum']; ?><br>
                                         <strong>Role:</strong> <?php echo $nullUser['role']; ?>
+                                        <form action="recruitmember.php" method="post">
+                                <button type="submit" class="btn btn-success">Recruit</button>
+                            </form>
                                     </div>
                                 </div>
                             </div>
@@ -444,6 +447,7 @@ try {
         </div>
     </div>
 </section>
+
 
     </main>
     <!-- End Main -->
