@@ -381,7 +381,48 @@ try {
         </div>
         <!-- End Page Title -->
 
-        <section class="section dashboard">
+            <!-- Dashboard -->
+    <section class="section dashboard">
+      <div class="row text-center">
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title total-request clickable" style="color: #1e73be; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total User</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total New Request</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title total-approved clickable" style="color: #039be5; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total Approved</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title total-rejected clickable" style="color: #e53935; font-size: 48px;">0</h1>
+              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+              <h5 class="card-subtitle text-muted">Total Rejected</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Dashboard -->
+
             <!-- Data Table -->
             <div class="row">
                 <div class="col-12">
@@ -413,8 +454,8 @@ try {
                                                 <td class="text-center align-middle">
                                                     <?php
                                                     $status = htmlspecialchars($user['status']);
-                                                    if ($status == 'Accepted') {
-                                                        echo '<span class="badge bg-success">Accepted</span>';
+                                                    if ($status == 'Approved') {
+                                                        echo '<span class="badge bg-success">Approved</span>';
                                                     } elseif ($status == 'Rejected') {
                                                         echo '<span class="badge bg-danger">Rejected</span>';
                                                     } elseif ($status == 'Pending') {
@@ -478,50 +519,135 @@ try {
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 
+
+
     <script>
-        new DataTable('#example');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Approve button click
+            document.querySelectorAll('.approvebtn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr'); // Find the closest table row
+                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
+                    changeStatus(staffID, 'Approved', row); // Pass the row for updating
+                });
+            });
+
+            // Reject button click
+            document.querySelectorAll('.rejectbtn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr'); // Find the closest table row
+                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
+                    changeStatus(staffID, 'Rejected', row); // Pass the row for updating
+                });
+            });
+        });
+
+        function changeStatus(staffID, status, row) {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'controller/requestcont.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Update the status badge in the table in the provided row
+                    const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
+                    if (status === 'Approved') {
+                        statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
+                    } else if (status === 'Rejected') {
+                        statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+                    }
+                } else {
+                    alert('Error updating status');
+                }
+            };
+            xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
+        }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-    // Approve button click
-    document.querySelectorAll('.approvebtn').forEach(button => {
-        button.addEventListener('click', function () {
-            const row = this.closest('tr');  // Find the closest table row
-            const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-            changeStatus(staffID, 'Accepted', row); // Pass the row for updating
-        });
+
+        <!-- DataTable Script Initialization -->
+  <script>
+$(document).ready(function() {
+  // Initialize DataTable
+  const table = $('#example').DataTable({
+    paging: true,
+    searching: true,
+    info: true,
+    lengthChange: true,
+  });
+
+  // Function to calculate the dashboard counts
+  function calculateDashboard() {
+    const allRows = table.rows().nodes(); // Include all rows in DataTable
+
+    let totalUsers = 0;
+    let totalNewRequest = 0; // Pending status
+    let totalApproved = 0;   // Approved status
+    let totalRejected = 0;   // Rejected status
+
+    // Loop through all rows and update counts based on status
+    $(allRows).each(function() {
+      const statusElement = $(this).find('td:nth-child(6) .badge');
+      if (statusElement.length > 0) {
+        const status = statusElement.text().trim();
+        totalUsers++; // Count every row as a user (total bids/users)
+
+        // Count based on the status
+        if (status === 'Pending') {
+          totalNewRequest++;
+        } else if (status === 'Approved') {
+          totalApproved++;
+        } else if (status === 'Rejected') {
+          totalRejected++;
+        }
+      }
     });
 
-    // Reject button click
-    document.querySelectorAll('.rejectbtn').forEach(button => {
-        button.addEventListener('click', function () {
-            const row = this.closest('tr');  // Find the closest table row
-            const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-            changeStatus(staffID, 'Rejected', row); // Pass the row for updating
-        });
-    });
+    // Update the calculated totals in the dashboard elements
+    document.querySelector('.total-request').textContent = totalUsers;
+    document.querySelector('.total-new-request').textContent = totalNewRequest;
+    document.querySelector('.total-approved').textContent = totalApproved;
+    document.querySelector('.total-rejected').textContent = totalRejected;
+  }
+
+  // Function to filter the DataTable based on status
+  function filterByStatus(status) {
+    table.search(''); // Clear any existing search
+
+    if (status === 'all') {
+      // Show all rows
+      table.column(5).search('').draw();
+    } else {
+      // Filter by specific status
+      table.column(5).search(status).draw();
+    }
+  }
+
+  // Calculate dashboard counts after every DataTable draw event
+  table.on('draw', function() {
+    calculateDashboard();
+  });
+
+  // Event listeners for filtering based on the clicked dashboard element
+  document.querySelector('.total-request').addEventListener('click', function() {
+    filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
+  });
+
+  document.querySelector('.total-new-request').addEventListener('click', function() {
+    filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
+  });
+
+  document.querySelector('.total-approved').addEventListener('click', function() {
+    filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
+  });
+
+  document.querySelector('.total-rejected').addEventListener('click', function() {
+    filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
+  });
+
+  // Call the function once the document is ready and the table is fully loaded
+  calculateDashboard();
 });
 
-function changeStatus(staffID, status, row) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'controller/requestcont.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            // Update the status badge in the table in the provided row
-            const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
-            if (status === 'Accepted') {
-                statusCell.innerHTML = '<span class="badge bg-success">Accepted</span>';
-            } else if (status === 'Rejected') {
-                statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
-            }
-        } else {
-            alert('Error updating status');
-        }
-    };
-    xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
-}
     </script>
 </body>
 
