@@ -1,18 +1,5 @@
 <?php
 include_once 'controller/handler/session.php';
-include_once 'controller/calculateSumSolution.php';
-include_once 'controller/calculateMarketSector.php';
-include_once 'controller/calculateInfraSolution.php';
-include_once 'controller/calculatebidType.php';
-include_once 'controller/calculatereport.php';
-include_once 'controller/fetchYear.php';
-include_once 'controller/viewStatus.php';
-
-// Convert the counts to a JSON string for JavaScript
-$bidCountsJson = json_encode($bidCounts);
-
-// Convert the counts array to a JSON string
-$solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
 ?>
 
@@ -131,6 +118,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
     .card.filtering {
       margin-bottom: 15px;
     }
+
+    .small-label {
+    font-size: 0.85rem; /* Adjust this value as needed */
+    font-weight: normal; /* Optional: Change font weight */
+    color: #555; /* Maintain the original color or adjust if needed */
+}
   </style>
 </head>
 
@@ -192,22 +185,22 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <h5 class="card-title">Profile Details</h5>
 
               <div class="row">
-                <div class="col-lg-3 col-md-4 label ">Full Name</div>
+                <div class="col-lg-3 col-md-4 label small-label ">Full Name</div>
                 <div class="col-lg-9 col-md-8">Kevin Anderson</div>
               </div>
 
               <div class="row">
-                <div class="col-lg-3 col-md-4 label">Email</div>
+                <div class="col-lg-3 col-md-4 label small-label">Email</div>
                 <div class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
               </div>
 
               <div class="row">
-                <div class="col-lg-3 col-md-4 label">Phone Number</div>
+                <div class="col-lg-3 col-md-4 label small-label">Phone Number</div>
                 <div class="col-lg-9 col-md-8">Web Designer</div>
               </div>
 
               <div class="row">
-                <div class="col-lg-3 col-md-4 label">Manager Name</div>
+                <div class="col-lg-3 col-md-4 label small-label">Manager Name</div>
                 <div class="col-lg-9 col-md-8">USA</div>
               </div>
 
@@ -216,9 +209,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
               <!-- Profile Edit Form -->
-              <form>
+              <form action="#" method="" >
                 <div class="row mb-3">
-                  <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                  <label for="profileImage" class="col-md-4 col-lg-3 col-form-label small-label">Profile Image</label>
                   <div class="col-md-8 col-lg-9">
                     <img src="assets/img/profile-img.jpg" alt="Profile">
                     <div class="pt-2">
@@ -229,56 +222,28 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 </div>
 
                 <div class="row mb-3">
-                  <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
+                  <label for="fullName" class="col-md-4 col-lg-3 col-form-label small-label">Full Name</label>
                   <div class="col-md-8 col-lg-9">
-                    <input name="fullName" type="text" class="form-control" id="fullName" value="Kevin Anderson">
+                    <input name="Name" type="text" class="form-control" id="Name" value="lorem">
                   </div>
                 </div>
 
                 <div class="row mb-3">
-                  <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                  <label for="company" class="col-md-4 col-lg-3 col-form-label small-label">Manager Name</label>
                   <div class="col-md-8 col-lg-9">
-                    <textarea name="about" class="form-control" id="about" style="height: 100px">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</textarea>
+                    <input name="managerN" type="text" class="form-control" id="managerN" value="lorem">
                   </div>
                 </div>
 
                 <div class="row mb-3">
-                  <label for="company" class="col-md-4 col-lg-3 col-form-label">Company</label>
-                  <div class="col-md-8 col-lg-9">
-                    <input name="company" type="text" class="form-control" id="company" value="Lueilwitz, Wisoky and Leuschke">
-                  </div>
-                </div>
-
-                <div class="row mb-3">
-                  <label for="Job" class="col-md-4 col-lg-3 col-form-label">Job</label>
-                  <div class="col-md-8 col-lg-9">
-                    <input name="job" type="text" class="form-control" id="Job" value="Web Designer">
-                  </div>
-                </div>
-
-                <div class="row mb-3">
-                  <label for="Country" class="col-md-4 col-lg-3 col-form-label">Country</label>
-                  <div class="col-md-8 col-lg-9">
-                    <input name="country" type="text" class="form-control" id="Country" value="USA">
-                  </div>
-                </div>
-
-                <div class="row mb-3">
-                  <label for="Address" class="col-md-4 col-lg-3 col-form-label">Address</label>
-                  <div class="col-md-8 col-lg-9">
-                    <input name="address" type="text" class="form-control" id="Address" value="A108 Adam Street, New York, NY 535022">
-                  </div>
-                </div>
-
-                <div class="row mb-3">
-                  <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                  <label for="Email" class="col-md-4 col-lg-3 col-form-label small-label">Email</label>
                   <div class="col-md-8 col-lg-9">
                     <input name="email" type="email" class="form-control" id="Email" value="k.anderson@example.com">
                   </div>
                 </div>
 
                 <div class="row mb-3">
-                  <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                  <label for="Phone" class="col-md-4 col-lg-3 col-form-label small-label">Phone</label>
                   <div class="col-md-8 col-lg-9">
                     <input name="phone" type="text" class="form-control" id="Phone" pattern="0\d{9,11}" value="0171112222">
                   </div>
@@ -296,21 +261,21 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <form>
 
                 <div class="row mb-3">
-                  <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
+                  <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label small-label">Current Password</label>
                   <div class="col-md-8 col-lg-9">
                     <input name="password" type="password" class="form-control" id="currentPassword">
                   </div>
                 </div>
 
                 <div class="row mb-3">
-                  <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
+                  <label for="newPassword" class="col-md-4 col-lg-3 col-form-label small-label">New Password</label>
                   <div class="col-md-8 col-lg-9">
                     <input name="newpassword" type="password" class="form-control" id="newPassword">
                   </div>
                 </div>
 
                 <div class="row mb-3">
-                  <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
+                  <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label small-label">Re-enter New Password</label>
                   <div class="col-md-8 col-lg-9">
                     <input name="renewpassword" type="password" class="form-control" id="renewPassword">
                   </div>

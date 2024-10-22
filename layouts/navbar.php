@@ -1,5 +1,6 @@
-<?php include_once 'controller/handler/session.php'; 
+<?php include_once 'controller/handler/session.php';
 
+$profile_picture = include 'controller/handler/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
 $role = $_SESSION['user_role']; // Get the role from the session
 
 ?>
@@ -31,7 +32,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
               data-bs-toggle="dropdown"
             >
               <img
-                src="assets/img/profile-img.jpg"
+                src="<?php echo $profile_picture; ?>"
                 alt="Profile"
                 class="rounded-circle"
               />

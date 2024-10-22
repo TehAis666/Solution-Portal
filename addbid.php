@@ -461,20 +461,32 @@
     background-color: #0056b3;
   }
 
-  #Remarks {
-    border-radius: 15px; /* Adjust to your preference for rounded corners */
-    padding: 12px; /* Adjust padding for better appearance */
+/* Style for the textarea to make it rounded with specified properties */
+#Remarks {
+    width: calc(100% - 10px); /* Full width minus margin */
+    padding: 12px; /* Padding for comfort */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 15px; /* Rounded corners */
+    box-sizing: border-box; /* Include padding and border in width */
+    font-size: 16px; /* Font size */
+    color: #333; /* Text color */
 }
 
 /* Dark Mode for the textarea */
 .dark-mode #Remarks {
-  background-color: #1e1e1e; /* Dark background for the textarea */
-  color: #ffffff; /* Light text color */
-  border: 1px solid #555; /* Darker border */
+    background-color: #1e1e1e; /* Dark background for the textarea */
+    color: #ffffff; /* Light text color */
+    border: 1px solid #555; /* Darker border */
 }
 
+/* Placeholder styling for the textarea */
+#Remarks::placeholder {
+    color: rgba(51, 51, 51, 0.7); /* Light placeholder text in light mode */
+}
+
+/* Placeholder styling for dark mode */
 .dark-mode #Remarks::placeholder {
-  color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text color */
+    color: rgba(255, 255, 255, 0.7); /* Lighter placeholder text color in dark mode */
 }
   </style>
 
