@@ -10,19 +10,26 @@ include_once 'db/db.php';
 $staffID = $_SESSION['user_id'];
 
 try {
-    // Modify the query to calculate TotalValue by summing Value1 to Value4
     $stmt = $conn->query("
-        SELECT * FROM user
+        SELECT * FROM user WHERE managerID = $staffID
     ");
-
-    // Fetch all rows as an associative array
     $users = $stmt->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
-    // Handle any errors
     echo "Error: " . $e->getMessage();
 }
 
+// Fetch users with NULL managerID
+try {
+    $stmtNull = $conn->query("
+        SELECT * FROM user WHERE managerID IS NULL
+    ");
+    $nullUsers = $stmtNull->fetch_all(MYSQLI_ASSOC);
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage();
+}
 ?>
+
+
 
 <head>
     <meta charset="utf-8" />
@@ -370,7 +377,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Verify User</h1>
+            <h1>Squad Member</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -381,110 +388,63 @@ try {
         </div>
         <!-- End Page Title -->
 
-            <!-- Dashboard -->
-    <section class="section dashboard">
-      <div class="row text-center">
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-request clickable" style="color: #1e73be; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total User</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total New Request</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-approved clickable" style="color: #039be5; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Approved</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-rejected clickable" style="color: #e53935; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Rejected</h5>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End Dashboard -->
+        <!-- Dashboard -->
+        <section class="section">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Team Members</h5>
 
-            <!-- Data Table -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Bids List</h5>
-                            <!-- New Table with stripped rows -->
-                            <table id="example" class="table table-striped" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>StaffID</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Phone Number</th>
-                                        <th>Request Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($users)): ?>
-                                        <?php foreach ($users as $user): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($user['staffID']); ?></td>
-                                                <td><?php echo htmlspecialchars($user['name']); ?></td>
-                                                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                                <td><?php echo htmlspecialchars($user['role']); ?></td>
-                                                <td><?php echo htmlspecialchars($user['phonenum']); ?></td>
-                                                <td class="text-center align-middle">
-                                                    <?php
-                                                    $status = htmlspecialchars($user['status']);
-                                                    if ($status == 'Approved') {
-                                                        echo '<span class="badge bg-success">Approved</span>';
-                                                    } elseif ($status == 'Rejected') {
-                                                        echo '<span class="badge bg-danger">Rejected</span>';
-                                                    } elseif ($status == 'Pending') {
-                                                        echo '<span class="badge bg-warning text-dark">Pending</span>';
-                                                    } else {
-                                                        echo '<span class="badge bg-secondary">Unknown</span>';
-                                                    }
-                                                    ?>
-                                                </td>
-                                                <td>
-                                                    <!-- View Button with Data Attributes for Each Bid -->
-                                                    <button type="button" class="btn btn-primary rejectbtn">Reject</button>
-                                                    <button type="button" class="btn btn-primary approvebtn">Approve</button>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="6">No bids found</td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <!-- Display Team Members -->
+                    <?php if (!empty($users)) { ?>
+                        <?php foreach ($users as $user) { ?>
+                            <div class="row mb-3">
+                                <div class="col-sm-12">
+                                    <div class="form-control">
+                                        <strong>Name:</strong> <?php echo $user['name']; ?><br>
+                                        <strong>Email:</strong> <?php echo $user['email']; ?><br>
+                                        <strong>Phone:</strong> <?php echo $user['phonenum']; ?><br>
+                                        <strong>Role:</strong> <?php echo $user['role']; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <p>No team members found.</p>
+                    <?php } ?>
                 </div>
             </div>
+        </div>
 
-        </section>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Members Without Manager</h5>
+
+                    <!-- Display Users with NULL managerID -->
+                    <?php if (!empty($nullUsers)) { ?>
+                        <?php foreach ($nullUsers as $nullUser) { ?>
+                            <div class="row mb-3">
+                                <div class="col-sm-12">
+                                    <div class="form-control">
+                                        <strong>Name:</strong> <?php echo $nullUser['name']; ?><br>
+                                        <strong>Email:</strong> <?php echo $nullUser['email']; ?><br>
+                                        <strong>Phone:</strong> <?php echo $nullUser['phonenum']; ?><br>
+                                        <strong>Role:</strong> <?php echo $nullUser['role']; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <p>No members without a manager found.</p>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
     </main>
     <!-- End Main -->
 
@@ -514,141 +474,6 @@ try {
 
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Approve button click
-            document.querySelectorAll('.approvebtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Approved', row); // Pass the row for updating
-                });
-            });
-
-            // Reject button click
-            document.querySelectorAll('.rejectbtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Rejected', row); // Pass the row for updating
-                });
-            });
-        });
-
-        function changeStatus(staffID, status, row) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'controller/requestcont.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    // Update the status badge in the table in the provided row
-                    const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
-                    if (status === 'Approved') {
-                        statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
-                    } else if (status === 'Rejected') {
-                        statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
-                    }
-                } else {
-                    alert('Error updating status');
-                }
-            };
-            xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
-        }
-    </script>
-
-
-        <!-- DataTable Script Initialization -->
-  <script>
-$(document).ready(function() {
-  // Initialize DataTable
-  const table = $('#example').DataTable({
-    paging: true,
-    searching: true,
-    info: true,
-    lengthChange: true,
-  });
-
-  // Function to calculate the dashboard counts
-  function calculateDashboard() {
-    const allRows = table.rows().nodes(); // Include all rows in DataTable
-
-    let totalUsers = 0;
-    let totalNewRequest = 0; // Pending status
-    let totalApproved = 0;   // Approved status
-    let totalRejected = 0;   // Rejected status
-
-    // Loop through all rows and update counts based on status
-    $(allRows).each(function() {
-      const statusElement = $(this).find('td:nth-child(6) .badge');
-      if (statusElement.length > 0) {
-        const status = statusElement.text().trim();
-        totalUsers++; // Count every row as a user (total bids/users)
-
-        // Count based on the status
-        if (status === 'Pending') {
-          totalNewRequest++;
-        } else if (status === 'Approved') {
-          totalApproved++;
-        } else if (status === 'Rejected') {
-          totalRejected++;
-        }
-      }
-    });
-
-    // Update the calculated totals in the dashboard elements
-    document.querySelector('.total-request').textContent = totalUsers;
-    document.querySelector('.total-new-request').textContent = totalNewRequest;
-    document.querySelector('.total-approved').textContent = totalApproved;
-    document.querySelector('.total-rejected').textContent = totalRejected;
-  }
-
-  // Function to filter the DataTable based on status
-  function filterByStatus(status) {
-    table.search(''); // Clear any existing search
-
-    if (status === 'all') {
-      // Show all rows
-      table.column(5).search('').draw();
-    } else {
-      // Filter by specific status
-      table.column(5).search(status).draw();
-    }
-  }
-
-  // Calculate dashboard counts after every DataTable draw event
-  table.on('draw', function() {
-    calculateDashboard();
-  });
-
-  // Event listeners for filtering based on the clicked dashboard element
-  document.querySelector('.total-request').addEventListener('click', function() {
-    filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
-  });
-
-  document.querySelector('.total-new-request').addEventListener('click', function() {
-    filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
-  });
-
-  document.querySelector('.total-approved').addEventListener('click', function() {
-    filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
-  });
-
-  document.querySelector('.total-rejected').addEventListener('click', function() {
-    filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
-  });
-
-  // Call the function once the document is ready and the table is fully loaded
-  calculateDashboard();
-});
-
-    </script>
 </body>
 
 </html>

@@ -166,6 +166,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
       </a>
     </li>
     <?php endif; ?>
+
+    
     <!-- End Components Nav -->
 
     <!-- End Forms Nav -->
