@@ -485,7 +485,6 @@ try {
                             data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
                             data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
                             data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
-
                             data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
                             data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
                             data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"

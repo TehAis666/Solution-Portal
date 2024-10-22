@@ -412,13 +412,13 @@ try {
                                                 <td><?php echo htmlspecialchars($user['phonenum']); ?></td>
                                                 <td class="text-center align-middle">
                                                     <?php
-                                                    $status = htmlspecialchars($user['Status']);
-                                                    if ($status == 'Submitted') {
-                                                        echo '<span class="badge bg-success">Submitted</span>';
-                                                    } elseif ($status == 'Dropped') {
-                                                        echo '<span class="badge bg-danger">Dropped</span>';
-                                                    } elseif ($status == 'WIP') {
-                                                        echo '<span class="badge bg-warning text-dark">WIP</span>';
+                                                    $status = htmlspecialchars($user['status']);
+                                                    if ($status == 'Accepted') {
+                                                        echo '<span class="badge bg-success">Accepted</span>';
+                                                    } elseif ($status == 'Rejected') {
+                                                        echo '<span class="badge bg-danger">Rejected</span>';
+                                                    } elseif ($status == 'Pending') {
+                                                        echo '<span class="badge bg-warning text-dark">Pending</span>';
                                                     } else {
                                                         echo '<span class="badge bg-secondary">Unknown</span>';
                                                     }
@@ -426,8 +426,8 @@ try {
                                                 </td>
                                                 <td>
                                                     <!-- View Button with Data Attributes for Each Bid -->
-                                                    <button type="button" class="btn btn-primary approvebtn">Approve</button>
                                                     <button type="button" class="btn btn-primary rejectbtn">Reject</button>
+                                                    <button type="button" class="btn btn-primary approvebtn">Approve</button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -480,6 +480,48 @@ try {
 
     <script>
         new DataTable('#example');
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    // Approve button click
+    document.querySelectorAll('.approvebtn').forEach(button => {
+        button.addEventListener('click', function () {
+            const row = this.closest('tr');  // Find the closest table row
+            const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
+            changeStatus(staffID, 'Accepted', row); // Pass the row for updating
+        });
+    });
+
+    // Reject button click
+    document.querySelectorAll('.rejectbtn').forEach(button => {
+        button.addEventListener('click', function () {
+            const row = this.closest('tr');  // Find the closest table row
+            const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
+            changeStatus(staffID, 'Rejected', row); // Pass the row for updating
+        });
+    });
+});
+
+function changeStatus(staffID, status, row) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'controller/requestcont.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            // Update the status badge in the table in the provided row
+            const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
+            if (status === 'Accepted') {
+                statusCell.innerHTML = '<span class="badge bg-success">Accepted</span>';
+            } else if (status === 'Rejected') {
+                statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+            }
+        } else {
+            alert('Error updating status');
+        }
+    };
+    xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
+}
     </script>
 </body>
 

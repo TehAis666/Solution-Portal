@@ -136,13 +136,18 @@
                 <i class="bi bi-circle"></i><span>BossBid</span>
               </a>
             </li>
+            <li>
+              <a href="viewbid.php">
+                <i class="bi bi-circle"></i><span>View Bid</span>
+              </a>
+            </li>
           </ul>
         </li>
 
         <li class="nav-item">
           <a class="nav-link" href="verification.php">
             <i class="bi bi-person"></i>
-            <span>Verification</span>
+            <span>Signup Request</span>
           </a>
         </li>
         <!-- End Components Nav -->
