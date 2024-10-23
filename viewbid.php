@@ -364,7 +364,7 @@ try {
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Manage Bid</h1>
+      <h1>View Bid</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>

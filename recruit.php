@@ -21,7 +21,7 @@ try {
 // Fetch users with NULL managerID
 try {
     $stmtNull = $conn->query("
-        SELECT * FROM user WHERE managerID IS NULL
+        SELECT * FROM user WHERE managerID IS NULL AND role != 'Management'
     ");
     $nullUsers = $stmtNull->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
@@ -377,7 +377,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Squad Member</h1>
+            <h1>Manage Team</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -390,64 +390,95 @@ try {
 
         <!-- Dashboard -->
         <section class="section">
-    <div class="row">
-        <div class="col-lg-6 d-flex align-items-stretch">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <h5 class="card-title">Team Members</h5>
+            <div class="row align-items-start">
+                <div class="col-lg-6 d-flex align-items-stretch">
+                    <div class="card flex-fill" style="height: 100%;">
+                        <div class="card-body">
+                            <h5 class="card-title">Team Members</h5>
 
-                    <!-- Display Team Members -->
-                    <?php if (!empty($users)) { ?>
-                        <?php foreach ($users as $user) { ?>
-                            <div class="row mb-3">
-                                <div class="col-sm-12">
-                                    <div class="form-control">
-                                        <strong>Name:</strong> <?php echo $user['name']; ?><br>
-                                        <strong>Email:</strong> <?php echo $user['email']; ?><br>
-                                        <strong>Phone:</strong> <?php echo $user['phonenum']; ?><br>
-                                        <strong>Role:</strong> <?php echo $user['role']; ?>
+                            <!-- Display Team Members -->
+                            <?php if (!empty($users)) { ?>
+                                <?php foreach ($users as $user) { ?>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-12">
+                                            <div class="form-control">
+                                                <div class="row">
+                                                    <!-- First Column: User Details -->
+                                                    <div class="col-sm-8">
+                                                        <strong>Name:</strong> <?php echo $user['name']; ?><br>
+                                                        <strong>Email:</strong> <?php echo $user['email']; ?><br>
+                                                        <strong>Phone:</strong> <?php echo $user['phonenum']; ?><br>
+                                                        <strong>Role:</strong> <?php echo $user['role']; ?>
+                                                    </div>
+
+                                                    <!-- Second Column: PFP -->
+                                                    <div class="col-sm-4 d-flex align-items-center justify-content-center">
+                                                        <?php
+                                                        // Check if the user profile picture is null
+                                                        $profilePicture = !empty($user['userpfp']) ? $user['userpfp'] : 'pfp/default.jpg';
+                                                        ?>
+                                                        <img src="<?php echo $profilePicture; ?>" alt="Profile Picture" style="max-width: 100px; max-height: 100px; border-radius: 50%;">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                <?php } ?>
+                            <?php } else { ?>
+                                <p>No team members found.</p>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 d-flex align-items-stretch">
+                    <div class="card flex-fill" style="height: 100%;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Recruit Team Member</h5>
+
+                            <!-- Display Users with NULL managerID, excluding Management -->
+                            <div class="flex-grow-1">
+                                <?php if (!empty($nullUsers)) { ?>
+                                    <?php foreach ($nullUsers as $nullUser) { ?>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-12">
+                                                <div class="form-control">
+                                                    <div class="row">
+                                                        <!-- First Column: User Details -->
+                                                        <div class="col-sm-8">
+                                                            <strong>Name:</strong> <?php echo $nullUser['name']; ?><br>
+                                                            <strong>Email:</strong> <?php echo $nullUser['email']; ?><br>
+                                                            <strong>Phone:</strong> <?php echo $nullUser['phonenum']; ?><br>
+                                                            <strong>Role:</strong> <?php echo $nullUser['role']; ?>
+
+                                                            <!-- Recruit Button for each user -->
+                                                            <form action="controller/recruitcont.php" method="post" class="mt-2">
+                                                                <input type="hidden" name="user_id" value="<?php echo $nullUser['staffID']; ?>">
+                                                                <button type="submit" class="btn btn-success">Recruit</button>
+                                                            </form>
+                                                        </div>
+                                                        <!-- Second Column: PFP -->
+                                                        <div class="col-sm-4 d-flex align-items-center justify-content-center">
+                                                            <?php
+                                                            // Check if the user profile picture is null
+                                                            $profilePicture = !empty($user['userpfp']) ? $user['userpfp'] : 'pfp/default.jpg';
+                                                            ?>
+                                                            <img src="<?php echo $profilePicture; ?>" alt="Profile Picture" style="max-width: 100px; max-height: 100px; border-radius: 50%;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <p>No members without a manager found.</p>
+                                <?php } ?>
                             </div>
-                        <?php } ?>
-                    <?php } else { ?>
-                        <p>No team members found.</p>
-                    <?php } ?>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 d-flex align-items-stretch">
-            <div class="card flex-fill">
-                <div class="card-body">
-                    <h5 class="card-title">Members Without Manager</h5>
-
-                    <!-- Display Users with NULL managerID -->
-                    <?php if (!empty($nullUsers)) { ?>
-                        <?php foreach ($nullUsers as $nullUser) { ?>
-                            <div class="row mb-3">
-                                <div class="col-sm-12">
-                                    <div class="form-control">
-                                        <strong>Name:</strong> <?php echo $nullUser['name']; ?><br>
-                                        <strong>Email:</strong> <?php echo $nullUser['email']; ?><br>
-                                        <strong>Phone:</strong> <?php echo $nullUser['phonenum']; ?><br>
-                                        <strong>Role:</strong> <?php echo $nullUser['role']; ?>
-                                        <form action="recruitmember.php" method="post">
-                                <button type="submit" class="btn btn-success">Recruit</button>
-                            </form>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    <?php } else { ?>
-                        <p>No members without a manager found.</p>
-                    <?php } ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
+        </section>
 
     </main>
     <!-- End Main -->

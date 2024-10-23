@@ -168,6 +168,15 @@ $role = $_SESSION['user_role']; // Get the role from the session
     </li>
     <?php endif; ?>
 
+    <?php if($role != 'Presales' && $role != 'Product Admin'): // Only Management ?>
+    <li class="nav-item">
+      <a class="nav-link" href="recruit.php">
+        <i class="bi bi-people"></i>
+        <span>Manage Team</span>
+      </a>
+    </li>
+    <?php endif; ?>
+
     
     <!-- End Components Nav -->
 

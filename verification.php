@@ -319,14 +319,11 @@ try {
             }
         }
 
-
         .modal-title {
             font-weight: bold;
             font-size: 1.25rem;
             color: #333;
         }
-
-
 
         .modal-footer {
             padding: 1rem;
@@ -515,7 +512,6 @@ try {
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 
