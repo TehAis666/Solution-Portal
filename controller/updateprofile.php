@@ -17,61 +17,82 @@ if (isset($_SESSION['user_id'])) {
         $stmt = $conn->prepare($query);
         $stmt->bind_param("i", $staffID);
         if ($stmt->execute()) {
-            // Redirect back to the profile page
+            $_SESSION['update_success'] = true; // Set session variable for success
             header("Location: ../manageprofile.php");
+            exit(); // Ensure no further code is executed
         } else {
             echo "Error removing profile picture.";
         }
         $stmt->close();
     } else {
-        // Handle profile image upload if there is a file
-        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] == 0) {
-            // Define the allowed file types and maximum size (e.g., 2MB)
-            $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-            $max_file_size = 2 * 1024 * 1024; // 2MB
+        // Get the current profile picture from the database
+        $query = "SELECT userpfp FROM user WHERE StaffID = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $staffID);
+        $stmt->execute();
+        $stmt->bind_result($currentImage);
+        $stmt->fetch();
+        $stmt->close();
 
-            // Get file details
-            $file_name = $_FILES['profile_image']['name'];
-            $file_size = $_FILES['profile_image']['size'];
-            $file_tmp = $_FILES['profile_image']['tmp_name'];
-            $file_type = $_FILES['profile_image']['type'];
+        // Handle cropped image
+        if (isset($_POST['cropped_image']) && !empty($_POST['cropped_image'])) {
+            $croppedImage = $_POST['cropped_image'];
 
-            // Check file type and size
-            if (in_array($file_type, $allowed_types) && $file_size <= $max_file_size) {
-                // Create a unique file name and move it to the `pfp/` folder
-                $new_file_name = uniqid() . "_" . basename($file_name);
-                $upload_path = "../pfp/" . $new_file_name;
-                if (move_uploaded_file($file_tmp, $upload_path)) {
-                    // Update the user profile with the new profile picture
+            // Remove the base64 part from the image data
+            $imageParts = explode(";base64,", $croppedImage);
+
+            // Ensure that we have the expected parts before proceeding
+            if (count($imageParts) === 2) {
+                $imageBase64 = base64_decode($imageParts[1]);
+
+                // Generate a unique name for the cropped image
+                $fileName = 'cropped_' . uniqid() . '.png';
+
+                // Define the path where the image will be saved
+                $filePath = '../pfp/' . $fileName;
+
+                // Check if the current image exists and delete it to save storage
+                if ($currentImage && $currentImage !== 'default.jpg') {
+                    $oldImagePath = '../pfp/' . $currentImage;
+                    if (file_exists($oldImagePath)) {
+                        unlink($oldImagePath); // Delete the old image
+                    }
+                }
+
+                // Save the image to the specified path
+                if (file_put_contents($filePath, $imageBase64) !== false) {
+                    // Update the user profile with the cropped profile picture
                     $query = "UPDATE user SET userpfp = ? WHERE StaffID = ?";
                     $stmt = $conn->prepare($query);
-                    $stmt->bind_param("si", $new_file_name, $staffID);
+                    $stmt->bind_param("si", $fileName, $staffID);
                     if ($stmt->execute()) {
-                        // Success, redirect back to profile page
+                        $_SESSION['update_success'] = true; // Set session variable for success
                         header("Location: ../manageprofile.php");
+                        exit(); // Ensure no further code is executed
                     } else {
                         echo "Error updating profile picture.";
                     }
                     $stmt->close();
                 } else {
-                    echo "Error uploading the file.";
+                    echo "Error saving the cropped image.";
                 }
             } else {
-                echo "Invalid file type or file is too large.";
+                echo "Error: Invalid image data.";
             }
-        }
-
-        // Update user details (name, email, phone)
-        $query = "UPDATE user SET name = ?, email = ?, phonenum = ? WHERE StaffID = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("sssi", $name, $email, $phone, $staffID);
-        if ($stmt->execute()) {
-            // Redirect back to profile page after a successful update
-            header("Location: ../manageprofile.php");
         } else {
-            echo "Error updating profile details.";
+            // If no new image is uploaded, update only the user details (name, email, phone)
+            $query = "UPDATE user SET name = ?, email = ?, phonenum = ? WHERE StaffID = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sssi", $name, $email, $phone, $staffID);
+            if ($stmt->execute()) {
+                $_SESSION['update_success'] = true; // Set session variable for success
+                header("Location: ../manageprofile.php");
+                exit(); // Ensure no further code is executed
+            } else {
+                echo "Error updating profile details.";
+            }
+            $stmt->close();
         }
-        $stmt->close();
     }
 } else {
     // Redirect to login page if not logged in
