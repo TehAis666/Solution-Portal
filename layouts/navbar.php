@@ -55,7 +55,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
               <li>
                 <a
                   class="dropdown-item d-flex align-items-center"
-                  href="users-profile.html"
+                  href="manageprofile.php"
                 >
                   <i class="bi bi-person"></i>
                   <span>My Profile</span>
@@ -63,16 +63,6 @@ $role = $_SESSION['user_role']; // Get the role from the session
               </li>
               <li>
                 <hr class="dropdown-divider" />
-              </li>
-
-              <li>
-                <a
-                  class="dropdown-item d-flex align-items-center"
-                  href="users-profile.html"
-                >
-                  <i class="bi bi-gear"></i>
-                  <span>Account Settings</span>
-                </a>
               </li>
               <li>
                 <hr class="dropdown-divider" />
@@ -185,7 +175,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
     <li class="nav-heading">Pages</li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="#">
+      <a class="nav-link collapsed" href="manageprofile.php">
         <i class="bi bi-person"></i>
         <span>Profile</span>
       </a>
@@ -193,9 +183,9 @@ $role = $_SESSION['user_role']; // Get the role from the session
     <!-- End Profile Page Nav -->
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="signup.php">
-        <i class="bi bi-box-arrow-in-right"></i>
-        <span>Login</span>
+      <a class="nav-link collapsed" href="controller/handler/logout.php">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Sign Out</span>
       </a>
     </li>
     <!-- End Login Page Nav -->

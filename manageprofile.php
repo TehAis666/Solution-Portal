@@ -221,21 +221,29 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
                   <!-- Profile Edit Form -->
-                  <form action="#" method="">
+                  <form action="controller/updateprofile.php" method="post" enctype="multipart/form-data">
 
                     <div class="row mb-3">
                       <div class="col-md-8 col-lg-9">
-                        <input name="StaffID" type="hidden" class="form-control" id="StaffID" value="lorem">
+                        <input name="staffID" type="hidden" class="form-control" id="StaffID" value="<?php echo $user_data['staffID']; ?>">
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label small-label">Profile Image</label>
                       <div class="col-md-8 col-lg-9">
-                        <img src="assets/img/profile-img.jpg" alt="Profile">
+                        <!-- Add id to the img tag to reference it in JavaScript -->
+                        <img id="profilePreview" src="<?php echo $user_data['profile_picture']; ?>" alt="Profile" style="max-width: 150px; max-height: 150px;">
                         <div class="pt-2">
-                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
-                          <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
+                          <!-- Added accept="image/*" to ensure only image files are uploaded -->
+                          <input type="file" name="profile_image" id="profile_image" class="form-control" style="display:none;" accept="pfp/*" onchange="previewImage(this)">
+                          <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image" onclick="document.getElementById('profile_image').click();">
+                            <i class="bi bi-upload"></i>
+                          </a>
+                          <!-- Revert to old image button -->
+                          <a href="#" id="revertButton" class="btn btn-danger btn-sm" title="Remove my profile picture" onclick="revertImage(); return false;">
+                            <i class="bi bi-trash"></i>
+                          </a>
                         </div>
                       </div>
                     </div>
@@ -243,7 +251,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                     <div class="row mb-3">
                       <label for="fullName" class="col-md-4 col-lg-3 col-form-label small-label">Full Name</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="Name" type="text" class="form-control" id="Name" value="lorem">
+                        <input name="Name" type="text" class="form-control" id="Name" value="<?php echo $user_data['name']; ?>">
                       </div>
                     </div>
 
@@ -257,7 +265,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                     <div class="row mb-3">
                       <label for="Phone" class="col-md-4 col-lg-3 col-form-label small-label">Phone</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="phone" type="text" class="form-control" id="Phone" pattern="0\d{9,11}" value="0171112222">
+                        <input name="phone" type="text" class="form-control" id="Phone" pattern="0\d{9,11}" value="<?php echo $user_data['phonenum']; ?>">
                       </div>
                     </div>
 
@@ -338,6 +346,44 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  <script>
+    //Dynamic Profile Picture Upload
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]); // Convert the uploaded image to base64 and display it.
+      }
+    }
+
+    // Remove Profile Picture
+    let oldProfilePicture = document.getElementById('profilePreview').src; // Store the original profile picture
+
+    function previewImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]); // Convert the uploaded image to base64 and display it.
+      }
+    }
+
+    function revertImage() {
+      const currentProfilePicture = document.getElementById('profilePreview').src;
+
+      // If the current image is not the default image, revert to the old one
+      if (currentProfilePicture !== oldProfilePicture) {
+        document.getElementById('profilePreview').src = oldProfilePicture; // Revert to original picture
+        document.getElementById('profile_image').value = ''; // Clear the file input
+      } else {
+        alert('You are already using the original profile picture!');
+      }
+    }
+  </script>
 
 </body>
 
