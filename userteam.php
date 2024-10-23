@@ -247,12 +247,12 @@ try {
         }
 
         .section-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    color: #333;
-}
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #333;
+        }
 
         /* Profile Picture Styling */
         .profile-pic {
@@ -340,13 +340,12 @@ try {
         }
 
         /* Style for the "You" tag */
-.you-tag {
-    color: #007bff;
-    font-weight: bold;
-    font-size: 0.85rem;
-    margin-left: 5px;
-}
-
+        .you-tag {
+            color: #007bff;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
     </style>
 </head>
 
@@ -392,7 +391,7 @@ try {
                         <div class="card">
                             <div class="card-body text-center">
                                 <!-- Manager's Profile Picture and Name -->
-                                <img src="<?php echo !empty($manager['manager_pfp']) ? $manager['manager_pfp'] : 'pfp/default.jpg'; ?>" alt="Manager Profile Picture" class="profile-pic">
+                                <img src="<?php echo !empty($manager['manager_pfp']) ? 'pfp/' . $manager['manager_pfp'] : 'pfp/default.jpg'; ?>" alt="Manager Profile Picture" class="profile-pic">
                                 <h5 class="card-title1 mt-3" style="font-size: 1.5rem"><?php echo $manager['manager_name']; ?></h5>
                                 <p class="card-role"><?php echo $manager['manager_role']; ?></p>
                             </div>
@@ -406,28 +405,28 @@ try {
                         <h5 class="section-title">Team Members</h5>
                     </div>
                     <?php if (!empty($teamMembers)) { ?>
-    <?php foreach ($teamMembers as $member) { ?>
-        <div class="col-md-3 col-sm-6 text-center mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <!-- Team Member's Profile Picture and Name -->
-                    <img src="<?php echo !empty($member['userpfp']) ? $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
-                    <b>
-                        <p class="mt-2">
-                            <?php echo $member['name']; ?>
-                            <?php if ($member['staffID'] == $staffID) { ?>
-                                <span class="you-tag">(You)</span>
-                            <?php } ?>
-                        </p>
-                    </b>
-                    <p class="mt-2"><?php echo $member['role']; ?></p>
-                </div>
-            </div>
-        </div>
-    <?php } ?>
-<?php } else { ?>
-    <p>No team members found.</p>
-<?php } ?>
+                        <?php foreach ($teamMembers as $member) { ?>
+                            <div class="col-md-3 col-sm-6 text-center mb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <!-- Team Member's Profile Picture and Name -->
+                                        <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                                        <b>
+                                            <p class="mt-2">
+                                                <?php echo $member['name']; ?>
+                                                <?php if ($member['staffID'] == $staffID) { ?>
+                                                    <span class="you-tag">(You)</span>
+                                                <?php } ?>
+                                            </p>
+                                        </b>
+                                        <p class="mt-2"><?php echo $member['role']; ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php } ?>
+                    <?php } else { ?>
+                        <p>No team members found.</p>
+                    <?php } ?>
                 </div>
             </div>
         </section>
