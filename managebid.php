@@ -726,11 +726,11 @@ try {
                   <div class="row mb-3">
                     <div class="col-md-6">
                       <label for="updateRequestDate" class="form-label"><strong>Request Date:</strong></label>
-                      <input type="date" id="updateRequestDate" class="form-control" name="RequestDate" >
+                      <input type="date" id="updateRequestDate" class="form-control" name="RequestDate">
                     </div>
                     <div class="col-md-6">
                       <label for="updateSubmissionDate" class="form-label"><strong>Submission Date:</strong></label>
-                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate" >
+                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate">
                     </div>
                   </div>
                   <!-- Status and Tender Status -->
@@ -852,14 +852,14 @@ try {
                   </div>
                   <!-- Button Slide & calculate -->
                   <div class="text-center">
-                  <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
+                    <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
                     <button type="button" class="btn btn-primary" id="calculateButton">Calculate</button>
                   </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
-                <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
-              </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
+                  <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                </div>
             </form>
           </div>
         </div>
@@ -1253,7 +1253,7 @@ try {
     });
   </script>
 
-<!-- DarkMode Toggle -->
+  <!-- DarkMode Toggle -->
   <script>
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode'); // Toggle dark mode on body
