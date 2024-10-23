@@ -415,7 +415,7 @@ try {
                                                     <div class="col-sm-4 d-flex align-items-center justify-content-center">
                                                         <?php
                                                         // Check if the user profile picture is null
-                                                        $profilePicture = !empty($user['userpfp']) ? $user['userpfp'] : 'pfp/default.jpg';
+                                                        $profilePicture = !empty($user['userpfp']) ? 'pfp/' . $user['userpfp'] : 'pfp/default.jpg';
                                                         ?>
                                                         <img src="<?php echo $profilePicture; ?>" alt="Profile Picture" style="max-width: 100px; max-height: 100px; border-radius: 50%;">
                                                     </div>
@@ -461,7 +461,7 @@ try {
                                                         <div class="col-sm-4 d-flex align-items-center justify-content-center">
                                                             <?php
                                                             // Check if the user profile picture is null
-                                                            $profilePicture = !empty($user['userpfp']) ? $user['userpfp'] : 'pfp/default.jpg';
+                                                            $profilePicture = !empty($user['userpfp']) ? 'pfp/' . $user['userpfp'] : 'pfp/default.jpg';
                                                             ?>
                                                             <img src="<?php echo $profilePicture; ?>" alt="Profile Picture" style="max-width: 100px; max-height: 100px; border-radius: 50%;">
                                                         </div>
