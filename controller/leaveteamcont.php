@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the update and check for success
     if ($stmt_update->execute()) {
-        echo "<script>alert('User recruited succesfully.'); window.location.href = '../dashboard.php';</script>";
+        echo "<script>alert('User recruited succesfully.'); window.location.href = '../requestboss.php';</script>";
     } else {
         die("Error leaving the team: " . $stmt_update->error);
     }
