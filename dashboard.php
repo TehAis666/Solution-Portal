@@ -241,7 +241,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>RM <?php echo number_format($totalRevenue, 0); ?></h6>
+                      <h6>RM <?php echo number_format($totalRevenue ?? 0, 0); ?></h6>
                     </div>
                   </div>
                 </div>
