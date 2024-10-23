@@ -1,3 +1,5 @@
+<!-- Nanti kene buat satu lagi untuk navbar tukar fetchprofilepicture -->
+
 <?php
 // Include database connection
 include_once 'db/db.php'; // Adjust the path as necessary
