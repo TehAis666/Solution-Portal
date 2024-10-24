@@ -9,23 +9,30 @@
 <?php
 // Include the database connection file
 include_once 'db/db.php';
+
+// Fetch the logged-in user's staffID from the session
 $staffID = $_SESSION['user_id'];
 
 try {
-    // Modify the query to calculate TotalValue by summing Value1 to Value4
-    $stmt = $conn->query("
+    // Fetch the request_status and request (which stores the manager ID) of the logged-in user
+    $stmt_user = $conn->prepare("SELECT request_status, request FROM user WHERE staffID = ?");
+    $stmt_user->bind_param("s", $staffID);
+    $stmt_user->execute();
+    $result_user = $stmt_user->get_result();
+    $loggedInUser = $result_user->fetch_assoc(); // Get logged-in user's data
+
+    // Fetch all management users
+    $stmt_managers = $conn->query("
         SELECT * FROM user WHERE role = 'Management'
     ");
 
     // Fetch all rows as an associative array
-    $users = $stmt->fetch_all(MYSQLI_ASSOC);
+    $users = $stmt_managers->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
     // Handle any errors
     echo "Error: " . $e->getMessage();
 }
 ?>
-
-
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -372,52 +379,64 @@ try {
         <!-- End Page Title -->
 
 
-            <!-- Data Table -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Manager List</h5>
-                            <!-- New Table with stripped rows -->
-                            <table id="example" class="table table-striped" style="width:100%">
-                                <thead>
+        <!-- Data Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manager List</h5>
+                        <!-- New Table with stripped rows -->
+                        <table id="example" class="table table-striped" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th style="text-align:center">Phone Number</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($users)): ?>
+                                    <?php foreach ($users as $user): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($user['name']); ?></td>
+                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
+                                            <td style="text-align:center">
+                                                <!-- Button that reflects the request_status of the session user -->
+                                                <?php
+                                                // Check if the logged-in user has requested this manager (managerID matches user's 'request')
+                                                if ($loggedInUser['request'] == $user['staffID'] && $loggedInUser['request_status'] === 'Pending'): ?>
+                                                    <button type="button"
+                                                        class="btn btn-primary applybtn"
+                                                        data-manager-id="<?php echo $user['staffID']; ?>"
+                                                        data-status="Pending">
+                                                        Pending
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button type="button"
+                                                        class="btn btn-primary applybtn"
+                                                        data-manager-id="<?php echo $user['staffID']; ?>"
+                                                        data-status="null">
+                                                        Apply
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th style="text-align:center">Phone Number</th>
-                                        <th style="text-align:center">Action</th>
+                                        <td colspan="6">No Manager found</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-    <?php if (!empty($users)): ?>
-        <?php foreach ($users as $user): ?>
-            <tr>
-                <td><?php echo htmlspecialchars($user['name']); ?></td>
-                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
-                <td style="text-align:center">
-                    <!-- Apply/Pending Button with managerID -->
-                    <button type="button" class="btn btn-primary applybtn" data-manager-id="<?php echo $user['staffID']; ?>" data-status="<?php echo $user['request_status']; ?>">
-                        <?php echo $user['request_status'] == 'pending' ? 'Pending' : 'Apply'; ?>
-                    </button>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="6">No Manager found</td>
-        </tr>
-    <?php endif; ?>
-</tbody>
-
-                            </table>
-                        </div>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
         </section>
         <!-- End Data Table -->
-
         >
     </main>
     <!-- End #main -->
@@ -449,142 +468,68 @@ try {
     <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 
-    
-
-
     <!-- Data Table -->
-    <!-- <script>
-    new DataTable('#example');
-  </script> -->
-
-    <!-- DataTable Script Initialization -->
     <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            const table = $('#example').DataTable({
-                paging: true,
-                searching: true,
-                info: true,
-                lengthChange: true,
-            });
-
-            // Function to calculate the dashboard counts
-            function calculateDashboard() {
-                // Get all rows from the original unfiltered dataset
-                const allRows = table.rows().nodes(); // Use table.rows() to include all rows in the DataTable, not just the current view
-
-                let totalBids = 0;
-                let totalNewRequest = 0;
-                let totalSubmitted = 0;
-                let totalDropped = 0;
-
-                // Loop through all rows and update counts
-                $(allRows).each(function() {
-                    const statusElement = $(this).find('td:nth-child(6) .badge');
-                    if (statusElement.length > 0) {
-                        const status = statusElement.text().trim();
-                        totalBids++; // Count every row as a bid
-
-                        // Count based on the status
-                        if (status === 'WIP') {
-                            totalNewRequest++;
-                        } else if (status === 'Submitted') {
-                            totalSubmitted++;
-                        } else if (status === 'Dropped') {
-                            totalDropped++;
-                        }
-                    }
-                });
-
-                // Set the calculated totals to the dashboard elements
-                document.querySelector('.total-bids').textContent = totalBids;
-                document.querySelector('.total-new-request').textContent = totalNewRequest;
-                document.querySelector('.total-submitted').textContent = totalSubmitted;
-                document.querySelector('.total-dropped').textContent = totalDropped;
-            }
-
-            // Function to filter the DataTable based on status
-            function filterByStatus(status) {
-                table.search(''); // Clear any existing search
-
-                if (status === 'all') {
-                    // Show all rows if 'Total Bids' is clicked
-                    table.column(5).search('').draw();
-                } else {
-                    // Filter by the specific status
-                    table.column(5).search(status).draw();
-                }
-            }
-
-            // Wait until the table is fully initialized before calculating dashboard counts
-            table.on('draw', function() {
-                calculateDashboard(); // Recalculate dashboard counts after every DataTable draw event
-            });
-
-            // Event listeners for filtering based on the clicked dashboard element
-            document.querySelector('.total-bids').addEventListener('click', function() {
-                filterByStatus('all'); // Show all rows when 'Total Bids' is clicked
-            });
-
-            document.querySelector('.total-new-request').addEventListener('click', function() {
-                filterByStatus('WIP'); // Show only 'WIP' rows when 'Total New Request' is clicked
-            });
-
-            document.querySelector('.total-submitted').addEventListener('click', function() {
-                filterByStatus('Submitted'); // Show only 'Submitted' rows when 'Total Submitted' is clicked
-            });
-
-            document.querySelector('.total-dropped').addEventListener('click', function() {
-                filterByStatus('Dropped'); // Show only 'Dropped' rows when 'Total Dropped' is clicked
-            });
-
-            // Call the function once the document is ready and the table is fully loaded
-            calculateDashboard();
-        });
+        new DataTable('#example');
     </script>
 
-<script>
-document.querySelectorAll('.applybtn').forEach(button => {
-    button.addEventListener('click', function() {
-        const managerID = this.getAttribute('data-manager-id');
-        let status = this.getAttribute('data-status');
-        
-        // Toggle the status
-        if (status === 'pending') {
-            status = null;  // Cancel application
-        } else {
-            status = 'pending';  // Apply for the team
-        }
 
-        // Send an AJAX POST request to update the request_status and request
-        fetch('controller/applycont.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `managerID=${managerID}&status=${status}`,
-        })
-        .then(response => response.text())
-        .then(data => {
-            // Update the button text and data-status attribute
-            if (status === 'pending') {
-                this.textContent = 'Pending';
-                this.setAttribute('data-status', 'pending');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.applybtn');
+            if (buttons.length > 0) {
+                buttons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        // Your existing click handler code
+                    });
+                });
             } else {
-                this.textContent = 'Apply';
-                this.setAttribute('data-status', null);
+                console.error('No apply buttons found on the page.');
             }
-            console.log(data);  // Optional: Check response from the server
-        })
-        .catch(error => console.error('Error:', error));
-    });
-});
-</script>
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.applybtn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const managerID = this.getAttribute('data-manager-id');
+                    let request_status = this.getAttribute('data-status');
 
+                    // Toggle the request_status
+                    if (request_status === 'Pending') {
+                        request_status = null; // Cancel application
+                    } else {
+                        request_status = 'Pending'; // Apply for the team
+                    }
+
+                    // Send an AJAX POST request to update the request_status and request
+                    fetch('controller/applycont.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `managerID=${managerID}&request_status=${request_status}`,
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            // Update the button text and data-status attribute based on the updated request_status
+                            if (request_status === 'Pending') {
+                                this.textContent = 'Pending';
+                                this.setAttribute('data-status', 'Pending');
+                            } else {
+                                this.textContent = 'Apply';
+                                this.setAttribute('data-status', 'null');
+                            }
+                            console.log(data); // Optional: Check response from the server
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
 
     <!-- DarkMode Toggle -->
     <script>
