@@ -196,7 +196,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="acceptrequest.php">
-              <i class="bi bi-circle"></i><span>Find Team</span>
+              <i class="bi bi-circle"></i><span>Manage Request</span>
             </a>
           </li>
         <?php endif; ?>
