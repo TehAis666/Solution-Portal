@@ -11,6 +11,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = htmlspecialchars($_POST['role']);
     $phone = htmlspecialchars($_POST['phone']);
 
+    // Initialize managerID
+    $managerID = null;
+
+    // If the role is "Management", set managerID as staffID
+    if ($role == 'Management') {
+        $managerID = $staff_id;
+    }
+
     // Check if any form field is empty
     if (empty($staff_id) || empty($name) || empty($email) || empty($password) || empty($role) || empty($phone)) {
         echo "<script>alert('Please fill out all fields.'); history.back();</script>";
@@ -33,8 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Prepare SQL statement using prepared statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO user (staffID, name, email, password, role, phonenum) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssss", $staff_id, $name, $email, $hashed_password, $role, $phone);
+    $stmt = $conn->prepare("INSERT INTO user (staffID, name, email, password, role, phonenum, managerID) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $staff_id, $name, $email, $hashed_password, $role, $phone, $managerID);
 
     // Execute the query
     if ($stmt->execute()) {
@@ -49,4 +57,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close();
 }
 ?>
-
