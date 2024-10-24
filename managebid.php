@@ -1251,6 +1251,8 @@ try {
         });
       });
     });
+
+    $.fn.dataTable.ext.errMode = 'throw';
   </script>
 
   <!-- DarkMode Toggle -->
