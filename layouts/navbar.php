@@ -3,6 +3,7 @@
 $profile_picture = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
 $role = $_SESSION['user_role']; // Get the role from the session
 
+
 ?>
 <!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
@@ -187,6 +188,14 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="requestboss.php">
+              <i class="bi bi-circle"></i><span>Find Team</span>
+            </a>
+          </li>
+        <?php endif; ?>
+        <?php if ($role != 'Presales' && $role != 'Product Admin'): // Only visible for Management 
+        ?>
+          <li>
+            <a href="acceptrequest.php">
               <i class="bi bi-circle"></i><span>Find Team</span>
             </a>
           </li>

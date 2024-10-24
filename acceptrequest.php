@@ -9,30 +9,24 @@
 <?php
 // Include the database connection file
 include_once 'db/db.php';
-
-// Fetch the logged-in user's staffID from the session
-$staffID = $_SESSION['user_id'];
+$managerID = $_SESSION['user_id']; // Assuming the manager is logged in and has their session stored
 
 try {
-    // Fetch the request_status and request (which stores the manager ID) of the logged-in user
-    $stmt_user = $conn->prepare("SELECT request_status, request FROM user WHERE staffID = ?");
-    $stmt_user->bind_param("s", $staffID);
-    $stmt_user->execute();
-    $result_user = $stmt_user->get_result();
-    $loggedInUser = $result_user->fetch_assoc(); // Get logged-in user's data
-
-    // Fetch all management users
-    $stmt_managers = $conn->query("
-        SELECT * FROM user WHERE role = 'Management'
+    // Fetch the requests for this manager
+    $stmt = $conn->prepare("
+        SELECT u.name, u.email, u.phonenum, u.request_status, u.staffID
+        FROM user u
+        WHERE u.request = ?
     ");
-
-    // Fetch all rows as an associative array
-    $users = $stmt_managers->fetch_all(MYSQLI_ASSOC);
+    $stmt->bind_param("s", $managerID);
+    $stmt->execute();
+    $users = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
     // Handle any errors
     echo "Error: " . $e->getMessage();
 }
 ?>
+
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -392,45 +386,36 @@ try {
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th style="text-align:center">Phone Number</th>
+                                    <th style="text-align:center">Request Status</th>
                                     <th style="text-align:center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($users)): ?>
-                                    <?php foreach ($users as $user): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($user['name']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                            <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
-                                            <td style="text-align:center">
-                                                <!-- Button that reflects the request_status of the session user -->
-                                                <?php
-                                                // Check if the logged-in user has requested this manager (managerID matches user's 'request')
-                                                if ($loggedInUser['request'] == $user['staffID'] && $loggedInUser['request_status'] === 'Pending'): ?>
-                                                    <button type="button"
-                                                        class="btn btn-primary applybtn"
-                                                        data-manager-id="<?php echo $user['staffID']; ?>"
-                                                        data-status="Pending">
-                                                        Pending
-                                                    </button>
-                                                <?php else: ?>
-                                                    <button type="button"
-                                                        class="btn btn-primary applybtn"
-                                                        data-manager-id="<?php echo $user['staffID']; ?>"
-                                                        data-status="null">
-                                                        Apply
-                                                    </button>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No Manager found</td>
-                                    </tr>
-                                <?php endif; ?>
+                            <?php if (!empty($users)): ?>
+    <?php foreach ($users as $user): ?>
+        <?php if ($user['request_status'] == 'Pending'): // Only show if request_status is 'Pending' ?>
+            <tr>
+                <td><?php echo htmlspecialchars($user['name']); ?></td>
+                <td><?php echo htmlspecialchars($user['email']); ?></td>
+                <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
+                <td style="text-align:center"><?php echo htmlspecialchars($user['request_status']); ?></td>
+                <td style="text-align:center">
+                    <!-- Accept and Reject buttons -->
+                    <button type="button" class="btn btn-success acceptbtn" data-user-id="<?php echo $user['staffID']; ?>">Accept</button>
+                    <button type="button" class="btn btn-danger rejectbtn" data-user-id="<?php echo $user['staffID']; ?>">Reject</button>
+                </td>
+            </tr>
+        <?php endif; ?>
+    <?php endforeach; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="5">No pending requests found.</td>
+    </tr>
+<?php endif; ?>
+
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </div>
@@ -476,75 +461,58 @@ try {
         new DataTable('#example');
     </script>
 
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const buttons = document.querySelectorAll('.applybtn');
-            if (buttons.length > 0) {
-                buttons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        // Your existing click handler code
-                    });
-                });
-            } else {
-                console.error('No apply buttons found on the page.');
-            }
-        });
-    </script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Accept button logic
+    document.querySelectorAll('.acceptbtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userID = this.getAttribute('data-user-id');
 
-      <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.applybtn').forEach(button => {
-            button.addEventListener('click', function() {
-                const managerID = this.getAttribute('data-manager-id');
-                let request_status = this.getAttribute('data-status');
-
-                // Toggle the request_status
-                if (request_status === 'Pending') {
-                    request_status = null; // Cancel application
-                } else {
-                    request_status = 'Pending'; // Apply for this manager
-                }
-
-                // Send an AJAX POST request to update the request_status and request
-                fetch('controller/applycont.php', {
+            // Send an AJAX POST request to accept the request
+            fetch('controller/acceptrequest.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `managerID=${managerID}&request_status=${request_status}`,
+                    body: `userID=${userID}&action=accept`,
                 })
                 .then(response => response.text())
                 .then(data => {
-                    // Handle the response from the server
-                    console.log(data); // Optional: Check response from the server
-
-                    if (request_status === 'Pending') {
-                        // Update the clicked button to "Pending" and apply the yellow style
-                        this.textContent = 'Pending';
-                        this.setAttribute('data-status', 'Pending');
-                        this.classList.add('pending');
-
-                        // Revert all other buttons to "Apply" and remove the yellow style
-                        document.querySelectorAll('.applybtn').forEach(btn => {
-                            if (btn !== this && btn.getAttribute('data-status') === 'Pending') {
-                                btn.textContent = 'Apply';
-                                btn.setAttribute('data-status', 'null');
-                                btn.classList.remove('pending');
-                            }
-                        });
-                    } else {
-                        // Revert the current button to "Apply" and remove the yellow style
-                        this.textContent = 'Apply';
-                        this.setAttribute('data-status', 'null');
-                        this.classList.remove('pending');
-                    }
+                    // Handle successful acceptance
+                    console.log(data);
+                    this.closest('tr').querySelector('td:nth-child(4)').textContent = 'Accepted';
                 })
                 .catch(error => console.error('Error:', error));
-            });
         });
     });
-</script>
+
+    // Reject button logic
+    document.querySelectorAll('.rejectbtn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userID = this.getAttribute('data-user-id');
+
+            // Send an AJAX POST request to reject the request
+            fetch('controller/acceptrequest.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `userID=${userID}&action=reject`,
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data); // Optional: Check response from the server
+                    // Optionally, update the UI to reflect the change
+                    this.closest('tr').querySelector('td:nth-child(4)').textContent = 'Rejected';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+    </script>
+
+
 
 
 
