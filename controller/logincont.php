@@ -43,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_id'] = $user['staffID'];
                     $_SESSION['user_email'] = $user['email'];
                     $_SESSION['user_role'] = $user['role'];
+
+                    // Set login success session for greeting modal
+                    $_SESSION['login_success'] = true;
                     
                     // Redirect to the dashboard or home page upon success
                     echo "<script>

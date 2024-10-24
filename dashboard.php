@@ -131,6 +131,104 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
     .card.filtering {
       margin-bottom: 15px;
     }
+
+    /* Modal Styling */
+    .modal-content {
+      text-align: center;
+      padding: 40px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, #f0f0f0, #ffffff);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-body {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    /* Icon styling */
+    .greeting-icon {
+      margin-bottom: 20px;
+    }
+
+    #greetingIcon {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* SVG Animation */
+    .sun,
+    .cloud-sun,
+    .moon {
+      width: 64px;
+      height: 64px;
+    }
+
+    .sun {
+      animation: rotate 3s infinite linear;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .moon,
+    .cloud-sun {
+      animation: move 2s infinite ease-in-out;
+    }
+
+    @keyframes move {
+      0% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    /* Fade-in animation for modal content */
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Additional animation for the user's name */
+    .slide-in {
+            animation: slideIn 1s ease-in;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
   </style>
 </head>
 
@@ -266,7 +364,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                       <h6 style="font-size: 12px">Action</h6>
                     </li>
                     <li>
-                    <a class="dropdown-item" href="#" style="font-size: 12px" id="resetZoom">Reset</a>
+                      <a class="dropdown-item" href="#" style="font-size: 12px" id="resetZoom">Reset</a>
                     </li>
                   </ul>
                 </div>
@@ -413,6 +511,20 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         </div>
       </div>
       <!-- End Responsive Bid Types and Pipelines -->
+
+      <!-- Modal HTML for Greeting -->
+      <div class="modal fade" id="greetingModal" tabindex="-1" aria-labelledby="greetingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-body">
+              <!-- SVG Icon will change based on greeting -->
+              <div id="greetingIcon"></div>
+              <p id="greetingMessage" class="fade-in"></p>
+              <p class="slide-in"><?php echo $userData['name']; ?></p> <!-- Display the user's name -->
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
   <!-- End #main -->
@@ -1210,6 +1322,59 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         },
       }).render();
     });
+  </script>
+
+  <script>
+    window.onload = function() {
+      // Check for success login session
+      <?php if (isset($_SESSION['login_success'])): ?>
+        const greetingModal = new bootstrap.Modal(document.getElementById('greetingModal'));
+
+        // Get the current time
+        let currentHour = new Date().getHours();
+        let greetingMessage = '';
+        let svgIcon = '';
+
+        // Determine the greeting based on the time
+        if (currentHour < 12) {
+          greetingMessage = 'Good Morning';
+          svgIcon = `<svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="12" cy="12" r="5" fill="#FFD700"/>
+                              <g stroke="#FFD700" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="4"/>
+                                <line x1="12" y1="20" x2="12" y2="23"/>
+                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                                <line x1="1" y1="12" x2="4" y2="12"/>
+                                <line x1="20" y1="12" x2="23" y2="12"/>
+                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                              </g>
+                            </svg>`;
+        } else if (currentHour >= 12 && currentHour < 17) {
+          greetingMessage = 'Good Afternoon';
+          svgIcon = `<svg class="cloud-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <circle cx="6" cy="6" r="4" fill="#FFD700"/>
+                              <path d="M17 16a5 5 0 1 0-8 4H4a4 4 0 1 1 0-8c0-.3.02-.59.07-.88A6 6 0 1 1 17 16z" fill="#B0C4DE"/>
+                            </svg>`;
+        } else {
+          greetingMessage = 'Good Evening';
+          svgIcon = `<svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z" fill="#B0C4DE"/>
+                            </svg>`;
+        }
+
+        // Display the greeting message and SVG icon
+        document.getElementById('greetingMessage').textContent = greetingMessage;
+        document.getElementById('greetingIcon').innerHTML = svgIcon;
+
+        // Show the modal
+        greetingModal.show();
+
+        <?php unset($_SESSION['login_success']); // Clear the session variable to prevent the modal from showing again 
+        ?>
+      <?php endif; ?>
+    };
   </script>
 
 </body>

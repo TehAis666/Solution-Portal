@@ -13,7 +13,7 @@
         html,
         body {
             position: relative;
-            min-height: 110vh;
+            min-height: 105vh;
             background-color: #E1E8EE;
             display: flex;
             align-items: center;
@@ -22,6 +22,7 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             background-color: #2C3E50;
+            overflow-y: hidden;
         }
 
         .form-structor {
