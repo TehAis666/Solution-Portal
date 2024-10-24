@@ -1,6 +1,6 @@
 <?php include_once 'controller/handler/session.php';
 
-$profile_picture = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
+$userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
 $role = $_SESSION['user_role']; // Get the role from the session
 
 ?>
@@ -30,16 +30,16 @@ $role = $_SESSION['user_role']; // Get the role from the session
           href="#"
           data-bs-toggle="dropdown">
           <img
-            src="<?php echo $profile_picture; ?>"
+            src="<?php echo $userData['profile_picture']; ?>"
             alt="Profile"
             class="rounded-circle" />
-          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $_SESSION['user_name']; ?></span> </a><!-- End Profile Iamge Icon -->
+          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $userData['name']; ?></span> </a><!-- End Profile Iamge Icon -->
 
         <ul
           class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">
-            <h6><?php echo $_SESSION['user_name']; ?></h6>
-            <span><?php echo $_SESSION['user_role']; ?></span>
+            <h6><?php echo $userData['name']; ?></h6>
+            <span><?php echo $userData['role']; ?></span>
           </li>
           <li>
             <hr class="dropdown-divider" />
@@ -48,22 +48,13 @@ $role = $_SESSION['user_role']; // Get the role from the session
           <li>
             <a
               class="dropdown-item d-flex align-items-center"
-              href="users-profile.html">
+              href="manageprofile.php">
               <i class="bi bi-person"></i>
               <span>My Profile</span>
             </a>
           </li>
           <li>
             <hr class="dropdown-divider" />
-          </li>
-
-          <li>
-            <a
-              class="dropdown-item d-flex align-items-center"
-              href="users-profile.html">
-              <i class="bi bi-gear"></i>
-              <span>Account Settings</span>
-            </a>
           </li>
           <li>
             <hr class="dropdown-divider" />

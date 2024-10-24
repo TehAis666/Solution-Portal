@@ -46,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     // Redirect to the dashboard or home page upon success
                     echo "<script>
-                            alert('Login successful! Redirecting...');
                             window.location.href = '../dashboard.php';
                           </script>";
                 } else {
