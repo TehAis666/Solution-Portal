@@ -34,6 +34,9 @@ if (isset($_SESSION['user_id'])) {
         $stmt->fetch();
         $stmt->close();
 
+        // Initialize the variable to store the profile picture update
+        $profilePicUpdate = false;
+
         // Handle cropped image
         if (isset($_POST['cropped_image']) && !empty($_POST['cropped_image'])) {
             $croppedImage = $_POST['cropped_image'];
@@ -66,9 +69,7 @@ if (isset($_SESSION['user_id'])) {
                     $stmt = $conn->prepare($query);
                     $stmt->bind_param("si", $fileName, $staffID);
                     if ($stmt->execute()) {
-                        $_SESSION['update_success'] = true; // Set session variable for success
-                        header("Location: ../manageprofile.php");
-                        exit(); // Ensure no further code is executed
+                        $profilePicUpdate = true; // Mark profile picture as updated
                     } else {
                         echo "Error updating profile picture.";
                     }
@@ -79,20 +80,22 @@ if (isset($_SESSION['user_id'])) {
             } else {
                 echo "Error: Invalid image data.";
             }
-        } else {
-            // If no new image is uploaded, update only the user details (name, email, phone)
-            $query = "UPDATE user SET name = ?, email = ?, phonenum = ? WHERE StaffID = ?";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("sssi", $name, $email, $phone, $staffID);
-            if ($stmt->execute()) {
-                $_SESSION['update_success'] = true; // Set session variable for success
-                header("Location: ../manageprofile.php");
-                exit(); // Ensure no further code is executed
-            } else {
-                echo "Error updating profile details.";
-            }
-            $stmt->close();
         }
+
+        // Always update user details (name, email, phone)
+        $query = "UPDATE user SET name = ?, email = ?, phonenum = ? WHERE StaffID = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("sssi", $name, $email, $phone, $staffID);
+        if ($stmt->execute()) {
+            $_SESSION['update_success'] = true; // Set session variable for success
+
+            // Redirect if profile picture was also updated or after details update
+            header("Location: ../manageprofile.php");
+            exit(); // Ensure no further code is executed
+        } else {
+            echo "Error updating profile details.";
+        }
+        $stmt->close();
     }
 } else {
     // Redirect to login page if not logged in
