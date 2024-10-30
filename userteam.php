@@ -18,7 +18,7 @@ try {
         FROM user 
         WHERE sector = '$sector' AND role = 'head'
     ");
-    $sectorHead = $stmtHead->fetch_assoc();
+    $sectorHeads = $stmtHead->fetch_all(MYSQLI_ASSOC);
 
     // Get team members with the same sector but with a 'normal' role, including bid counts for each status
     $stmtTeam = $conn->query("
@@ -437,17 +437,22 @@ try {
                     </div>
                 </div>
                 <div class="row justify-content-center">
-                    <div class="col-12 text-center">
+                    <div class="col-12">
                         <div class="card">
-                            <div class="card-body text-center">
-                                <!-- Head's Profile Picture and Name -->
-                                <img src="<?php echo !empty($sectorHead['userpfp']) ? 'pfp/' . $sectorHead['userpfp'] : 'pfp/default.jpg'; ?>" alt="Sector Head Profile Picture" class="profile-pic">
-                                <h5 class="card-title1 mt-3" style="font-size: 1.5rem"><?php echo $sectorHead['name']; ?></h5>
-                                <p class="card-role"><?php echo $sectorHead['role']; ?></p>
+                            <div class="card-body d-flex justify-content-center">
+                                <?php foreach ($sectorHeads as $sectorHead): ?>
+                                    <div class="text-center mx-5"> <!-- Increased spacing with mx-4 -->
+                                        <!-- Head's Profile Picture and Name -->
+                                        <img src="<?php echo !empty($sectorHead['userpfp']) ? 'pfp/' . $sectorHead['userpfp'] : 'pfp/default.jpg'; ?>" alt="Sector Head Profile Picture" class="profile-pic">
+                                        <h5 class="card-title1 mt-3" style="font-size: 1.5rem"><?php echo $sectorHead['name']; ?></h5>
+                                        <p class="card-role"><?php echo $sectorHead['role']; ?></p>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 <!-- Team Members Section -->
                 <div class="row mt-4">
