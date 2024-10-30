@@ -1,27 +1,25 @@
 <?php include_once 'controller/handler/session.php'; ?>
 
 
-<!DOCTYPE html>
-<html lang="en">
-
 <?php
 // Include the database connection file
 include_once 'db/db.php';
 
 try {
-  // Assuming staffID is stored in the session
+  // Assuming staffID and sector are stored in the session
   $staffID = $_SESSION['user_id'];
+  $sector = $_SESSION['user_sector'];
 
-  // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
+  // Query to select bids and match the solution column based on the sector
   $stmt = $conn->query("
-        SELECT 
-            b.*, 
-            t.*, 
-            (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
-        FROM bids b
-        JOIN tender t ON b.BidID = t.BidID
-        WHERE b.staffID = $staffID
-    ");
+      SELECT 
+          b.*, 
+          t.*, 
+          (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
+      FROM bids b
+      JOIN tender t ON b.BidID = t.BidID
+   
+  ");
 
   // Fetch all rows as an associative array
   $bids = $stmt->fetch_all(MYSQLI_ASSOC);
@@ -29,8 +27,11 @@ try {
   // Handle any errors
   echo "Error: " . $e->getMessage();
 }
+
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
@@ -366,7 +367,7 @@ try {
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>User Bid</h1>
+      <h1>Manage Bid</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -425,7 +426,7 @@ try {
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Bids List</h5>
-              <!-- New Table with stripped rows -->
+              <!-- Table to display only the BidID based on the sector's solution -->
               <table id="example" class="table table-striped" style="width:100%">
                 <thead>
                   <tr>
@@ -441,68 +442,76 @@ try {
                 <tbody>
                   <?php if (!empty($bids)): ?>
                     <?php foreach ($bids as $bid): ?>
-                      <tr>
-                        <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
-                        <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
-                        <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
-                        <td class="text-center align-middle">
-                          <?php
-                          $status = htmlspecialchars($bid['Status']);
-                          if ($status == 'Submitted') {
-                            echo '<span class="badge bg-success">Submitted</span>';
-                          } elseif ($status == 'Dropped') {
-                            echo '<span class="badge bg-danger">Dropped</span>';
-                          } elseif ($status == 'WIP') {
-                            echo '<span class="badge bg-warning text-dark">WIP</span>';
-                          } else {
-                            echo '<span class="badge bg-secondary">Unknown</span>';
-                          }
-                          ?>
-                        </td>
-                        <td>
-                          <!-- View Button with Data Attributes for Each Bid -->
-                          <button type="button" class="btn btn-primary viewbtn"
-                            data-bs-toggle="modal" data-bs-target="#viewbids"
-                            data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
-                            data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
-                            data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
-                            data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
-                            data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
-                            data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
-                            data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
-                            data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
-                            data-solution1="<?php echo htmlspecialchars($bid['Solution1']); ?>"
-                            data-solution2="<?php echo htmlspecialchars($bid['Solution2']); ?>"
-                            data-solution3="<?php echo htmlspecialchars($bid['Solution3']); ?>"
-                            data-solution4="<?php echo htmlspecialchars($bid['Solution4']); ?>"
-                            data-presales1="<?php echo htmlspecialchars($bid['Presales1']); ?>"
-                            data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
-                            data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
-                            data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
-                            data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
-                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
-
-                            data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
-                            data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
-                            data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
-                            data-value4="<?php echo htmlspecialchars($bid['Value4']); ?>"
-                            data-totalvalue="<?php echo htmlspecialchars($bid['TotalValue']); ?>"
-                            data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
-                            data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
-                            data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
-                            data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
-                            data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
-                            data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>">
-                            View
-                          </button>
-                        </td>
-                      </tr>
+                      <?php
+                      // Display rows based on sector's solution column
+                      if (($sector === 'AwanHeiTech' && !empty($bid['Solution1'])) ||
+                        ($sector === 'PaduNet' && !empty($bid['Solution2'])) ||
+                        ($sector === 'Secure-X' && !empty($bid['Solution3'])) ||
+                        ($sector === 'i-Sentrix' && !empty($bid['Solution4']))
+                      ) :
+                      ?>
+                        <tr>
+                          <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
+                          <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+                          <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
+                          <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
+                          <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
+                          <td class="text-center align-middle">
+                            <?php
+                            $status = htmlspecialchars($bid['Status']);
+                            if ($status == 'Submitted') {
+                              echo '<span class="badge bg-success">Submitted</span>';
+                            } elseif ($status == 'Dropped') {
+                              echo '<span class="badge bg-danger">Dropped</span>';
+                            } elseif ($status == 'WIP') {
+                              echo '<span class="badge bg-warning text-dark">WIP</span>';
+                            } else {
+                              echo '<span class="badge bg-secondary">Unknown</span>';
+                            }
+                            ?>
+                          </td>
+                          <td>
+                            <!-- View Button with Data Attributes for Each Bid -->
+                            <button type="button" class="btn btn-primary viewbtn"
+                              data-bs-toggle="modal" data-bs-target="#viewbids"
+                              data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
+                              data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
+                              data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
+                              data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
+                              data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
+                              data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
+                              data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
+                              data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
+                              data-solution1="<?php echo htmlspecialchars($bid['Solution1']); ?>"
+                              data-solution2="<?php echo htmlspecialchars($bid['Solution2']); ?>"
+                              data-solution3="<?php echo htmlspecialchars($bid['Solution3']); ?>"
+                              data-solution4="<?php echo htmlspecialchars($bid['Solution4']); ?>"
+                              data-presales1="<?php echo htmlspecialchars($bid['Presales1']); ?>"
+                              data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
+                              data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
+                              data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
+                              data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
+                              data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
+                              data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
+                              data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
+                              data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
+                              data-value4="<?php echo htmlspecialchars($bid['Value4']); ?>"
+                              data-totalvalue="<?php echo htmlspecialchars($bid['TotalValue']); ?>"
+                              data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
+                              data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
+                              data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
+                              data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
+                              data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
+                              data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>">
+                              View
+                            </button>
+                          </td>
+                        </tr>
+                      <?php endif; ?>
                     <?php endforeach; ?>
                   <?php else: ?>
                     <tr>
-                      <td colspan="6">No bids found</td>
+                      <td colspan="7">No bids found</td>
                     </tr>
                   <?php endif; ?>
                 </tbody>
@@ -511,6 +520,7 @@ try {
           </div>
         </div>
       </div>
+
     </section>
     <!-- End Data Table -->
 

@@ -395,7 +395,7 @@
             background-color: #f1f1f1;
         }
 
-        #roleDisplay {
+        #sectorDisplay {
             cursor: pointer;
         }
     </style>
@@ -424,21 +424,21 @@
                 <form id="signupcont" action="controller/signupcont.php" method="POST">
                     <div class="form-holder">
                         <input type="text" name="staff_id" class="input" placeholder="Staff ID" required />
-                        <input type="text" name="name" class="input" placeholder="Name" required />
-                        <input type="email" name="email" class="input" placeholder="Email" required />
-                        <input type="password" name="password" class="input" placeholder="Password" required />
-
-                        <div class="role-selection">
-                            <input type="text" name="role" class="input" id="roleDisplay" placeholder="Role" readonly required />
+                        <div class="sector-selection">
+                            <input type="text" name="sector" class="input" id="sectorDisplay" placeholder="Sector" readonly required />
                             <div class="dropdown">
                                 <ul>
-                                    <li onclick="setRole('Presales')" data-value="Presales">Presales</li>
-                                    <li onclick="setRole('ProdAdmin')" data-value="ProdAdmin">Product Admin</li>
-                                    <li onclick="setRole('Management')" data-value="Management">Management</li>
+                                    <li onclick="setsector('AwanHeiTech')" data-value="AwanHeiTech">AwanHeiTech</li>
+                                    <li onclick="setsector('PaduNet')" data-value="PaduNet">PaduNet</li>
+                                    <li onclick="setsector('Secure-X')" data-value="Secure-X">Secure-X</li>
+                                    <li onclick="setsector('i-Sentrix')" data-value="i-Sentrix">i-Sentrix</li>
                                 </ul>
                             </div>
                         </div>
-
+                        <input type="text" name="name" class="input" placeholder="Name" required />
+                        <input type="email" name="email" class="input" placeholder="Email" required />
+                        <input type="password" name="password" class="input" placeholder="Password" required />
+                        <input type="password" name="confirmpassword" class="input" placeholder="Confirm Password" required />
                         <input
                             type="tel"
                             name="phone"
@@ -449,34 +449,38 @@
                             title="Phone number must start with '0' followed by 9 to 11 digits." />
                     </div>
                     <button type="submit" class="submit-btn">Sign Up</button>
+                    <p id="error" style="color: red; display: none;"></p>
                 </form>
+
             </div>
         </div>
     </div>
 </body>
+
+
 <script>
     console.clear();
 
-    const roleDisplay = document.getElementById('roleDisplay');
+    const sectorDisplay = document.getElementById('sectorDisplay');
     const dropdown = document.querySelector('.dropdown');
-    const roleItems = dropdown.querySelectorAll('li');
+    const sectorItems = dropdown.querySelectorAll('li');
 
     // Toggle dropdown visibility when input is clicked
-    roleDisplay.addEventListener('click', () => {
+    sectorDisplay.addEventListener('click', () => {
         dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
     });
 
     // Hide dropdown when clicking outside
     document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target) && e.target !== roleDisplay) {
+        if (!dropdown.contains(e.target) && e.target !== sectorDisplay) {
             dropdown.style.display = 'none';
         }
     });
 
-    // Update input value when selecting a role
-    roleItems.forEach(item => {
+    // Update input value when selecting a sector
+    sectorItems.forEach(item => {
         item.addEventListener('click', () => {
-            roleDisplay.value = item.textContent; // Set input to the selected role
+            sectorDisplay.value = item.textContent; // Set input to the selected sector
             dropdown.style.display = 'none'; // Close the dropdown
         });
     });
@@ -508,5 +512,7 @@
         });
     });
 </script>
+
+
 
 </html>

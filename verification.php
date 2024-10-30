@@ -57,6 +57,8 @@ try {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
 
+
+
     <!-- Template Main CSS File -->
     <link href="assets/css/style.css" rel="stylesheet" />
 
@@ -378,54 +380,60 @@ try {
         </div>
         <!-- End Page Title -->
 
-            <!-- Dashboard -->
-    <section class="section dashboard">
-      <div class="row text-center">
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-request clickable" style="color: #1e73be; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total User</h5>
+        <!-- Dashboard -->
+        <section class="section dashboard">
+            <div class="row text-center">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="card-title total-request clickable" style="color: #1e73be; font-size: 48px;">0</h1>
+                            <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+                            <h5 class="card-subtitle text-muted">Total User</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
+                            <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+                            <h5 class="card-subtitle text-muted">Total New Request</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="card-title total-approved clickable" style="color: #039be5; font-size: 48px;">0</h1>
+                            <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+                            <h5 class="card-subtitle text-muted">Total Approved</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="card-title total-rejected clickable" style="color: #e53935; font-size: 48px;">0</h1>
+                            <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
+                            <h5 class="card-subtitle text-muted">Total Rejected</h5>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total New Request</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-approved clickable" style="color: #039be5; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Approved</h5>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <div class="card-body">
-              <h1 class="card-title total-rejected clickable" style="color: #e53935; font-size: 48px;">0</h1>
-              <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-              <h5 class="card-subtitle text-muted">Total Rejected</h5>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End Dashboard -->
+            <!-- End Dashboard -->
 
             <!-- Data Table -->
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Bids List</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title">Bids List</h5>
+                                <h5 class="card-title" style="margin: 0;">
+                                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#signupModal" style="border: none; background: none; padding: 0;">
+                                        <i class='bx bx-plus-circle' style="margin-right: 5px; font-size: 1.5em;"></i> Add User
+                                </h5>
+                            </div>
                             <!-- New Table with stripped rows -->
                             <table id="example" class="table table-striped" style="width:100%">
                                 <thead>
@@ -481,6 +489,110 @@ try {
                 </div>
             </div>
 
+            <!-- Modal Structure -->
+            <div class="modal fade" id="signupModal" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="signupModalLabel">Sign Up</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="signupForm"  action="controller/addusercont.php" method="POST">
+                                <div class="container">
+                                    <!-- Staff ID -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="staff_id" class="form-label"><strong>Staff ID:</strong></label>
+                                            <input type="text" id="staff_id" class="form-control" name="staff_id" required>
+                                        </div>
+                                    </div>
+                                     <!-- Name -->
+                                     <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="name" class="form-label"><strong>Name:</strong></label>
+                                            <input type="text" id="name" class="form-control" name="name" required>
+                                        </div>
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="signupEmail" class="form-label"><strong>Email:</strong></label>
+                                            <input type="email" id="signupEmail" class="form-control" name="email" required>
+                                        </div>
+                                    </div>
+                                    <!-- Phone Number -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="signupPhoneNum" class="form-label"><strong>Phone Number:</strong></label>
+                                            <input
+                                                type="tel"
+                                                name="phone"
+                                                class="input form-control"
+                                                placeholder="Phone Number"
+                                                required
+                                                pattern="0\d{9,11}"
+                                                title="Phone number must start with '0' followed by 9 to 11 digits." />
+                                        </div>
+                                    </div>
+                                    <!-- Sector Dropdown -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="sectorSelect" class="form-label"><strong>Sector:</strong></label>
+                                            <select name="sector" id="sectorSelect" class="form-select" required>
+                                                <option value="" disabled selected>Select Sector</option>
+                                                <option value="AwanHeiTech">AwanHeiTech</option>
+                                                <option value="PaduNet">PaduNet</option>
+                                                <option value="Secure-X">Secure-X</option>
+                                                <option value="i-Sentrix">i-Sentrix</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Role Dropdown -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="roleSelect" class="form-label"><strong>Role:</strong></label>
+                                            <select name="role" id="roleSelect" class="form-select" required>
+                                                <option value="" disabled selected>Select Role</option>
+                                                <option value="CTO">CTO</option>
+                                                <option value="SO">Service Owner (SO)</option>
+                                                <option value="SA">SA</option>
+                                                <option value="head">Head Presales</option>
+                                                <option value="presales">Presales</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Password -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="signupPassword" class="form-label"><strong>Password:</strong></label>
+                                            <input type="password" id="signupPassword" class="form-control" name="password" required>
+                                        </div>
+                                    </div>
+                                    <!-- Confirm Password -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="signupConfirmPassword" class="form-label"><strong>Confirm Password:</strong></label>
+                                            <input type="password" id="signupConfirmPassword" class="form-control" name="confirmpassword" required>
+                                        </div>
+                                    </div>
+                                    <!-- Submit Button -->
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Create Account</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
         </section>
     </main>
     <!-- End Main -->
@@ -515,7 +627,11 @@ try {
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
 
-
+    <script>
+        function setsector(value) {
+            document.getElementById('sectorDisplay').value = value;
+        }
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -560,90 +676,89 @@ try {
     </script>
 
 
-        <!-- DataTable Script Initialization -->
-  <script>
-$(document).ready(function() {
-  // Initialize DataTable
-  const table = $('#example').DataTable({
-    paging: true,
-    searching: true,
-    info: true,
-    lengthChange: true,
-  });
+    <!-- DataTable Script Initialization -->
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            const table = $('#example').DataTable({
+                paging: true,
+                searching: true,
+                info: true,
+                lengthChange: true,
+            });
 
-  // Function to calculate the dashboard counts
-  function calculateDashboard() {
-    const allRows = table.rows().nodes(); // Include all rows in DataTable
+            // Function to calculate the dashboard counts
+            function calculateDashboard() {
+                const allRows = table.rows().nodes(); // Include all rows in DataTable
 
-    let totalUsers = 0;
-    let totalNewRequest = 0; // Pending status
-    let totalApproved = 0;   // Approved status
-    let totalRejected = 0;   // Rejected status
+                let totalUsers = 0;
+                let totalNewRequest = 0; // Pending status
+                let totalApproved = 0; // Approved status
+                let totalRejected = 0; // Rejected status
 
-    // Loop through all rows and update counts based on status
-    $(allRows).each(function() {
-      const statusElement = $(this).find('td:nth-child(6) .badge');
-      if (statusElement.length > 0) {
-        const status = statusElement.text().trim();
-        totalUsers++; // Count every row as a user (total bids/users)
+                // Loop through all rows and update counts based on status
+                $(allRows).each(function() {
+                    const statusElement = $(this).find('td:nth-child(6) .badge');
+                    if (statusElement.length > 0) {
+                        const status = statusElement.text().trim();
+                        totalUsers++; // Count every row as a user (total bids/users)
 
-        // Count based on the status
-        if (status === 'Pending') {
-          totalNewRequest++;
-        } else if (status === 'Approved') {
-          totalApproved++;
-        } else if (status === 'Rejected') {
-          totalRejected++;
-        }
-      }
-    });
+                        // Count based on the status
+                        if (status === 'Pending') {
+                            totalNewRequest++;
+                        } else if (status === 'Approved') {
+                            totalApproved++;
+                        } else if (status === 'Rejected') {
+                            totalRejected++;
+                        }
+                    }
+                });
 
-    // Update the calculated totals in the dashboard elements
-    document.querySelector('.total-request').textContent = totalUsers;
-    document.querySelector('.total-new-request').textContent = totalNewRequest;
-    document.querySelector('.total-approved').textContent = totalApproved;
-    document.querySelector('.total-rejected').textContent = totalRejected;
-  }
+                // Update the calculated totals in the dashboard elements
+                document.querySelector('.total-request').textContent = totalUsers;
+                document.querySelector('.total-new-request').textContent = totalNewRequest;
+                document.querySelector('.total-approved').textContent = totalApproved;
+                document.querySelector('.total-rejected').textContent = totalRejected;
+            }
 
-  // Function to filter the DataTable based on status
-  function filterByStatus(status) {
-    table.search(''); // Clear any existing search
+            // Function to filter the DataTable based on status
+            function filterByStatus(status) {
+                table.search(''); // Clear any existing search
 
-    if (status === 'all') {
-      // Show all rows
-      table.column(5).search('').draw();
-    } else {
-      // Filter by specific status
-      table.column(5).search(status).draw();
-    }
-  }
+                if (status === 'all') {
+                    // Show all rows
+                    table.column(5).search('').draw();
+                } else {
+                    // Filter by specific status
+                    table.column(5).search(status).draw();
+                }
+            }
 
-  // Calculate dashboard counts after every DataTable draw event
-  table.on('draw', function() {
-    calculateDashboard();
-  });
+            // Calculate dashboard counts after every DataTable draw event
+            table.on('draw', function() {
+                calculateDashboard();
+            });
 
-  // Event listeners for filtering based on the clicked dashboard element
-  document.querySelector('.total-request').addEventListener('click', function() {
-    filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
-  });
+            // Event listeners for filtering based on the clicked dashboard element
+            document.querySelector('.total-request').addEventListener('click', function() {
+                filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
+            });
 
-  document.querySelector('.total-new-request').addEventListener('click', function() {
-    filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
-  });
+            document.querySelector('.total-new-request').addEventListener('click', function() {
+                filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
+            });
 
-  document.querySelector('.total-approved').addEventListener('click', function() {
-    filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
-  });
+            document.querySelector('.total-approved').addEventListener('click', function() {
+                filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
+            });
 
-  document.querySelector('.total-rejected').addEventListener('click', function() {
-    filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
-  });
+            document.querySelector('.total-rejected').addEventListener('click', function() {
+                filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
+            });
 
-  // Call the function once the document is ready and the table is fully loaded
-  calculateDashboard();
-});
-
+            // Call the function once the document is ready and the table is fully loaded
+            calculateDashboard();
+        });
     </script>
 </body>
 

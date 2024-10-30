@@ -7,6 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $staffID = $_POST['staffID'];
     $requestDate = $_POST['RequestDate'];
+    $submissionDate = $_POST['SubmissionDate'];
     $status = $_POST['status'];
     $customerName = $_POST['Name'];
     $scope = $_POST['Scope'];
@@ -37,8 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Prepare the SQL for inserting into the tender table
-    $sql_tender = "INSERT INTO tender (BidID, Solution1, Solution2, Solution3, Solution4, Remarks) 
-                   VALUES (?, ?, ?, ?, ?, ?)";
+    $sql_tender = "INSERT INTO tender (BidID, Solution1, Solution2, Solution3, Solution4, SubmissionDate,Remarks) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     // Prepare the statement
     $stmt_tender = $conn->prepare($sql_tender);
@@ -49,14 +50,14 @@ $solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : "";
 $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
 
     // Bind parameters
-    $stmt_tender->bind_param("isssss", $bidID, $solution1, $solution2, $solution3, $solution4, $remarks);
+    $stmt_tender->bind_param("issssss", $bidID, $solution1, $solution2, $solution3, $solution4, $submissionDate,$remarks);
 
     // Execute tender insertion and check for errors
     if ($stmt_tender->execute()) {
         // On successful insertion, redirect with an alert
         echo "<script>
                 alert('Bids successfully created.');
-                window.location.href = '../managebid.php';
+                window.location.href = '../userbid.php';
               </script>";
     } else {
         die("Error inserting tender: " . $stmt_tender->error);

@@ -4,33 +4,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
-</html>
-
 <?php
 // Include the database connection file
 include_once 'db/db.php';
 
 try {
-  // Modify the query to calculate TotalValue by summing Value1 to Value4
-  $stmt = $conn->query("
+    // Get staffID from the URL (e.g., staff_bid_list.php?staffID=1)
+    $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : $_SESSION['user_id'];
+    // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
+    $stmt = $conn->query("
         SELECT 
             b.*, 
             t.*, 
             (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
+        WHERE b.staffID = $staffID
     ");
 
-  // Fetch all rows as an associative array
-  $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+    // Fetch all rows as an associative array
+    $bids = $stmt->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
-  // Handle any errors
-  echo "Error: " . $e->getMessage();
+    // Handle any errors
+    echo "Error: " . $e->getMessage();
+}
+
+try {
+    // Assuming you have the staffID from the URL
+    $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : 0;
+
+    // Query to get the staff member's name
+    $stmt = $conn->prepare("SELECT name FROM user WHERE staffID = ?");
+    $stmt->bind_param("i", $staffID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Fetch the staff member's name
+    $staffName = $result->fetch_assoc()['name'] ?? 'Staff Member';
+} catch (Exception $e) {
+    // Handle any errors
+    echo "Error: " . $e->getMessage();
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
   <meta charset="utf-8" />
@@ -366,7 +382,7 @@ try {
 
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Manage Bid</h1>
+    <h1><?php echo htmlspecialchars($staffName); ?>'s Bids</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -483,6 +499,7 @@ try {
                             data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
                             data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
                             data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
+
                             data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
                             data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
                             data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
@@ -1252,7 +1269,7 @@ try {
       });
     });
 
-    $.fn.dataTable.ext.errMode = 'throw';
+     $.fn.dataTable.ext.errMode = 'throw';
   </script>
 
   <!-- DarkMode Toggle -->

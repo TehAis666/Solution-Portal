@@ -1,6 +1,7 @@
 <?php include_once 'controller/handler/session.php';
 
 $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
+$role = $_SESSION['user_role']; // Get the role from the session
 
 
 ?>
@@ -40,7 +41,6 @@ $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get th
           <li class="dropdown-header">
             <h6><?php echo $userData['name']; ?></h6>
             <span><?php echo $userData['role']; ?></span>
-            <span><?php echo $userData['sector']; ?></span>
           </li>
           <li>
             <hr class="dropdown-divider" />
@@ -102,39 +102,43 @@ $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get th
         id="bids-nav"
         class="nav-content collapse"
         data-bs-parent="#sidebar-nav">
-
+        <?php if ($role != 'Presales'): // Not visible for Presales 
+        ?>
           <li>
             <a href="addbid.php">
               <i class="bi bi-circle"></i><span>Add</span>
             </a>
           </li>
+        <?php endif; ?>
+        <?php if ($role == 'Admin'): // Only Admin can access ManageBid 
+        ?>
           <li>
-            <a href="adminbid.php">
-              <i class="bi bi-circle"></i><span>Admin Bid</span>
+            <a href="managebid.php">
+              <i class="bi bi-circle"></i><span>ManageBid</span>
             </a>
           </li>
-          <li>
-            <a href="headbid.php">
-              <i class="bi bi-circle"></i><span>Head Presales Bid</span>
-            </a>
-          </li>
-
+        <?php endif; ?>
+        <?php if ($role != 'Presales'): // Not visible for Presales 
+        ?>
           <li>
             <a href="userbid.php">
-              <i class="bi bi-circle"></i><span>Presales Bid</span>
+              <i class="bi bi-circle"></i><span>UserBid</span>
             </a>
           </li>
+        <?php endif; ?>
 
-          <!-- <li>
+        <?php if ($role != 'Presales' && $role != 'Product Admin'): // Only Management 
+        ?>
+          <li>
             <a href="bossbid.php">
               <i class="bi bi-circle"></i><span>BossBid</span>
             </a>
-          </li> -->
-
+          </li>
+        <?php endif; ?>
 
         <li>
           <a href="viewbid.php">
-            <i class="bi bi-circle"></i><span>CTO/SO/SA Bid</span>
+            <i class="bi bi-circle"></i><span>View Bid</span>
           </a>
         </li>
       </ul>
@@ -155,41 +159,51 @@ $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get th
         id="team-nav"
         class="nav-content collapse"
         data-bs-parent="#sidebar-nav">
-
+        <?php if ($role != 'Presales' && $role != 'Product Admin'): // Only Management 
+        ?>
+          <li>
             <a href="recruit.php">
               <i class="bi bi-circle"></i><span>Manage Team</span>
             </a>
           </li>
-
+        <?php endif; ?>
+        <?php if ($role != 'Presales'): // Only Admin can access ManageBid 
+        ?>
+          <li>
             <a href="userteam.php">
               <i class="bi bi-circle"></i><span>My Team</span>
             </a>
           </li>
-
+        <?php endif; ?>
+        <?php if ($role != 'Presales' && $role != 'Management'): // Not visible for Presales 
+        ?>
           <li>
             <a href="requestboss.php">
               <i class="bi bi-circle"></i><span>Find Team</span>
             </a>
           </li>
-
+        <?php endif; ?>
+        <?php if ($role != 'Presales' && $role != 'Product Admin'): // Only visible for Management 
+        ?>
           <li>
             <a href="acceptrequest.php">
               <i class="bi bi-circle"></i><span>Manage Request</span>
             </a>
           </li>
-
+        <?php endif; ?>
       </ul>
     </li>
     <!-- End Second Nav -->
 
-
+    <?php if ($role == 'Admin'): // Only visible for Admin 
+    ?>
       <li class="nav-item">
         <a class="nav-link" href="verification.php">
           <i class="bi bi-person"></i>
           <span>Signup Request</span>
         </a>
       </li>
-
+    <?php endif; ?>
     <!-- End Components Nav -->
 
     <!-- End Forms Nav -->

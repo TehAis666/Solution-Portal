@@ -45,14 +45,14 @@ try {
   JOIN tender t ON b.BidID = t.BidID
 ";
 
-  if (!empty($selectedSolutions)) {
-    $query .= " WHERE " . implode(' OR ', array_map(function ($sol) {
-      return "t.$sol IS NOT NULL AND t.$sol != ''";
-    }, $selectedSolutions));
-  }
+if (!empty($selectedSolutions)) {
+  $query .= " WHERE " . implode(' OR ', array_map(function ($sol) {
+    return "t.$sol IS NOT NULL AND t.$sol != ''";
+  }, $selectedSolutions));
+}
 
-  $stmt = $conn->query($query);
-  $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+$stmt = $conn->query($query);
+$bids = $stmt->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
   echo "Error: " . $e->getMessage();
 }
@@ -432,35 +432,40 @@ try {
           <label class="form-label">Filter by Solution</label>
           <div class="checkbox-container">
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="allSolutions" class="form-check-input" onchange="toggleAllSolutions()">
+            <input type="checkbox" id="allSolutions" class="form-check-input" onchange="toggleAllSolutions()">
               <label for="allSolutions" class="form-check-label">All Solutions</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution1" class="form-check-input solution-checkbox" value="Solution1" onchange="filterBids()">
+            <input type="checkbox" id="solution1" class="form-check-input solution-checkbox" value="Solution1" onchange="filterBids()">
               <label for="solution1" class="form-check-label">AwanHeiTech</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution2" class="form-check-input solution-checkbox" value="Solution2" onchange="filterBids()">
+            <input type="checkbox" id="solution2" class="form-check-input solution-checkbox" value="Solution2" onchange="filterBids()">
               <label for="solution2" class="form-check-label">PaduNet</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution3" class="form-check-input solution-checkbox" value="Solution3" onchange="filterBids()">
+            <input type="checkbox" id="solution3" class="form-check-input solution-checkbox" value="Solution3" onchange="filterBids()">
               <label for="solution3" class="form-check-label">Secure-X</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution4" class="form-check-input solution-checkbox" value="Solution4" onchange="filterBids()">
+            <input type="checkbox" id="solution4" class="form-check-input solution-checkbox" value="Solution4" onchange="filterBids()">
               <label for="solution4" class="form-check-label">i-Sentrix</label>
             </div>
           </div>
         </div>
       </div>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-          <li class="breadcrumb-item">Bids</li>
-          <li class="breadcrumb-item active">Manage</li>
-        </ol>
-      </nav>
+
+      <h5 class="card-title">Bids</h5>
+    </div>
+
+
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
+        <li class="breadcrumb-item">Bids</li>
+        <li class="breadcrumb-item active">Manage</li>
+      </ol>
+    </nav>
     </div>
     <!-- End Page Title -->
 
@@ -516,42 +521,42 @@ try {
 
               <!-- New Table with stripped rows -->
               <table id="example" class="table table-striped" style="width:100%">
-                <thead>
-                  <tr>
-                    <th>Last Update</th>
-                    <th>Company/Agency Name</th>
-                    <th>Tender Proposal Title</th>
-                    <th>Request Value (RM)</th>
-                    <th>Submission Value (RM)</th>
-                    <th>Solutions</th> <!-- New Solutions Column -->
-                    <th>Request Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <?php if (!empty($bids)): ?>
-                    <?php foreach ($bids as $bid): ?>
-                      <tr>
-                        <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
-                        <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
-                        <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
-                        <td><?php echo htmlspecialchars($bid['Solutions']); ?></td> <!-- Display Solutions -->
-                        <td class="text-center align-middle">
-                          <?php
-                          $status = htmlspecialchars($bid['Status']);
-                          if ($status == 'Submitted') {
-                            echo '<span class="badge bg-success">Submitted</span>';
-                          } elseif ($status == 'Dropped') {
-                            echo '<span class="badge bg-danger">Dropped</span>';
-                          } elseif ($status == 'WIP') {
-                            echo '<span class="badge bg-warning text-dark">WIP</span>';
-                          } else {
-                            echo '<span class="badge bg-secondary">Unknown</span>';
-                          }
-                          ?>
-                        </td>
+  <thead>
+    <tr>
+      <th>Last Update</th>
+      <th>Company/Agency Name</th>
+      <th>Tender Proposal Title</th>
+      <th>Request Value (RM)</th>
+      <th>Submission Value (RM)</th>
+      <th>Solutions</th> <!-- New Solutions Column -->
+      <th>Request Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php if (!empty($bids)): ?>
+      <?php foreach ($bids as $bid): ?>
+        <tr>
+          <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
+          <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+          <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
+          <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
+          <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
+          <td><?php echo htmlspecialchars($bid['Solutions']); ?></td> <!-- Display Solutions -->
+          <td class="text-center align-middle">
+            <?php
+            $status = htmlspecialchars($bid['Status']);
+            if ($status == 'Submitted') {
+              echo '<span class="badge bg-success">Submitted</span>';
+            } elseif ($status == 'Dropped') {
+              echo '<span class="badge bg-danger">Dropped</span>';
+            } elseif ($status == 'WIP') {
+              echo '<span class="badge bg-warning text-dark">WIP</span>';
+            } else {
+              echo '<span class="badge bg-secondary">Unknown</span>';
+            }
+            ?>
+          </td>
                         <td>
                           <button type="button" class="btn btn-primary viewbtn"
                             data-bs-toggle="modal" data-bs-target="#viewbids"
@@ -594,7 +599,7 @@ try {
                       <td colspan="7">No bids found</td>
                     </tr>
                   <?php endif; ?>
-                </tbody>
+                  </tbody>
               </table>
             </div>
           </div>
@@ -853,63 +858,7 @@ try {
     });
   </script>
 
-  <!-- Solution Filtering Script -->
-  <script>
-    $(document).ready(function() {
-      const table = $('#example').DataTable();
-
-      // Define the mapping from solution keys to display names
-      const solutionMapping = {
-        'Solution1': 'AwanHeiTech',
-        'Solution2': 'PaduNet',
-        'Solution3': 'Secure-X',
-        'Solution4': 'i-Sentrix'
-      };
-
-      // Function to filter by solutions and update the display title
-      function filterBySolutions() {
-        const selectedSolutions = [];
-
-        // Collect display names of checked solution checkboxes
-        $('.solution-checkbox:checked').each(function() {
-          const solutionKey = $(this).val();
-          if (solutionMapping[solutionKey]) {
-            selectedSolutions.push(solutionMapping[solutionKey]);
-          }
-        });
-
-        // Debug: Log selected display names
-        console.log("Mapped Selected Solutions:", selectedSolutions);
-
-        // Update the title dynamically with selected solutions or "All Solutions" if none
-        const selectedSolutionDisplay = selectedSolutions.length > 0 ? selectedSolutions.join(', ') : 'All Solutions';
-        $('.card-title').text(`${selectedSolutionDisplay}'s Bids`);
-
-        if (selectedSolutions.length === 0) {
-          table.column(5).search('').draw(); // Clear filter if none selected
-        } else {
-          const searchQuery = selectedSolutions.join('|'); // Combine with OR operator
-          console.log("Search Query for Solutions Column:", searchQuery); // Debug log
-          table.column(5).search(searchQuery, true, false).draw(); // Apply filter
-        }
-      }
-
-      // Toggle all solutions checkboxes
-      function toggleAllSolutions() {
-        const isChecked = $('#allSolutions').is(':checked');
-        $('.solution-checkbox').prop('checked', isChecked);
-        filterBySolutions(); // Trigger filtering after toggling
-      }
-
-      // Event listeners for solution checkboxes
-      $('.solution-checkbox').on('change', filterBySolutions);
-      $('#allSolutions').on('change', toggleAllSolutions);
-    });
-  </script>
-
-
-
-
+ 
   <!-- MODAL Fect Data -->
   <script>
     $(document).ready(function() {

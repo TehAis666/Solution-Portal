@@ -42,7 +42,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Fetch the user details (name and role) based on the session's user_id
 $user_id = $_SESSION['user_id'];
-$sql = "SELECT name, role FROM user WHERE StaffID = '$user_id'";
+$sql = "SELECT name, sector, role  FROM user WHERE StaffID = '$user_id'";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {
@@ -51,6 +51,14 @@ if (mysqli_num_rows($result) > 0) {
     // Store user details in session if not already set
     if (!isset($_SESSION['user_name'])) {
         $_SESSION['user_name'] = $user['name'];
+    }
+    
+    if (!isset($_SESSION['user_role'])) {
+        $_SESSION['user_role'] = $user['role'];
+    }
+
+    if (!isset($_SESSION['user_sector'])) {
+        $_SESSION['user_sector'] = $user['sector'];
     }
     
     if (!isset($_SESSION['user_role'])) {

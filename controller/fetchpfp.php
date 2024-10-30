@@ -9,17 +9,18 @@ $profile_picture = 'pfp/default.jpg'; // Default picture path
 // Initialize variables for name and role
 $name = '';
 $role = '';
+$sector = '';
 
 // Check if user is logged in
 if (isset($_SESSION['user_id'])) {
     $user_id = $_SESSION['user_id']; // Get the user ID from the session
 
     // Prepare the SQL query to fetch the user profile picture, name, and role
-    $query = "SELECT userpfp, name, role FROM user WHERE staffID = ?";
+    $query = "SELECT userpfp, name, role, sector FROM user WHERE staffID = ?";
     $stmt = $conn->prepare($query); // Use prepared statements to prevent SQL injection
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $stmt->bind_result($userpfp, $name, $role);
+    $stmt->bind_result($userpfp, $name, $role, $sector);
     $stmt->fetch();
     $stmt->close();
 
@@ -30,5 +31,5 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Return the profile picture, name, and role
-return ['profile_picture' => $profile_picture, 'name' => $name, 'role' => $role]; // This will be returned as an array
+return ['profile_picture' => $profile_picture, 'name' => $name, 'role' => $role, 'sector' => $sector]; // This will be returned as an array
 ?>

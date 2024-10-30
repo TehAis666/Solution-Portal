@@ -8,22 +8,27 @@
 // Include the database connection file
 include_once 'db/db.php';
 $staffID = $_SESSION['user_id'];
+$sector = $_SESSION['user_sector'];
+$isHead = ($_SESSION['user_role'] === 'head');
 
 try {
-    // Fetch the staff's manager
-    $stmtManager = $conn->query("
-        SELECT u1.name AS manager_name, u1.userpfp AS manager_pfp, u1.role AS manager_role 
-        FROM user u1
-        JOIN user u2 ON u2.managerID = u1.staffID
-        WHERE u2.staffID = $staffID
+    // Get the head of the sector
+    $stmtHead = $conn->query("
+        SELECT name, userpfp, role 
+        FROM user 
+        WHERE sector = '$sector' AND role = 'head'
     ");
-    $manager = $stmtManager->fetch_assoc();
+    $sectorHead = $stmtHead->fetch_assoc();
 
-    // Fetch team members under the same manager
+    // Get team members with the same sector but with a 'normal' role, including bid counts for each status
     $stmtTeam = $conn->query("
-        SELECT * FROM user WHERE managerID = (
-            SELECT managerID FROM user WHERE staffID = $staffID
-        )
+        SELECT u.*, 
+               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID) AS bid_count,
+               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'Submitted') AS submitted_count,
+               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'Dropped') AS dropped_count,
+               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'WIP') AS wip_count
+        FROM user u 
+        WHERE u.sector = '$sector' AND u.role = 'presales'
     ");
     $teamMembers = $stmtTeam->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
@@ -242,90 +247,121 @@ try {
         }
 
         /* Styles for Manager and Team Member Display */
+        /* General Layout */
         .container {
             max-width: 100%;
         }
 
         .section-title {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: bold;
             margin-bottom: 20px;
             text-transform: uppercase;
-            color: #333;
+            color: #444;
+            letter-spacing: 1px;
+            text-align: center;
         }
 
         /* Profile Picture Styling */
         .profile-pic {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 80px;
+            max-height: 80px;
             border-radius: 50%;
+            border: 4px solid #e3e3e3;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            margin-top: 15px;
         }
 
         /* Manager and Team Member Name and Role */
-        .card-title {
+        .card-title1 {
             font-size: 1.5rem;
-            font-weight: bold;
+            font-weight: 600;
+            color: #333;
         }
 
         .card-role {
             font-size: 1rem;
-            color: #777;
+            color: #666;
             margin-top: -5px;
         }
 
         /* Leave Team Button */
-        /* Leave Team Button Styling */
         .leave-team-btn {
-            background-color: #dc3545;
+            background-color: #e74c3c;
             color: white;
             border: none;
             position: absolute;
             right: 20px;
-            /* Position it 20px from the right edge */
             top: 50%;
-            /* Center vertically */
             transform: translateY(-50%);
-            /* Correct vertical alignment */
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            border-radius: 5px;
+            transition: background-color 0.2s;
         }
 
         .leave-team-btn:hover {
-            background-color: #c82333;
+            background-color: #c0392b;
         }
-
 
         /* Card Styling */
         .card {
             border: none;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: #f9f9f9;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
         }
 
         .card-body {
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-        }
-
-        .card-body img {
-            border: 3px solid #f0f0f0;
-            margin-top: 10px;
         }
 
         .card-body h5 {
             font-size: 1.25rem;
-            font-weight: bold;
-            margin-top: 10px;
+            font-weight: 700;
+            color: #333;
+            margin-top: 15px;
         }
 
         .card-body p {
-            font-size: 1rem;
-            margin-top: 10px;
+            font-size: 0.95rem;
+            margin-top: 8px;
+            color: #555;
         }
 
-        /* Grid for Team Members */
+        /* Status Badge Styling */
+        .badge {
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 12px;
+            margin: 0 5px;
+        }
+
+        .badge.bg-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge.bg-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .badge.bg-warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        /* Responsive Grid for Team Members */
         .row {
             justify-content: center;
         }
-
 
         @media (min-width: 768px) {
             .col-md-3 {
@@ -339,12 +375,30 @@ try {
             }
         }
 
-        /* Style for the "You" tag */
+        /* Style for the "You" Tag */
         .you-tag {
             color: #007bff;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 0.85rem;
             margin-left: 5px;
+        }
+
+        /* Additional Styling for a Clean Professional Look */
+        .text-center h5.section-title {
+            border-bottom: 2px solid #ddd;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .card .card-body img {
+            border-radius: 50%;
+            margin-top: 15px;
+            border: 2px solid #e3e3e3;
+        }
+
+        .card-body .card-role {
+            font-style: italic;
+            color: #888;
         }
     </style>
 </head>
@@ -368,32 +422,28 @@ try {
         <!-- Dashboard -->
         <section class="section dashboard">
             <div class="container">
-                <!-- Team Manager Section -->
+                <!-- Head of Sector Section -->
+                <!-- Sector Head Section -->
                 <div class="row">
                     <div class="col-12">
                         <div class="card1">
                             <div class="card-body position-relative">
-                                <!-- Centered Team Manager Title -->
-                                <h5 class="section-title text-center" style="font-size: 1.75rem; font-weight: bold;">Team Manager</h5>
-                                <!-- Leave Team Button positioned at the right -->
-                                <form action="controller/leaveteamcont.php" method="post">
-                                    <button type="submit" class="btn btn-danger leave-team-btn">Leave Team</button>
-                                </form>
+                                <h5 class="section-title text-center" style="font-size: 1.75rem; font-weight: bold;">Head Presales</h5>
+                                <!-- <form action="controller/leaveteamcont.php" method="post">
+                            <button type="submit" class="btn btn-danger leave-team-btn">Leave Team</button>
+                        </form> -->
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
                 <div class="row justify-content-center">
                     <div class="col-12 text-center">
                         <div class="card">
                             <div class="card-body text-center">
-                                <!-- Manager's Profile Picture and Name -->
-                                <img src="<?php echo !empty($manager['manager_pfp']) ? 'pfp/' . $manager['manager_pfp'] : 'pfp/default.jpg'; ?>" alt="Manager Profile Picture" class="profile-pic">
-                                <h5 class="card-title1 mt-3" style="font-size: 1.5rem"><?php echo $manager['manager_name']; ?></h5>
-                                <p class="card-role"><?php echo $manager['manager_role']; ?></p>
+                                <!-- Head's Profile Picture and Name -->
+                                <img src="<?php echo !empty($sectorHead['userpfp']) ? 'pfp/' . $sectorHead['userpfp'] : 'pfp/default.jpg'; ?>" alt="Sector Head Profile Picture" class="profile-pic">
+                                <h5 class="card-title1 mt-3" style="font-size: 1.5rem"><?php echo $sectorHead['name']; ?></h5>
+                                <p class="card-role"><?php echo $sectorHead['role']; ?></p>
                             </div>
                         </div>
                     </div>
@@ -402,7 +452,7 @@ try {
                 <!-- Team Members Section -->
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <h5 class="section-title">Team Members</h5>
+                        <h5 class="section-title">Presales Members</h5>
                     </div>
                     <?php if (!empty($teamMembers)) { ?>
                         <?php foreach ($teamMembers as $member) { ?>
@@ -410,16 +460,28 @@ try {
                                 <div class="card">
                                     <div class="card-body">
                                         <!-- Team Member's Profile Picture and Name -->
-                                        <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
-                                        <b>
-                                            <p class="mt-2">
-                                                <?php echo $member['name']; ?>
-                                                <?php if ($member['staffID'] == $staffID) { ?>
-                                                    <span class="you-tag">(You)</span>
-                                                <?php } ?>
+                                        <?php if ($member['staffID'] == $staffID || $isHead) { ?>
+                                            <a href="viewstaffbid.php?staffID=<?php echo htmlspecialchars($member['staffID']); ?>" class="staff-name-link">
+                                            <?php } ?>
+                                            <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
+                                            <b>
+                                                <p class="mt-2">
+                                                    <?php echo htmlspecialchars($member['name']); ?>
+                                                    <?php if ($member['staffID'] == $staffID) { ?>
+                                                        <span class="you-tag">(You)</span>
+                                                    <?php } ?>
+                                                </p>
+                                            </b>
+                                            </a>
+                                            <p class="mt-2"><?php echo htmlspecialchars($member['role']); ?></p>
+                                            <p>Total Bids: <?php echo htmlspecialchars($member['bid_count']); ?></p>
+
+                                            <!-- Bid Status Counts with Badges -->
+                                            <p>
+                                                <span class="badge bg-success">Submitted: <?php echo htmlspecialchars($member['submitted_count']); ?></span>
+                                                <span class="badge bg-danger">Dropped: <?php echo htmlspecialchars($member['dropped_count']); ?></span>
+                                                <span class="badge bg-warning text-dark">WIP: <?php echo htmlspecialchars($member['wip_count']); ?></span>
                                             </p>
-                                        </b>
-                                        <p class="mt-2"><?php echo $member['role']; ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -428,6 +490,7 @@ try {
                         <p>No team members found.</p>
                     <?php } ?>
                 </div>
+
             </div>
         </section>
 
