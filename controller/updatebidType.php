@@ -1,28 +1,33 @@
 <?php
-include_once 'db/db.php'; // Assuming this file sets up the $conn variable
+include_once '../db/db.php'; // Assuming this file sets up the $conn variable
 
 // Get filter inputs from the URL (GET method)
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+$sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
 
-// Fetch Bid Types from the `bids` table where Status is 'Submitted'
+// Fetch Bid Types from the `bids` table where Status matches the selected status
 $sqlBidTypes = "
     SELECT Type, COUNT(*) as type_count 
     FROM bids b
     JOIN tender t ON t.BidID = b.BidID
 ";
 
-// Apply filters based on the selected year, start date, and end date
-if (!empty($year)) {
-    $sqlBidTypes .= " AND YEAR(b.RequestDate) = $year"; // Filter by year
+// Initialize the WHERE clause for filtering
+$whereClauses = [];
+
+// Add status filter if provided
+if (!empty($statusFilter)) {
+    $whereClauses[] = "b.Status = '$statusFilter'"; // Filter by status
 }
-if (!empty($startDate) && !empty($endDate)) {
-    $sqlBidTypes .= " AND b.RequestDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
-} elseif (!empty($startDate)) {
-    $sqlBidTypes .= " AND b.RequestDate >= '$startDate'"; // Filter from start date
-} elseif (!empty($endDate)) {
-    $sqlBidTypes .= " AND b.RequestDate <= '$endDate'"; // Filter up to end date
+
+// Add sector filter to the Bid Types query if provided
+if (!empty($sectorFilter)) {
+    $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Filter by BusinessUnit
+}
+
+// Build the final SQL query for Bid Types
+if (!empty($whereClauses)) {
+    $sqlBidTypes .= " WHERE " . implode(' AND ', $whereClauses);
 }
 
 $sqlBidTypes .= " GROUP BY Type"; // Group by bid Type
@@ -55,16 +60,22 @@ $sqlPipelines = "
     JOIN bids b ON t.BidID = b.BidID
 ";
 
-// Apply filters based on the selected year, start date, and end date
-if (!empty($year)) {
-    $sqlPipelines .= " AND YEAR(b.RequestDate) = $year"; // Filter by year
+// Initialize the WHERE clause for filtering
+$whereClauses = [];
+
+// Add status filter if provided
+if (!empty($statusFilter)) {
+    $whereClauses[] = "b.Status = '$statusFilter'"; // Filter by status
 }
-if (!empty($startDate) && !empty($endDate)) {
-    $sqlPipelines .= " AND b.RequestDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
-} elseif (!empty($startDate)) {
-    $sqlPipelines .= " AND b.RequestDate >= '$startDate'"; // Filter from start date
-} elseif (!empty($endDate)) {
-    $sqlPipelines .= " AND b.RequestDate <= '$endDate'"; // Filter up to end date
+
+// Add sector filter to the Pipeline query if provided
+if (!empty($sectorFilter)) {
+    $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Filter by BusinessUnit
+}
+
+// Build the final SQL query for Pipelines
+if (!empty($whereClauses)) {
+    $sqlPipelines .= " WHERE " . implode(' AND ', $whereClauses);
 }
 
 $sqlPipelines .= " GROUP BY t.TenderStatus"; // Group by tender status
@@ -90,9 +101,15 @@ if ($resultPipelines->num_rows > 0) {
     }
 }
 
-// Convert the counts to a JSON string for JavaScript
-$bidTypesJson = json_encode($bidTypesCounts);
-$pipelineCountsJson = json_encode($pipelineCounts);
+// Prepare the final output
+$output = [
+    'bidTypesCounts' => $bidTypesCounts,
+    'pipelineCounts' => $pipelineCounts
+];
+
+// Output as JSON
+header('Content-Type: application/json');
+echo json_encode($output);
 
 // Close the connection
 // $conn->close();

@@ -216,19 +216,20 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
     /* Additional animation for the user's name */
     .slide-in {
-            animation: slideIn 1s ease-in;
-        }
+      animation: slideIn 1s ease-in;
+    }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
   </style>
 </head>
 
@@ -414,7 +415,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 Status
               </h5>
 
-              <table class="table tables-general" style="font-size: 12px">
+              <table class="table table-hover" style="font-size: 12px">
                 <thead>
                   <tr>
                     <th scope="col">Status</th>
@@ -422,15 +423,15 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr data-status="WIP">
                     <td>WIP</td>
                     <td><?php echo $statusData['WIP']; ?></td>
                   </tr>
-                  <tr>
+                  <tr data-status="Submitted">
                     <td>Submitted</td>
                     <td><?php echo $statusData['Submitted']; ?></td>
                   </tr>
-                  <tr>
+                  <tr data-status="Dropped">
                     <td>Dropped</td>
                     <td><?php echo $statusData['Dropped']; ?></td>
                   </tr>
@@ -554,6 +555,43 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+
+  
+  <script>
+  let selectedStatus = ''; // Variable to hold the selected status
+
+  // Add click event to the rows of the table
+  const rows = document.querySelectorAll('.table-hover tbody tr');
+
+  rows.forEach(row => {
+    row.addEventListener('click', () => {
+      // Get the status from the clicked row
+      const status = row.getAttribute('data-status');
+
+      // Check if the clicked row is already the selected one
+      if (selectedStatus === status) {
+        // If it is, remove the selection and class
+        selectedStatus = ''; // Reset selected status
+        row.classList.remove('table-active'); // Remove the active class
+      } else {
+        // If it is a different row, remove "table-active" from all rows
+        rows.forEach(r => r.classList.remove('table-active'));
+
+        // Add "table-active" class to the clicked row
+        row.classList.add('table-active');
+
+        // Update selected status
+        selectedStatus = status;
+      }
+
+      // Log the selected status to the console (you can replace this with your filtering logic)
+      console.log("Selected Status:", selectedStatus);
+
+      // Here you can call a function to filter your dashboard based on the selected status
+      // filterDashboardByStatus(selectedStatus);
+    });
+  });
+</script>
 
   <!-- HorizontalBarChart and StackedBarChart -->
   <script>

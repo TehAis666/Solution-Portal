@@ -1,18 +1,36 @@
 <?php
 // Include the database connection file
-include_once 'db/db.php';
+include_once '../db/db.php';
 
 // Initialize filter variables
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+$sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
 
 // Build the base query
 $sql = "
     SELECT t.Solution1, t.Solution2, t.Solution3, t.Solution4, t.Value1, t.Value2, t.Value3, t.Value4 
     FROM tender t
     JOIN bids b ON t.BidID = b.BidID
+    WHERE 1=1
 ";
+
+// Initialize where clauses array
+$whereClauses = [];
+
+// Append status filter if set
+if (!empty($statusFilter)) {
+    $whereClauses[] = "b.Status = '$statusFilter'"; // Filter by status
+}
+
+// Append sector filter if set
+if (!empty($sectorFilter)) {
+    $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Filter by BusinessUnit (or Sector)
+}
+
+// Add the where clauses to the query
+if (count($whereClauses) > 0) {
+    $sql .= " AND " . implode(' AND ', $whereClauses);
+}
 
 // Execute the query
 $result = $conn->query($sql);
@@ -55,6 +73,19 @@ if ($result->num_rows > 0) {
         }
     }
 }
+
+// Prepare the response data
+$response = [
+    "AwanHeiTech" => $awanHeiTechTotal,
+    "PaduNet" => $paduNetTotal,
+    "SecureX" => $secureXTotal,
+    "iSentrix" => $iSentrixTotal,
+    "MixSolution" => $mixSolutionTotal
+];
+
+// Set the header to JSON and encode the response data
+header('Content-Type: application/json');
+echo json_encode($response);
 
 // Close the connection
 // $conn->close();
