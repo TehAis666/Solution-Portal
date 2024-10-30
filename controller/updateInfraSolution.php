@@ -1,11 +1,10 @@
 <?php
 // Include the database connection file
-include_once 'db/db.php'; // Assuming this file sets up the $conn variable
+include_once '../db/db.php'; // Assuming this file sets up the $conn variable
 
-// Get filter inputs from the URL (GET method)
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
+// Initialize filter variables
+$statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+$sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
 
 // Build the base query
 $sql = "
@@ -14,16 +13,20 @@ $sql = "
     JOIN bids b ON t.BidID = b.BidID
 ";
 
-// Apply filters based on the selected year, start date, and end date
-if (!empty($year)) {
-    $sql .= " AND YEAR(t.SubmissionDate) = $year"; // Filter by year
+// Initialize where clauses array
+$whereClauses = [];
+
+// Append filters
+if (!empty($statusFilter)) {
+    $whereClauses[] = "b.Status = '$statusFilter'";
 }
-if (!empty($startDate) && !empty($endDate)) {
-    $sql .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
-} elseif (!empty($startDate)) {
-    $sql .= " AND t.SubmissionDate >= '$startDate'"; // Filter from start date
-} elseif (!empty($endDate)) {
-    $sql .= " AND t.SubmissionDate <= '$endDate'"; // Filter up to end date
+if (!empty($sectorFilter)) {
+    $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Adjust to match your DB column name
+}
+
+// Add the where clauses to the query
+if (count($whereClauses) > 0) {
+    $sql .= " AND " . implode(' AND ', $whereClauses);
 }
 
 // Execute the query
@@ -41,12 +44,11 @@ $solutionBusinessUnitCounts = [
 // Loop through each row and calculate the counts
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $solutions = [$row['Solution1'], $row['Solution2'], $row['Solution3'], $row['Solution4']];
         $businessUnit = trim($row['BusinessUnit']); // Clean any whitespace from BusinessUnit
         $solutionCount = 0;
 
         // Only proceed if $businessUnit is a valid key
-        if (!empty($businessUnit) && isset($solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit])) {
+        if (!empty($businessUnit)) {
             // Check each solution and increment the respective BusinessUnit count
             if (!empty($row['Solution1'])) {
                 $solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit]++;
@@ -73,8 +75,15 @@ if ($result->num_rows > 0) {
     }
 }
 
-// Output the counts (optional, if you want to inspect the results)
-// echo json_encode($solutionBusinessUnitCounts);
+// Prepare the final output
+$output = [
+    'solutionBusinessUnitCounts' => $solutionBusinessUnitCounts
+];
+
+// Set header for JSON response
+header('Content-Type: application/json');
+// Output as JSON
+echo json_encode($output);
 
 // Close the connection
 // $conn->close();

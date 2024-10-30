@@ -6,32 +6,36 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
 $endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
 
-// Start building the SQL query
+// Start building the SQL query without filtering by Status
 $sql = "
     SELECT
-    DATE_FORMAT(t.SubmissionDate, '%M %Y') AS month,
+    DATE_FORMAT(b.RequestDate, '%M %Y') AS month,
     COUNT(t.BidID) AS total_bids,
     SUM(t.RMValue) AS total_revenue
     FROM tender t
     JOIN bids b ON t.BidID = b.BidID
-    WHERE b.Status = 'Submitted'
 ";
 
 // Add conditions based on filter inputs
+$conditions = [];
 if (!empty($year)) {
-    $sql .= " AND YEAR(t.SubmissionDate) = '$year'";
+    $conditions[] = "YEAR(b.RequestDate) = '$year'";
 }
 if (!empty($startDate)) {
-    $sql .= " AND t.SubmissionDate >= '$startDate'";
+    $conditions[] = "b.RequestDate >= '$startDate'";
 }
 if (!empty($endDate)) {
-    $sql .= " AND t.SubmissionDate <= '$endDate'";
+    $conditions[] = "b.RequestDate <= '$endDate'";
+}
+
+if (!empty($conditions)) {
+    $sql .= ' WHERE ' . implode(' AND ', $conditions);
 }
 
 // Group by month and order the results
 $sql .= "
-    GROUP BY DATE_FORMAT(t.SubmissionDate, '%M %Y')
-    ORDER BY YEAR(MAX(t.SubmissionDate)), MONTH(MAX(t.SubmissionDate))
+    GROUP BY DATE_FORMAT(b.RequestDate, '%M %Y')
+    ORDER BY YEAR(MAX(b.RequestDate)), MONTH(MAX(b.RequestDate))
 ";
 
 $result = $conn->query($sql);
@@ -48,6 +52,11 @@ if ($result->num_rows > 0) {
         $totalRevenue[] = round($row['total_revenue'] / 1000000, 2); // Convert to millions for better visibility
     }
 }
+
+// Limit to the latest 8 entries
+// $months = array_slice($months, -8);
+// $totalBids = array_slice($totalBids, -8);
+// $totalRevenue = array_slice($totalRevenue, -8);
 
 // Optionally close the database connection
 // $conn->close();

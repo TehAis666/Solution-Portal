@@ -1,18 +1,10 @@
 <?php
 // Include your database connection file
-// include_once 'db/db.php'; // Assuming this file sets up the $conn variable
-// include '../db/db.php';
-
-// Check if the request is for updating status
-if (isset($_GET['action']) && $_GET['action'] === 'updateStatus') {
-    // ... (Your update logic here)
-}
+include '../db/db.php'; // Assuming this file sets up the $conn variable
 
 // Initialize filter variables for fetching data
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
+$businessUnitFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Renamed variable for clarity
 
 // Build the base query
 $sql = "
@@ -26,18 +18,10 @@ if (!empty($statusFilter)) {
     $sql .= " WHERE b.Status = '$statusFilter'";
 }
 
-// Append year filter if set
-if (!empty($year)) {
-    $sql .= " AND YEAR(t.SubmissionDate) = $year"; // Filter by year
-}
-
-// Append date range filter if set
-if (!empty($startDate) && !empty($endDate)) {
-    $sql .= " AND t.SubmissionDate BETWEEN '$startDate' AND '$endDate'";
-} elseif (!empty($startDate)) {
-    $sql .= " AND t.SubmissionDate >= '$startDate'";
-} elseif (!empty($endDate)) {
-    $sql .= " AND t.SubmissionDate <= '$endDate'";
+// Append the business unit filter if a business unit is selected
+if (!empty($businessUnitFilter)) {
+    // If there is already a WHERE clause, add AND; otherwise, add WHERE
+    $sql .= !empty($statusFilter) ? " AND b.BusinessUnit = '$businessUnitFilter'" : " WHERE b.BusinessUnit = '$businessUnitFilter'";
 }
 
 // Group by BusinessUnit
@@ -68,4 +52,6 @@ if ($result->num_rows > 0) {
     }
 }
 
+// Output bid counts as JSON
+echo json_encode($bidCounts);
 ?>

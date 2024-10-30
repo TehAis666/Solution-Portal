@@ -1924,17 +1924,17 @@ body.dark-mode .error-404 .btn:hover {
   }
 }
 
-body.dark-mode .tables-general {
+body.dark-mode .table-hover {
   background-color: #1f1f1f;
   color: #e0e0e0;
 }
 
-body.dark-mode .tables-general th {
+body.dark-mode .table-hover th {
   background-color: #2a2a2a;
   color: #ffffff;
 }
 
-body.dark-mode .tables-general td {
+body.dark-mode .table-hover td {
   background-color: #1f1f1f;
   color: #ffffff;
 }

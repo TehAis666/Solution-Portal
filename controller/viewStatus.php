@@ -34,7 +34,6 @@ $totalRevenueSql = "
     SELECT SUM(t.RMValue) as total_revenue 
     FROM tender t 
     JOIN bids b ON t.BidID = b.BidID 
-    WHERE b.Status = 'Submitted'
 ";
 
 // Apply filters for total revenue
