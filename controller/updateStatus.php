@@ -4,6 +4,7 @@ include_once '../db/db.php';
 // Get filter input from URL
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
+$bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter
 
 // Fetch total bids, applying status filter if set
 $totalBidsSql = "
@@ -22,6 +23,11 @@ if (!empty($statusFilter)) {
 }
 if (!empty($sectorFilter)) {
     $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Adjust to match your DB column name
+}
+
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
 }
 
 // Add the where clauses to the query
@@ -48,6 +54,10 @@ if (!empty($statusFilter)) {
 }
 if (!empty($sectorFilter)) {
     $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Adjust to match your DB column name
+}
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
 }
 
 // Add the where clauses to the query

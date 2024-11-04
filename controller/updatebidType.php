@@ -4,6 +4,7 @@ include_once '../db/db.php'; // Assuming this file sets up the $conn variable
 // Get filter inputs from the URL (GET method)
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
+$bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter
 
 // Fetch Bid Types from the `bids` table where Status matches the selected status
 $sqlBidTypes = "
@@ -23,6 +24,11 @@ if (!empty($statusFilter)) {
 // Add sector filter to the Bid Types query if provided
 if (!empty($sectorFilter)) {
     $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Filter by BusinessUnit
+}
+
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
 }
 
 // Build the final SQL query for Bid Types
@@ -71,6 +77,11 @@ if (!empty($statusFilter)) {
 // Add sector filter to the Pipeline query if provided
 if (!empty($sectorFilter)) {
     $whereClauses[] = "b.BusinessUnit = '$sectorFilter'"; // Filter by BusinessUnit
+}
+
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
 }
 
 // Build the final SQL query for Pipelines

@@ -4,6 +4,7 @@ include '../db/db.php';
 // Initialize filter inputs
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Get the sector filter
+$bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter 
 
 // Build the base query
 $sql = "
@@ -24,6 +25,11 @@ if (!empty($statusFilter)) {
 }
 if (!empty($sectorFilter)) {
     $conditions[] = "b.BusinessUnit = ?"; // Add sector filter
+}
+
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $conditions[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
 }
 
 // Append conditions if any exist

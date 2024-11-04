@@ -4,7 +4,8 @@ include '../db/db.php'; // Assuming this file sets up the $conn variable
 
 // Initialize filter variables for fetching data
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
-$businessUnitFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Renamed variable for clarity
+$businessUnitFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Business unit filter
+$bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter
 
 // Build the base query
 $sql = "
@@ -13,15 +14,27 @@ $sql = "
     JOIN tender t ON b.BidID = t.BidID
 ";
 
+// Initialize an array to hold the WHERE conditions
+$whereClauses = [];
+
 // Append the status filter if a status is selected
 if (!empty($statusFilter)) {
-    $sql .= " WHERE b.Status = '$statusFilter'";
+    $whereClauses[] = "b.Status = '" . $conn->real_escape_string($statusFilter) . "'";
 }
 
 // Append the business unit filter if a business unit is selected
 if (!empty($businessUnitFilter)) {
-    // If there is already a WHERE clause, add AND; otherwise, add WHERE
-    $sql .= !empty($statusFilter) ? " AND b.BusinessUnit = '$businessUnitFilter'" : " WHERE b.BusinessUnit = '$businessUnitFilter'";
+    $whereClauses[] = "b.BusinessUnit = '" . $conn->real_escape_string($businessUnitFilter) . "'";
+}
+
+// Append the bid type filter if a bid type is selected
+if (!empty($bidTypeFilter)) {
+    $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
+}
+
+// Combine all conditions into the SQL query
+if (!empty($whereClauses)) {
+    $sql .= " WHERE " . implode(" AND ", $whereClauses);
 }
 
 // Group by BusinessUnit
