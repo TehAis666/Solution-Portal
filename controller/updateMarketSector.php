@@ -6,6 +6,8 @@ include '../db/db.php'; // Assuming this file sets up the $conn variable
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $businessUnitFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Business unit filter
 $bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter
+$PipelineFilter = isset($_GET['ppline']) ? $_GET['ppline'] : ''; // Pipeline filter
+$monthYearFilter = isset($_GET['monthYear']) ? $_GET['monthYear'] : ''; // Month-Year filter
 
 // Build the base query
 $sql = "
@@ -30,6 +32,22 @@ if (!empty($businessUnitFilter)) {
 // Append the bid type filter if a bid type is selected
 if (!empty($bidTypeFilter)) {
     $whereClauses[] = "b.Type = '" . $conn->real_escape_string($bidTypeFilter) . "'";
+}
+
+// Append the Pipeline filter if a bid type is selected
+if (!empty($PipelineFilter)) {
+    $whereClauses[] = "t.TenderStatus = '" . $conn->real_escape_string($PipelineFilter) . "'";
+}
+
+// Append the month-year filter if a month-year is selected
+if (!empty($monthYearFilter)) {
+    // Convert the selected month-year to a date range
+    $dateTime = DateTime::createFromFormat('F Y', $monthYearFilter);
+    if ($dateTime) {
+        $startDate = $dateTime->format('Y-m-01'); // First day of the month
+        $endDate = $dateTime->format('Y-m-t'); // Last day of the month
+        $whereClauses[] = "b.RequestDate BETWEEN '$startDate' AND '$endDate'";
+    }
 }
 
 // Combine all conditions into the SQL query

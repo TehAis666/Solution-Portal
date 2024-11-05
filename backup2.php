@@ -579,6 +579,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       // Store last selected Bid Type to allow deselection on repeated clicks
       let selectedBidType = null;
 
+      // Store last selected Pipeline to allow deselection on repeated clicks
+      let selectedPipeline = null;
+
+      // Global variable to hold the selected month-year
+      let selectedMonthYear = null;
+
       // Get the JSON-encoded data from PHP
       var bidTypesCounts = <?php echo $bidTypesJson; ?>;
       var pipelineCounts = <?php echo $pipelineCountsJson; ?>;
@@ -1045,12 +1051,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             selectedStatus = status;
           }
 
-          fetchStatus(selectedStatus, lastSelectedSector, selectedBidType);
-          fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType);
-          fetchReportData(selectedStatus, lastSelectedSector, selectedBidType);
-          fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType);
-          fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType);
-          fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType);
+          fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
         });
       });
 
@@ -1067,12 +1073,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               lastSelectedSector = params.name;
             }
             // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType);
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
           }
         });
 
@@ -1087,12 +1093,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               lastSelectedSector = params.name;
             }
             // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType);
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
           }
         });
 
@@ -1109,12 +1115,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               lastSelectedSector = clickedLabel;
             }
             // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType);
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
           },
         };
 
@@ -1141,12 +1147,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             }
 
             // Call AJAX function after updating selectedBidType
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType);
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
           }
         });
       }
@@ -1154,7 +1160,68 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       // Call the function to activate event listeners on both charts
       filterBidType();
 
-      function fetchMarketSectorData(status, sector, bidtype) {
+      // Function to set up click event listener for capturing the Pipeline on the Pipeline Bar Chart
+      function filterPipeline() {
+        // Capture clicks on the bid types bar chart
+        pipelinesBarChart.on('click', function(params) {
+          if (params.seriesType === 'bar') {
+            // Check if the clicked bid type is already selected
+            if (selectedPipeline === params.name) {
+              // Deselect if the same bid type is clicked again
+              selectedPipeline = null;
+              //console.log("Deselected:", selectedPipeline);
+            } else {
+              // Set selectedBidType to the clicked bid type
+              selectedPipeline = params.name;
+              //console.log("Selected:", selectedPipeline);
+            }
+
+            // Call AJAX function after updating selectedBidType
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          }
+        });
+      }
+
+      // Call the function to activate event listeners on both charts
+      filterPipeline();
+
+      // Function to set up click event listener for capturing the Month Year on the Report Chart
+      function filterMonthYear() {
+        // Capture clicks on the reports chart
+        reportsChart.on('click', function(params) {
+          // Check if the clicked series is part of the x-axis category (Month Year)
+          if (params.seriesType === 'line' || params.seriesType === 'bar') {
+            // Check if the clicked month-year is already selected
+            if (selectedMonthYear === params.name) {
+              // Deselect if the same month-year is clicked again
+              selectedMonthYear = null;
+              console.log("Deselected Month-Year:", selectedMonthYear);
+            } else {
+              // Set selectedMonthYear to the clicked month-year
+              selectedMonthYear = params.name;
+              console.log("Selected Month-Year:", selectedMonthYear);
+            }
+
+            // Call AJAX functions or update charts after updating selectedMonthYear
+            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          }
+        });
+      }
+
+      // Call the function to activate event listeners on both charts
+      filterMonthYear();
+
+      function fetchMarketSectorData(status, sector, bidtype, ppline, monthYear) {
         // Set sector to an empty string if it is null
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1165,13 +1232,25 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           bidtype = ''; // Convert null to an empty string
         }
 
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
         $.ajax({
           url: 'controller/updateMarketSector.php',
           method: 'GET',
           data: {
             status: status,
             sector: sector, // Include the sector in the request
-            bidtype: bidtype // Include the bidtype in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline, // Include the pipeline in the request
+            monthYear: monthYear // Include the monthYear in the request
           },
           dataType: 'json',
           success: function(response) {
@@ -1200,7 +1279,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchReportData(status, sector, bidtype) {
+      function fetchReportData(status, sector, bidtype, ppline, monthYear) {
 
         // Set sector to an empty string if it is null
         if (sector === null) {
@@ -1210,6 +1289,16 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         // Set bidtype to an empty string if it is null
         if (bidtype === null) {
           bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
         }
 
         // Debug: Log the values of status and sector
@@ -1222,7 +1311,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           data: {
             status: status,
             sector: sector, // Include the sector in the request
-            bidtype: bidtype // Include the bidtype in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear // Include the monthYear in the request
           },
           dataType: 'json', // Assuming your response is in JSON format
           success: function(response) {
@@ -1231,9 +1322,13 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             // Assume the response contains totalBids and totalRevenue arrays
             const totalBids = response.totalBids; // Update this line based on your actual response structure
             const totalRevenue = response.totalRevenue; // Update this line based on your actual response structure
+            const months = response.months;
 
             // Update the ECharts option with new data
             reportsChart.setOption({
+              xAxis: {
+                data: months // Update the xAxis data with the new months
+              },
               series: [{
                   name: 'Number of Bids',
                   data: totalBids.map(val => parseInt(val)), // Ensure bids are integers
@@ -1251,14 +1346,22 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchBidPipelineData(status, sector, bidtype) {
+      function fetchBidPipelineData(status, sector, bidtype, ppline, monthYear) {
         // Set sector to an empty string if it is null
         if (sector === null) {
           sector = ''; // Convert null to an empty string
         }
-         // Set bidtype to an empty string if it is null
-         if (bidtype === null) {
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
           bidtype = ''; // Convert null to an empty string
+        }
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
         }
         $.ajax({
           url: 'controller/updatebidType.php',
@@ -1266,7 +1369,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           data: {
             status: status,
             sector: sector, // Include the sector in the request
-            bidtype: bidtype // Include the bidtype in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear // Include the monthYear in the request
           },
           dataType: 'json',
           success: function(response) {
@@ -1312,7 +1417,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchSumSolution(status, sector, bidtype) {
+      function fetchSumSolution(status, sector, bidtype, ppline, monthYear) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1323,13 +1428,25 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           bidtype = ''; // Convert null to an empty string
         }
 
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
         $.ajax({
           url: 'controller/updateSumSolution.php',
           method: 'GET',
           data: {
             status: status,
             sector: sector, // Include sector in the request
-            bidtype: bidtype
+            bidtype: bidtype,
+            ppline: ppline,
+            monthYear: monthYear // Include the monthYear in the request
           },
           dataType: 'json',
           success: function(response) {
@@ -1353,7 +1470,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
       // Function to fetch InfraSolution data
-      function fetchInfraSolution(status, sector, bidtype) {
+      function fetchInfraSolution(status, sector, bidtype, ppline, monthYear) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1364,13 +1481,25 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           bidtype = ''; // Convert null to an empty string
         }
 
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
         $.ajax({
           url: 'controller/updateInfraSolution.php',
           method: 'GET',
           data: {
             status: status,
             sector: sector,
-            bidtype: bidtype // Include the bidtype in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear // Include the monthYear in the request
           },
           dataType: 'json',
           success: function(response) {
@@ -1447,7 +1576,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchStatus(status, sector, bidtype) {
+      function fetchStatus(status, sector, bidtype, ppline, monthYear) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1458,13 +1587,25 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           bidtype = ''; // Convert null to an empty string
         }
 
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
         $.ajax({
           url: 'controller/updateStatus.php', // path
           method: 'GET',
           data: {
             status: status,
             sector: sector,
-            bidtype: bidtype // Include the bidtype in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear,
           },
           success: function(response) {
             // Parse and insert the new values for bids and revenue
