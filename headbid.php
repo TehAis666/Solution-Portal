@@ -15,10 +15,11 @@ try {
       SELECT 
           b.*, 
           t.*, 
+          u.name AS StaffName,
           (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
       FROM bids b
       JOIN tender t ON b.BidID = t.BidID
-   
+      JOIN user u ON b.staffID = u.staffID  -- Join with user table to get staff name
   ");
 
   // Fetch all rows as an associative array
@@ -27,7 +28,6 @@ try {
   // Handle any errors
   echo "Error: " . $e->getMessage();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -431,6 +431,7 @@ try {
                 <thead>
                   <tr>
                     <th>Last Update</th>
+                    <th>Presales</th>  <!-- New column for Presales Name -->
                     <th>Company/Agency Name</th>
                     <th>Tender Proposal Title</th>
                     <th>Request Value (RM)</th>
@@ -452,6 +453,7 @@ try {
                       ?>
                         <tr>
                           <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
+                          <td><?php echo htmlspecialchars($bid['StaffName']); ?></td> <!-- Display Staff Name -->
                           <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
                           <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                           <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
@@ -1054,7 +1056,7 @@ try {
 
         // Loop through all rows and update counts
         $(allRows).each(function() {
-          const statusElement = $(this).find('td:nth-child(6) .badge');
+          const statusElement = $(this).find('td:nth-child(7) .badge');
           if (statusElement.length > 0) {
             const status = statusElement.text().trim();
             totalBids++; // Count every row as a bid
@@ -1083,10 +1085,10 @@ try {
 
         if (status === 'all') {
           // Show all rows if 'Total Bids' is clicked
-          table.column(5).search('').draw();
+          table.column(6).search('').draw();
         } else {
           // Filter by the specific status
-          table.column(5).search(status).draw();
+          table.column(6).search(status).draw();
         }
       }
 

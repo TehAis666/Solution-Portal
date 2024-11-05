@@ -28,7 +28,7 @@ try {
                (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'Dropped') AS dropped_count,
                (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'WIP') AS wip_count
         FROM user u 
-        WHERE u.sector = '$sector' AND u.role = 'presales'
+        WHERE u.sector = '$sector' AND u.role = 'presales' AND  u.status = 'Approved'
     ");
     $teamMembers = $stmtTeam->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {

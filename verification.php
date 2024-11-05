@@ -442,6 +442,7 @@ try {
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
+                                        <th>Department</th>
                                         <th>Phone Number</th>
                                         <th>Request Status</th>
                                         <th>Action</th>
@@ -455,6 +456,7 @@ try {
                                                 <td><?php echo htmlspecialchars($user['name']); ?></td>
                                                 <td><?php echo htmlspecialchars($user['email']); ?></td>
                                                 <td><?php echo htmlspecialchars($user['role']); ?></td>
+                                                <td><?php echo htmlspecialchars($user['sector']); ?></td>
                                                 <td><?php echo htmlspecialchars($user['phonenum']); ?></td>
                                                 <td class="text-center align-middle">
                                                     <?php
@@ -554,9 +556,9 @@ try {
                                             <label for="roleSelect" class="form-label"><strong>Role:</strong></label>
                                             <select name="role" id="roleSelect" class="form-select" required>
                                                 <option value="" disabled selected>Select Role</option>
-                                                <option value="CTO">CTO</option>
+                                                <option value="CTO">Chief Technical Officer (CTO)</option>
                                                 <option value="SO">Service Owner (SO)</option>
-                                                <option value="SA">SA</option>
+                                                <option value="SA">Solution Architect (SA)</option>
                                                 <option value="head">Head Presales</option>
                                                 <option value="presales">Presales</option>
                                             </select>
@@ -698,7 +700,7 @@ try {
 
                 // Loop through all rows and update counts based on status
                 $(allRows).each(function() {
-                    const statusElement = $(this).find('td:nth-child(6) .badge');
+                    const statusElement = $(this).find('td:nth-child(7) .badge');
                     if (statusElement.length > 0) {
                         const status = statusElement.text().trim();
                         totalUsers++; // Count every row as a user (total bids/users)
@@ -727,10 +729,10 @@ try {
 
                 if (status === 'all') {
                     // Show all rows
-                    table.column(5).search('').draw();
+                    table.column(6).search('').draw();
                 } else {
                     // Filter by specific status
-                    table.column(5).search(status).draw();
+                    table.column(6).search(status).draw();
                 }
             }
 

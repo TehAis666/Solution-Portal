@@ -583,6 +583,7 @@
                     <option value="IMG">IMG</option>
                     <option value="NMG">NMG</option>
                     <option value="Channel">Channel</option>
+                    <option value="Others">Others</option>
                   </select>
                 </div>
               </div>
@@ -636,9 +637,10 @@
                 <div class="form-group">
                   <label for="submissionDate">Submission Date:</label>
                   <div class="">
-                    <input type="date" class="form-control" name="SubmissionDate" id="submissionDate" required>
+                    <input type="date" class="form-control" name="SubmissionDate" id="submissionDate" min="<?php echo date('Y-m-d'); ?>" required>
                   </div>
                 </div>
+
               </div>
               <div class="form-row">
                 <div class="form-group">
@@ -797,38 +799,38 @@
     };
   </script>
 
-<script>
-  document.getElementById("businessUnit").addEventListener("change", function() {
-    const businessUnit = this.value;
-    const accountSector = document.getElementById("accountSector");
+  <script>
+    document.getElementById("businessUnit").addEventListener("change", function() {
+      const businessUnit = this.value;
+      const accountSector = document.getElementById("accountSector");
 
-    // Define account sector options based on business unit
-    const options = {
-      "": ["Select account sector"],
-      "TMG (Public Sector)": ["Government"],
-      "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
-      "IMG": ["PBT/SME"],
-      "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
-      "Channel": ["Channel Partner"],
-      "Any": ["Open Market"]
-    };
+      // Define account sector options based on business unit
+      const options = {
+        "": ["Select account sector"],
+        "TMG (Public Sector)": ["Government"],
+        "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
+        "IMG": ["PBT/SME"],
+        "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
+        "Channel": ["Channel Partner"],
+        "Others": ["Open Market"]
+      };
 
-    // Clear current options
-    accountSector.innerHTML = "";
+      // Clear current options
+      accountSector.innerHTML = "";
 
-    // Add default option
-    accountSector.appendChild(new Option("Select account sector", ""));
+      // Add default option
+      accountSector.appendChild(new Option("Select account sector", ""));
 
-    // Populate Account Sector based on selected Business Unit
-    options[businessUnit] ? options[businessUnit].forEach(option => {
-      accountSector.appendChild(new Option(option, option));
-    }) : Object.values(options).forEach(list => {
-      if (list.includes("Open Market")) {
-        accountSector.appendChild(new Option("Open Market", "Open Market"));
-      }
+      // Populate Account Sector based on selected Business Unit
+      options[businessUnit] ? options[businessUnit].forEach(option => {
+        accountSector.appendChild(new Option(option, option));
+      }) : Object.values(options).forEach(list => {
+        if (list.includes("Open Market")) {
+          accountSector.appendChild(new Option("Open Market", "Open Market"));
+        }
+      });
     });
-  });
-</script>
+  </script>
 
 </body>
 

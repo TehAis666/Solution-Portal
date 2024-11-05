@@ -428,26 +428,26 @@ try {
       <h1>Manage Bid</h1>
       <div class="row mb-3">
         <div class="col-12">
-          <label class="form-label">Filter by Solution</label>
+          <label class="form-label">Filter by Department</label>
           <div class="checkbox-container">
             <div class="form-check form-check-inline">
               <input type="checkbox" id="allSolutions" class="form-check-input" onchange="toggleAllSolutions()">
-              <label for="allSolutions" class="form-check-label">All Solutions</label>
+              <label for="allSolutions" class="form-check-label">All</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution1" class="form-check-input solution-checkbox" value="Solution1" onchange="filterBids()">
+              <input type="checkbox" id="solution1" class="form-check-input solution-checkbox" value="Solution1">
               <label for="solution1" class="form-check-label">AwanHeiTech</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution2" class="form-check-input solution-checkbox" value="Solution2" onchange="filterBids()">
+              <input type="checkbox" id="solution2" class="form-check-input solution-checkbox" value="Solution2">
               <label for="solution2" class="form-check-label">PaduNet</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution3" class="form-check-input solution-checkbox" value="Solution3" onchange="filterBids()">
+              <input type="checkbox" id="solution3" class="form-check-input solution-checkbox" value="Solution3">
               <label for="solution3" class="form-check-label">Secure-X</label>
             </div>
             <div class="form-check form-check-inline">
-              <input type="checkbox" id="solution4" class="form-check-input solution-checkbox" value="Solution4" onchange="filterBids()">
+              <input type="checkbox" id="solution4" class="form-check-input solution-checkbox" value="Solution4">
               <label for="solution4" class="form-check-label">i-Sentrix</label>
             </div>
           </div>
@@ -770,6 +770,7 @@ try {
                         <option value="IMG">IMG</option>
                         <option value="NMG">NMG</option>
                         <option value="Channel">Channel</option>
+                        <option value="Others">Others</option>
                       </select>
                     </div>
                     <div class="col-md-6">
@@ -820,7 +821,7 @@ try {
                     </div>
                     <div class="col-md-6">
                       <label for="updateSubmissionDate" class="form-label"><strong>Submission Date:</strong></label>
-                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate">
+                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate" min="<?php echo date('Y-m-d'); ?>">
                     </div>
                   </div>
                   <!-- Status and Tender Status -->
@@ -1110,143 +1111,121 @@ try {
 
   <!-- DataTable Script Initialization -->
   <script>
-    $(document).ready(function() {
-      // Initialize DataTable
-      const table = $('#example').DataTable({
-        paging: true,
-        searching: true,
-        info: true,
-        lengthChange: true,
-      });
+$(document).ready(function() {
+  // Initialize DataTable
+  const table = $('#example').DataTable({
+    paging: true,
+    searching: true,
+    info: true,
+    lengthChange: true,
+  });
 
-      // Function to calculate the dashboard counts
-      function calculateDashboard() {
-        // Get all rows from the original unfiltered dataset
-        const allRows = table.rows().nodes(); // Use table.rows() to include all rows in the DataTable, not just the current view
+  // Solution Mapping for Display Names
+  const solutionMapping = {
+    'Solution1': 'AwanHeiTech',
+    'Solution2': 'PaduNet',
+    'Solution3': 'Secure-X',
+    'Solution4': 'i-Sentrix'
+  };
 
-        let totalBids = 0;
-        let totalNewRequest = 0;
-        let totalSubmitted = 0;
-        let totalDropped = 0;
+  // Variables to store the initial counts
+  let initialTotalBids = 0, initialTotalNewRequest = 0, initialTotalSubmitted = 0, initialTotalDropped = 0;
 
-        // Loop through all rows and update counts
-        $(allRows).each(function() {
-          const statusElement = $(this).find('td:nth-child(7) .badge');
-          if (statusElement.length > 0) {
-            const status = statusElement.text().trim();
-            totalBids++; // Count every row as a bid
+  // Function to calculate initial dashboard counts based on all data
+  function calculateInitialDashboard() {
+    const allRows = table.rows().nodes(); // All rows regardless of filter
 
-            // Count based on the status
-            if (status === 'WIP') {
-              totalNewRequest++;
-            } else if (status === 'Submitted') {
-              totalSubmitted++;
-            } else if (status === 'Dropped') {
-              totalDropped++;
-            }
-          }
-        });
-
-        // Set the calculated totals to the dashboard elements
-        document.querySelector('.total-bids').textContent = totalBids;
-        document.querySelector('.total-new-request').textContent = totalNewRequest;
-        document.querySelector('.total-submitted').textContent = totalSubmitted;
-        document.querySelector('.total-dropped').textContent = totalDropped;
+    $(allRows).each(function() {
+      const statusElement = $(this).find('td:nth-child(7) .badge');
+      if (statusElement.length > 0) {
+        const status = statusElement.text().trim();
+        initialTotalBids++;
+        if (status === 'WIP') initialTotalNewRequest++;
+        else if (status === 'Submitted') initialTotalSubmitted++;
+        else if (status === 'Dropped') initialTotalDropped++;
       }
-
-      // Function to filter the DataTable based on status
-      function filterByStatus(status) {
-        table.search(''); // Clear any existing search
-
-        if (status === 'all') {
-          // Show all rows if 'Total Bids' is clicked
-          table.column(6).search('').draw();
-        } else {
-          // Filter by the specific status
-          table.column(6).search(status).draw();
-        }
-      }
-
-      // Wait until the table is fully initialized before calculating dashboard counts
-      table.on('draw', function() {
-        calculateDashboard(); // Recalculate dashboard counts after every DataTable draw event
-      });
-
-      // Event listeners for filtering based on the clicked dashboard element
-      document.querySelector('.total-bids').addEventListener('click', function() {
-        filterByStatus('all'); // Show all rows when 'Total Bids' is clicked
-      });
-
-      document.querySelector('.total-new-request').addEventListener('click', function() {
-        filterByStatus('WIP'); // Show only 'WIP' rows when 'Total New Request' is clicked
-      });
-
-      document.querySelector('.total-submitted').addEventListener('click', function() {
-        filterByStatus('Submitted'); // Show only 'Submitted' rows when 'Total Submitted' is clicked
-      });
-
-      document.querySelector('.total-dropped').addEventListener('click', function() {
-        filterByStatus('Dropped'); // Show only 'Dropped' rows when 'Total Dropped' is clicked
-      });
-
-      // Call the function once the document is ready and the table is fully loaded
-      calculateDashboard();
     });
-  </script>
 
-  <!-- Solution Filter-->
-  <script>
-    $(document).ready(function() {
-      const table = $('#example').DataTable();
+    // Set initial counts in dashboard
+    document.querySelector('.total-bids').textContent = initialTotalBids;
+    document.querySelector('.total-new-request').textContent = initialTotalNewRequest;
+    document.querySelector('.total-submitted').textContent = initialTotalSubmitted;
+    document.querySelector('.total-dropped').textContent = initialTotalDropped;
+  }
 
-      // Define the mapping from solution keys to display names
-      const solutionMapping = {
-        'Solution1': 'AwanHeiTech',
-        'Solution2': 'PaduNet',
-        'Solution3': 'Secure-X',
-        'Solution4': 'i-Sentrix'
-      };
+  // Function to calculate dashboard counts based on the current filtered view
+  function calculateFilteredDashboard() {
+    const filteredRows = table.rows({ filter: 'applied' }).nodes();
 
-      // Function to filter by solutions and update the display title
-      function filterBySolutions() {
-        const selectedSolutions = [];
+    let totalBids = 0, totalNewRequest = 0, totalSubmitted = 0, totalDropped = 0;
 
-        // Collect display names of checked solution checkboxes
-        $('.solution-checkbox:checked').each(function() {
-          const solutionKey = $(this).val();
-          if (solutionMapping[solutionKey]) {
-            selectedSolutions.push(solutionMapping[solutionKey]);
-          }
-        });
-
-        // Debug: Log selected display names
-        console.log("Mapped Selected Solutions:", selectedSolutions);
-
-        // Update the title dynamically with selected solutions or "All Solutions" if none
-        const selectedSolutionDisplay = selectedSolutions.length > 0 ? selectedSolutions.join(', ') : 'All Solutions';
-        $('.card-title').text(`${selectedSolutionDisplay}'s Bids`);
-
-        if (selectedSolutions.length === 0) {
-          table.column(5).search('').draw(); // Clear filter if none selected
-        } else {
-          const searchQuery = selectedSolutions.join('|'); // Combine with OR operator
-          console.log("Search Query for Solutions Column:", searchQuery); // Debug log
-          table.column(5).search(searchQuery, true, false).draw(); // Apply filter
-        }
+    $(filteredRows).each(function() {
+      const statusElement = $(this).find('td:nth-child(7) .badge');
+      if (statusElement.length > 0) {
+        const status = statusElement.text().trim();
+        totalBids++;
+        if (status === 'WIP') totalNewRequest++;
+        else if (status === 'Submitted') totalSubmitted++;
+        else if (status === 'Dropped') totalDropped++;
       }
-
-      // Toggle all solutions checkboxes
-      function toggleAllSolutions() {
-        const isChecked = $('#allSolutions').is(':checked');
-        $('.solution-checkbox').prop('checked', isChecked);
-        filterBySolutions(); // Trigger filtering after toggling
-      }
-
-      // Event listeners for solution checkboxes
-      $('.solution-checkbox').on('change', filterBySolutions);
-      $('#allSolutions').on('change', toggleAllSolutions);
     });
-  </script>
+
+    // Update the filtered counts in the dashboard display
+    document.querySelector('.total-bids').textContent = totalBids;
+    document.querySelector('.total-new-request').textContent = totalNewRequest;
+    document.querySelector('.total-submitted').textContent = totalSubmitted;
+    document.querySelector('.total-dropped').textContent = totalDropped;
+  }
+
+  // Function to filter by status without changing dashboard counts
+  function filterByStatus(status) {
+    table.search('');
+    status === 'all' ? table.column(6).search('').draw() : table.column(6).search(status).draw();
+  }
+
+  // Function to filter by solutions and reset dashboard status filters
+  function filterBySolutions() {
+    // Clear any existing status filters
+    filterByStatus('all');
+
+    const selectedSolutions = $('.solution-checkbox:checked').map(function() {
+      return solutionMapping[$(this).val()];
+    }).get();
+
+    const selectedSolutionDisplay = selectedSolutions.length ? selectedSolutions.join(', ') : 'All Solutions';
+    $('.card-title').text(`${selectedSolutionDisplay}'s Bids`);
+
+    if (!selectedSolutions.length) {
+      table.column(5).search('').draw();
+    } else {
+      const searchQuery = selectedSolutions.join('|');
+      table.column(5).search(searchQuery, true, false).draw();
+    }
+
+    // Recalculate dashboard counts based on the filtered solution data
+    calculateFilteredDashboard(); 
+  }
+
+  // Toggle all solutions checkboxes
+  function toggleAllSolutions() {
+    const isChecked = $('#allSolutions').is(':checked');
+    $('.solution-checkbox').prop('checked', isChecked);
+    filterBySolutions();
+  }
+
+  // Event listeners for dashboard and solution filtering
+  $('.total-bids').click(() => filterByStatus('all'));
+  $('.total-new-request').click(() => filterByStatus('WIP'));
+  $('.total-submitted').click(() => filterByStatus('Submitted'));
+  $('.total-dropped').click(() => filterByStatus('Dropped'));
+
+  $('.solution-checkbox').on('change', filterBySolutions);
+  $('#allSolutions').on('change', toggleAllSolutions);
+
+  // Calculate initial dashboard counts when document is ready
+  calculateInitialDashboard();
+});
+</script>
 
 
   <!-- MODAL Fect Data -->
@@ -1398,6 +1377,39 @@ try {
     });
 
     $.fn.dataTable.ext.errMode = 'throw';
+  </script>
+
+<script>
+    document.getElementById("updateBusinessUnit").addEventListener("change", function() {
+      const businessUnit = this.value;
+      const accountSector = document.getElementById("updateAccountSector");
+
+      // Define account sector options based on business unit
+      const options = {
+        "": ["Select account sector"],
+        "TMG (Public Sector)": ["Government"],
+        "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
+        "IMG": ["PBT/SME"],
+        "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
+        "Channel": ["Channel Partner"],
+        "Others": ["Open Market"]
+      };
+
+      // Clear current options
+      accountSector.innerHTML = "";
+
+      // Add default option
+      accountSector.appendChild(new Option("Select account sector", ""));
+
+      // Populate Account Sector based on selected Business Unit
+      options[businessUnit] ? options[businessUnit].forEach(option => {
+        accountSector.appendChild(new Option(option, option));
+      }) : Object.values(options).forEach(list => {
+        if (list.includes("Open Market")) {
+          accountSector.appendChild(new Option("Open Market", "Open Market"));
+        }
+      });
+    });
   </script>
 
   <!-- DarkMode Toggle -->

@@ -1,7 +1,7 @@
 <?php include_once 'controller/handler/session.php';
 
 $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get the profile picture
-
+$role = $_SESSION['user_role']; // Get the role from the session
 
 ?>
 <!-- ======= Header ======= -->
@@ -103,45 +103,61 @@ $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get th
         class="nav-content collapse"
         data-bs-parent="#sidebar-nav">
 
+        <li>
+          <a href="addbid">
+            <i class="bi bi-circle"></i><span>Add Bid</span>
+          </a>
+        </li>
+
+        <?php if ($role == 'admin'): // Only Admin can access ManageBid 
+        ?>
           <li>
-            <a href="addbid.php">
-              <i class="bi bi-circle"></i><span>Add</span>
+            <a href="adminbid">
+              <i class="bi bi-circle"></i><span>ManageBid</span>
             </a>
           </li>
+        <?php endif; ?>
+
+        <?php if ($role == 'head'): // Only Head Presales
+        ?>
           <li>
-            <a href="adminbid.php">
-              <i class="bi bi-circle"></i><span>Admin Bid</span>
-            </a>
-          </li>
-          <li>
-            <a href="headbid.php">
+            <a href="headbid2">
               <i class="bi bi-circle"></i><span>Head Presales Bid</span>
             </a>
           </li>
+        <?php endif; ?>
 
+        <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
+        ?>
           <li>
-            <a href="userbid.php">
+            <a href="userbid">
               <i class="bi bi-circle"></i><span>Presales Bid</span>
             </a>
           </li>
+        <?php endif; ?>
 
-          <!-- <li>
+
+        <!-- <li>
             <a href="bossbid.php">
               <i class="bi bi-circle"></i><span>BossBid</span>
             </a>
           </li> -->
 
-
-        <li>
-          <a href="viewbid.php">
-            <i class="bi bi-circle"></i><span>CTO/SO/SA Bid</span>
-          </a>
-        </li>
+        <?php if ($role != 'presales' && $role != 'head' && $role != 'admin'): // Only SO/SA/CTO
+        ?>
+          <li>
+            <a href="viewbid">
+              <i class="bi bi-circle"></i><span>CTO/SO/SA Bid</span>
+            </a>
+          </li>
+        <?php endif; ?>
       </ul>
     </li>
-    <!-- End First Nav -->
 
+    <!-- End First Nav -->
     <!-- ======= First nav List ======= -->
+    <?php if ($role != 'admin'): // Only Admin
+        ?>
     <li class="nav-item">
       <a
         class="nav-link collapsed"
@@ -156,39 +172,45 @@ $userData = include 'controller/fetchpfp.php'; // Include fetchpfp.php to get th
         class="nav-content collapse"
         data-bs-parent="#sidebar-nav">
 
-            <a href="recruit.php">
+        <!-- <a href="recruit">
               <i class="bi bi-circle"></i><span>Manage Team</span>
             </a>
-          </li>
-
-            <a href="userteam.php">
+          </li> -->
+        <?php if ($role == 'SO' || $role == 'head'): // Only Service Owner & Head Presales 
+        ?>
+          <li>
+            <a href="userteam">
               <i class="bi bi-circle"></i><span>My Team</span>
             </a>
           </li>
+        <?php endif; ?>
 
-          <li>
-            <a href="requestboss.php">
+        <!-- <li>
+            <a href="requestboss">
               <i class="bi bi-circle"></i><span>Find Team</span>
             </a>
           </li>
 
           <li>
-            <a href="acceptrequest.php">
+            <a href="acceptrequest">
               <i class="bi bi-circle"></i><span>Manage Request</span>
             </a>
-          </li>
+          </li> -->
 
       </ul>
     </li>
+    <?php endif; ?>
     <!-- End Second Nav -->
 
-
-      <li class="nav-item">
-        <a class="nav-link" href="verification.php">
-          <i class="bi bi-person"></i>
-          <span>Signup Request</span>
-        </a>
-      </li>
+    <?php if ($role == 'admin'): // Only Admin
+        ?>
+    <li class="nav-item">
+      <a class="nav-link" href="verification.php">
+        <i class="bi bi-person"></i>
+        <span>Signup Request</span>
+      </a>
+    </li>
+    <?php endif; ?>
 
     <!-- End Components Nav -->
 

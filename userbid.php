@@ -683,6 +683,7 @@ try {
                         <option value="IMG">IMG</option>
                         <option value="NMG">NMG</option>
                         <option value="Channel">Channel</option>
+                        <option value="Others">Others</option>
                       </select>
                     </div>
                     <div class="col-md-6">
@@ -733,7 +734,7 @@ try {
                     </div>
                     <div class="col-md-6">
                       <label for="updateSubmissionDate" class="form-label"><strong>Submission Date:</strong></label>
-                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate">
+                      <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate" min="<?php echo date('Y-m-d'); ?>">
                     </div>
                   </div>
                   <!-- Status and Tender Status -->
@@ -1256,6 +1257,39 @@ try {
     });
 
     $.fn.dataTable.ext.errMode = 'throw';
+  </script>
+
+<script>
+    document.getElementById("updateBusinessUnit").addEventListener("change", function() {
+      const businessUnit = this.value;
+      const accountSector = document.getElementById("updateAccountSector");
+
+      // Define account sector options based on business unit
+      const options = {
+        "": ["Select account sector"],
+        "TMG (Public Sector)": ["Government"],
+        "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
+        "IMG": ["PBT/SME"],
+        "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
+        "Channel": ["Channel Partner"],
+        "Others": ["Open Market"]
+      };
+
+      // Clear current options
+      accountSector.innerHTML = "";
+
+      // Add default option
+      accountSector.appendChild(new Option("Select account sector", ""));
+
+      // Populate Account Sector based on selected Business Unit
+      options[businessUnit] ? options[businessUnit].forEach(option => {
+        accountSector.appendChild(new Option(option, option));
+      }) : Object.values(options).forEach(list => {
+        if (list.includes("Open Market")) {
+          accountSector.appendChild(new Option("Open Market", "Open Market"));
+        }
+      });
+    });
   </script>
 
   <!-- DarkMode Toggle -->

@@ -252,12 +252,12 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                     <div class="col-lg-9 col-md-8"><?php echo $user_data['phonenum']; ?></div>
                   </div>
 
-                  <?php if ($user_data['managerid'] != $user_data['staffID']): ?>
+                  
                     <div class="row">
-                      <div class="col-lg-3 col-md-4 label small-label">Manager Name</div>
-                      <div class="col-lg-9 col-md-8"><?php echo $user_data['managername']; ?></div>
+                      <div class="col-lg-3 col-md-4 label small-label">Department</div>
+                      <div class="col-lg-9 col-md-8"><?php echo $user_data['sector']; ?></div>
                     </div>
-                  <?php endif; ?>
+                  
 
                 </div>
 
