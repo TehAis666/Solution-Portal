@@ -1,8 +1,8 @@
-<?php
-// Include the database connection file
-include_once '../db/db.php'; // Assuming this file sets up the $conn variable
+<?php 
 
-// Initialize filter variables
+include_once '../db/db.php';
+
+// Get filter input from URL
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // New sector filter
 $bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter
@@ -13,12 +13,12 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
 $endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
 
-// Build the base query
-$sql = "
-    SELECT t.Solution1, t.Solution2, t.Solution3, t.Solution4, b.BusinessUnit
-    FROM tender t
-    JOIN bids b ON t.BidID = b.BidID
-";
+// Fetch the status counts
+$statusCountsSql = "
+    SELECT b.Status, COUNT(*) as total_count 
+    FROM bids b
+    JOIN tender t ON t.BidID = b.BidID
+";  
 
 // Initialize where clauses array
 $whereClauses = [];
@@ -52,7 +52,7 @@ if (!empty($monthYearFilter)) {
     }
 }
 
-// Append the solution filter if a specific solution is selected
+// Check if a solution filter is specified
 if (!empty($solutionFilter)) {
     if ($solutionFilter === 'Mix Solution') {
         // Mix Solution: Check if more than one of the Solution columns contains a non-empty string
@@ -63,25 +63,24 @@ if (!empty($solutionFilter)) {
             (t.Solution4 IS NOT NULL AND t.Solution4 != '') > 1
         )";
     } else {
-        // **Updated Logic for Single Solution**:
-        // Check if the specified solution appears in any of the columns
-        // AND ensure that we do NOT count rows with multiple solutions
+        // Single Solution: Check if the specified solution appears in any of the columns
+        // Also ensure that we do not count rows with multiple solutions
         $whereClauses[] = "(
             (t.Solution1 = '" . $conn->real_escape_string($solutionFilter) . "' AND 
              (t.Solution2 IS NULL OR t.Solution2 = '') AND 
              (t.Solution3 IS NULL OR t.Solution3 = '') AND 
-             (t.Solution4 IS NULL OR t.Solution4 = '')) OR
-
+             (t.Solution4 IS NULL OR t.Solution4 = '')) OR 
+             
             (t.Solution2 = '" . $conn->real_escape_string($solutionFilter) . "' AND 
              (t.Solution1 IS NULL OR t.Solution1 = '') AND 
              (t.Solution3 IS NULL OR t.Solution3 = '') AND 
              (t.Solution4 IS NULL OR t.Solution4 = '')) OR 
-
+             
             (t.Solution3 = '" . $conn->real_escape_string($solutionFilter) . "' AND 
              (t.Solution1 IS NULL OR t.Solution1 = '') AND 
              (t.Solution2 IS NULL OR t.Solution2 = '') AND 
              (t.Solution4 IS NULL OR t.Solution4 = '')) OR 
-
+             
             (t.Solution4 = '" . $conn->real_escape_string($solutionFilter) . "' AND 
              (t.Solution1 IS NULL OR t.Solution1 = '') AND 
              (t.Solution2 IS NULL OR t.Solution2 = '') AND 
@@ -106,76 +105,26 @@ if (!empty($startDate) && !empty($endDate)) {
 
 // Add the where clauses to the query
 if (count($whereClauses) > 0) {
-    $sql .= " WHERE " . implode(' AND ', $whereClauses); // Corrected: Added WHERE before clauses
+    $statusCountsSql .= " WHERE " . implode(' AND ', $whereClauses); // Use WHERE instead of AND
 }
 
-// Execute the query
-$result = $conn->query($sql);
+$statusCountsSql .= " GROUP BY b.Status"; // Group by bid status
+$statusCountsResult = $conn->query($statusCountsSql);
 
-// Initialize an array to hold the business unit counts for each solution
-$solutionBusinessUnitCounts = [
-    'AwanHeiTech' => ["TMG (Private Sector)" => 0, "TMG (Public Sector)" => 0, "NMG" => 0, "IMG" => 0, "Channel" => 0],
-    'PaduNet' => ["TMG (Private Sector)" => 0, "TMG (Public Sector)" => 0, "NMG" => 0, "IMG" => 0, "Channel" => 0],
-    'SecureX' => ["TMG (Private Sector)" => 0, "TMG (Public Sector)" => 0, "NMG" => 0, "IMG" => 0, "Channel" => 0],
-    'iSentrix' => ["TMG (Private Sector)" => 0, "TMG (Public Sector)" => 0, "NMG" => 0, "IMG" => 0, "Channel" => 0],
-    'MixSolution' => ["TMG (Private Sector)" => 0, "TMG (Public Sector)" => 0, "NMG" => 0, "IMG" => 0, "Channel" => 0],
-];
-
-// Loop through each row and calculate the counts
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $businessUnit = trim($row['BusinessUnit']); // Clean any whitespace from BusinessUnit
-        $solutions = [
-            $row['Solution1'],
-            $row['Solution2'],
-            $row['Solution3'],
-            $row['Solution4']
-        ];
-
-        // Initialize a counter for non-empty solutions
-        $solutionCount = 0;
-
-        // Only proceed if $businessUnit is a valid key
-        if (!empty($businessUnit) && isset($solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit])) {
-            // Check each solution and count them
-            foreach ($solutions as $solution) {
-                if (!empty($solution)) {
-                    $solutionCount++;
-                }
-            }
-
-            // If more than one solution is present, count it as a MixSolution
-            if ($solutionCount > 1) {
-                $solutionBusinessUnitCounts['MixSolution'][$businessUnit]++;
-            } else {
-                // If it's not a Mix Solution, increment the specific solution count based on the solution present
-                if (!empty($row['Solution1'])) {
-                    $solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit]++;
-                }
-                if (!empty($row['Solution2'])) {
-                    $solutionBusinessUnitCounts['PaduNet'][$businessUnit]++;
-                }
-                if (!empty($row['Solution3'])) {
-                    $solutionBusinessUnitCounts['SecureX'][$businessUnit]++;
-                }
-                if (!empty($row['Solution4'])) {
-                    $solutionBusinessUnitCounts['iSentrix'][$businessUnit]++;
-                }
-            }
-        }
-    }
+// Initialize an array to hold status data
+$statusData = [];
+while ($row = $statusCountsResult->fetch_assoc()) {
+    $statusData[$row['Status']] = $row['total_count'];
 }
 
-// Prepare the final output
-$output = [
-    'solutionBusinessUnitCounts' => $solutionBusinessUnitCounts
-];
+// Set default values for statuses that may not exist
+$statusData['WIP'] = $statusData['WIP'] ?? 0;
+$statusData['Submitted'] = $statusData['Submitted'] ?? 0;
+$statusData['Dropped'] = $statusData['Dropped'] ?? 0;
 
-// Set header for JSON response
-header('Content-Type: application/json');
-// Output as JSON
-echo json_encode($output);
+header('Content-Type: application/json'); 
+// Return the data as a JSON response
+echo json_encode($statusData);
+$conn->close();
 
-// Close the connection
-// $conn->close();
 ?>

@@ -7,6 +7,10 @@ $sectorFilter = isset($_GET['sector']) ? $_GET['sector'] : ''; // Get the sector
 $bidTypeFilter = isset($_GET['bidtype']) ? $_GET['bidtype'] : ''; // Bid type filter 
 $PipelineFilter = isset($_GET['ppline']) ? $_GET['ppline'] : ''; // Pipeline filter
 $monthYearFilter = isset($_GET['monthYear']) ? $_GET['monthYear'] : ''; // Month-Year filter
+$solutionFilter = isset($_GET['solutionn']) ? $_GET['solutionn'] : ''; // Solution filter
+$year = isset($_GET['year']) ? $_GET['year'] : '';
+$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
+$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
 
 // Build the base query
 $sql = "
@@ -48,6 +52,49 @@ if (!empty($monthYearFilter)) {
         $endDate = $dateTime->format('Y-m-t'); // Last day of the month
         $conditions[] = "b.RequestDate BETWEEN '$startDate' AND '$endDate'";
     }
+}
+
+// Handle the solution filter
+if (!empty($solutionFilter)) {
+    if ($solutionFilter === 'Mix Solution') {
+        // Mix Solution: Check if more than one of the Solution columns contains a non-empty string
+        $conditions[] = "(
+            (t.Solution1 IS NOT NULL AND t.Solution1 != '') + 
+            (t.Solution2 IS NOT NULL AND t.Solution2 != '') + 
+            (t.Solution3 IS NOT NULL AND t.Solution3 != '') + 
+            (t.Solution4 IS NOT NULL AND t.Solution4 != '') > 1
+        )";
+    } else {
+        // Single Solution: Check if the specified solution appears in any of the columns 
+        // AND ensure that we do NOT count rows with multiple solutions
+        $conditions[] = "(
+            (t.Solution1 = '" . $conn->real_escape_string($solutionFilter) . "' OR 
+             t.Solution2 = '" . $conn->real_escape_string($solutionFilter) . "' OR 
+             t.Solution3 = '" . $conn->real_escape_string($solutionFilter) . "' OR 
+             t.Solution4 = '" . $conn->real_escape_string($solutionFilter) . "') 
+            AND 
+            NOT (
+                (t.Solution1 IS NOT NULL AND t.Solution1 != '') + 
+                (t.Solution2 IS NOT NULL AND t.Solution2 != '') + 
+                (t.Solution3 IS NOT NULL AND t.Solution3 != '') + 
+                (t.Solution4 IS NOT NULL AND t.Solution4 != '') > 1
+            )
+        )";
+    }
+}
+
+// Append year filter
+if (!empty($year)) {
+    $conditions[] = "YEAR(b.RequestDate) = " . $conn->real_escape_string($year);
+}
+
+// Append date range filters
+if (!empty($startDate) && !empty($endDate)) {
+    $conditions[] = "b.RequestDate BETWEEN '" . $conn->real_escape_string($startDate) . "' AND '" . $conn->real_escape_string($endDate) . "'";
+} elseif (!empty($startDate)) {
+    $conditions[] = "b.RequestDate >= '" . $conn->real_escape_string($startDate) . "'";
+} elseif (!empty($endDate)) {
+    $conditions[] = "b.RequestDate <= '" . $conn->real_escape_string($endDate) . "'";
 }
 
 // Append conditions if any exist
@@ -101,7 +148,7 @@ if ($result->num_rows > 0) {
 
 // Close the statement and connection
 $stmt->close();
-$conn->close();
+//$conn->close();
 
 // Prepare the final output
 $output = [
