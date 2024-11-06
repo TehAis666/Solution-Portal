@@ -6,65 +6,58 @@
 include_once 'db/db.php';
 
 try {
-    // Assuming staffID and sector are stored in the session
-    $staffID = $_SESSION['user_id'];
+    // Assuming sector and staff ID are stored in the session
     $sector = $_SESSION['user_sector'];
+    $staffID = $_SESSION['user_id'];
 
-    // Query to select bids and match the solution column based on the sector
-    $stmt = $conn->query("
-        SELECT 
-            b.*, 
-            t.*, 
-            u.name AS StaffName,
-            (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
-        FROM bids b
-        JOIN tender t ON b.BidID = t.BidID
-        JOIN user u ON b.staffID = u.staffID
-    ");
+    // Map sectors to the correct solution columns
+    $solutionColumns = [
+        'AwanHeiTech' => 'Solution1',
+        'PaduNet' => 'Solution2',
+        'Secure-X' => 'Solution3',
+        'i-Sentrix' => 'Solution4',
+    ];
 
-    // Fetch all rows as an associative array
-    $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+    // Get the solution column for the user's sector
+    $solutionColumn = $solutionColumns[$sector] ?? null;
 
-    // Prepare variables for presales based on sector
-    $presales1 = null;
-    $presales2 = null;
-    $presales3 = null;
-    $presales4 = null;
+    if ($solutionColumn) {
+        // Construct SQL query to retrieve bids and staff names, with dynamic solution column
+        $sql = "
+            SELECT 
+                b.*, 
+                t.*, 
+                u.staffID, 
+                u.name AS StaffName,
+                (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN user u ON b.staffID = u.staffID
+            WHERE 
+                (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
+                OR 
+                (b.staffID IN (SELECT staffID FROM user WHERE sector = '$sector'))
+        ";
 
-    // Query to retrieve presales staff names without filtering by role
-    $presalesStmt = $conn->query("SELECT name, sector FROM user");
+        // Prepare and execute the SQL statement
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
 
-    // Check if any presales data is returned
-    if ($presalesStmt->num_rows > 0) {
-        // Fetch all presales names as an associative array
-        $presales = $presalesStmt->fetch_all(MYSQLI_ASSOC);
-
-        // Assign presales based on the sector
-        foreach ($presales as $presalesStaff) {
-            $name = $presalesStaff['name'];
-            $presalesSector = $presalesStaff['sector'];
-
-            // Assign based on the sector
-            if ($presalesSector === 'AwanHeiTech') {
-                $presales1 = $name; // presales1 for AwanHeiTech
-            } elseif ($presalesSector === 'PaduNet') {
-                $presales2 = $name; // presales2 for PaduNet
-            } elseif ($presalesSector === 'Secure-X') {
-                $presales3 = $name; // presales3 for Secure-X
-            } elseif ($presalesSector === 'i-Sentrix') {
-                $presales4 = $name; // presales4 for i-Sentrix
-            }
-        }
+        // Fetch the bid data as an associative array
+        $bids = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     } else {
-        echo "No presales staff found.<br>";
+        echo "Invalid sector.";
     }
-} catch (Exception $e) {
-    // Handle any errors
-    echo "Error: " . $e->getMessage();
-}
 
-try {
-    // Query to retrieve presales names filtered by sector without filtering by role
+    // Fetching staff names
+    $staffNames = [];
+    $staffStmt = $conn->query("SELECT staffID, name FROM user WHERE sector = '$sector'");
+
+    while ($row = $staffStmt->fetch_assoc()) {
+        $staffNames[$row['staffID']] = $row['name'];
+    }
+
+    // Prepare an array for presales names by sector
     $presalesBySector = [
         'AwanHeiTech' => [],
         'PaduNet' => [],
@@ -72,29 +65,23 @@ try {
         'i-Sentrix' => []
     ];
 
+    // Query to retrieve presales staff names by sector
     $presalesStmt = $conn->query("SELECT name, sector FROM user");
 
+    // Populate the presales array with names organized by sector
     while ($row = $presalesStmt->fetch_assoc()) {
-        switch ($row['sector']) {
-            case 'AwanHeiTech':
-                $presalesBySector['AwanHeiTech'][] = $row['name'];
-                break;
-            case 'PaduNet':
-                $presalesBySector['PaduNet'][] = $row['name'];
-                break;
-            case 'Secure-X':
-                $presalesBySector['Secure-X'][] = $row['name'];
-                break;
-            case 'i-Sentrix':
-                $presalesBySector['i-Sentrix'][] = $row['name'];
-                break;
+        if (isset($presalesBySector[$row['sector']])) {
+            $presalesBySector[$row['sector']][] = $row['name'];
         }
     }
+
 } catch (Exception $e) {
+    // Handle any errors
     echo "Error: " . $e->getMessage();
 }
-
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -433,7 +420,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-        <h1><?php echo $sector; ?> Bid</h1>
+            <h1><?php echo $sector; ?> Bid</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -497,7 +484,7 @@ try {
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Presales</th> <!-- New column for Presales Name -->
+                                        <th>Staff Name</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>
                                         <th>Request Value (RM)</th>
@@ -509,81 +496,75 @@ try {
                                 <tbody>
                                     <?php if (!empty($bids)): ?>
                                         <?php foreach ($bids as $bid): ?>
-                                            <?php
-                                            // Display rows based on sector's solution column
-                                            if (($sector === 'AwanHeiTech' && !empty($bid['Solution1'])) ||
-                                                ($sector === 'PaduNet' && !empty($bid['Solution2'])) ||
-                                                ($sector === 'Secure-X' && !empty($bid['Solution3'])) ||
-                                                ($sector === 'i-Sentrix' && !empty($bid['Solution4']))
-                                            ) :
-                                            ?>
-                                                <tr>
-                                                    <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
-                                                    <td><?php echo htmlspecialchars($bid['StaffName']); ?></td> <!-- Display Staff Name -->
-                                                    <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
-                                                    <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
-                                                    <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
-                                                    <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
-                                                    <td class="text-center align-middle">
-                                                        <?php
-                                                        $status = htmlspecialchars($bid['Status']);
-                                                        if ($status == 'Submitted') {
-                                                            echo '<span class="badge bg-success">Submitted</span>';
-                                                        } elseif ($status == 'Dropped') {
-                                                            echo '<span class="badge bg-danger">Dropped</span>';
-                                                        } elseif ($status == 'WIP') {
-                                                            echo '<span class="badge bg-warning text-dark">WIP</span>';
-                                                        } else {
-                                                            echo '<span class="badge bg-secondary">Unknown</span>';
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <!-- View Button with Data Attributes for Each Bid -->
-                                                        <button type="button" class="btn btn-primary viewbtn"
-                                                            data-bs-toggle="modal" data-bs-target="#viewbids"
-                                                            data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
-                                                            data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
-                                                            data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
-                                                            data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
-                                                            data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
-                                                            data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
-                                                            data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
-                                                            data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
-                                                            data-solution1="<?php echo htmlspecialchars($bid['Solution1']); ?>"
-                                                            data-solution2="<?php echo htmlspecialchars($bid['Solution2']); ?>"
-                                                            data-solution3="<?php echo htmlspecialchars($bid['Solution3']); ?>"
-                                                            data-solution4="<?php echo htmlspecialchars($bid['Solution4']); ?>"
-                                                            data-presales1="<?php echo htmlspecialchars($bid['Presales1']); ?>"
-                                                            data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
-                                                            data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
-                                                            data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
-                                                            data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
-                                                            data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
-                                                            data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
-                                                            data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
-                                                            data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
-                                                            data-value4="<?php echo htmlspecialchars($bid['Value4']); ?>"
-                                                            data-totalvalue="<?php echo htmlspecialchars($bid['TotalValue']); ?>"
-                                                            data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
-                                                            data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
-                                                            data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
-                                                            data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
-                                                            data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
-                                                            data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>">
-                                                            View
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            <?php endif; ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
+                                                <td><?php echo $bid['StaffName'] ? htmlspecialchars($bid['StaffName']) : 'null'; ?></td> <!-- Display staff name, or 'null' if no staff -->
+                                                <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+                                                <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
+                                                <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
+                                                <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
+                                                <td class="text-center align-middle">
+                                                    <?php
+                                                    $status = htmlspecialchars($bid['Status']);
+                                                    if ($status == 'Submitted') {
+                                                        echo '<span class="badge bg-success">Submitted</span>';
+                                                    } elseif ($status == 'Dropped') {
+                                                        echo '<span class="badge bg-danger">Dropped</span>';
+                                                    } elseif ($status == 'WIP') {
+                                                        echo '<span class="badge bg-warning text-dark">WIP</span>';
+                                                    } else {
+                                                        echo '<span class="badge bg-secondary">Unknown</span>';
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <!-- View Button with Data Attributes for Each Bid -->
+                                                    <button type="button" class="btn btn-primary viewbtn"
+                                                        data-bs-toggle="modal" data-bs-target="#viewbids"
+                                                        data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
+                                                        data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
+                                                        data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
+                                                        data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
+                                                        data-type="<?php echo htmlspecialchars($bid['Type']); ?>"
+                                                        data-businessunit="<?php echo htmlspecialchars($bid['BusinessUnit']); ?>"
+                                                        data-accountsector="<?php echo htmlspecialchars($bid['AccountSector']); ?>"
+                                                        data-accountmanager="<?php echo htmlspecialchars($bid['AccountManager']); ?>"
+                                                        data-solution1="<?php echo htmlspecialchars($bid['Solution1']); ?>"
+                                                        data-solution2="<?php echo htmlspecialchars($bid['Solution2']); ?>"
+                                                        data-solution3="<?php echo htmlspecialchars($bid['Solution3']); ?>"
+                                                        data-solution4="<?php echo htmlspecialchars($bid['Solution4']); ?>"
+                                                        data-presales1="<?php echo htmlspecialchars($bid['Presales1']); ?>"
+                                                        data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
+                                                        data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
+                                                        data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
+                                                        data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
+                                                        data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
+                                                        data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
+                                                        data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
+                                                        data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
+                                                        data-value4="<?php echo htmlspecialchars($bid['Value4']); ?>"
+                                                        data-totalvalue="<?php echo htmlspecialchars($bid['TotalValue']); ?>"
+                                                        data-rmvalue="<?php echo htmlspecialchars($bid['RMValue']); ?>"
+                                                        data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
+                                                        data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
+                                                        data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
+                                                        data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
+                                                        data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>"
+                                                        data-staffid="<?php echo htmlspecialchars($bid['staffID']); ?>"
+                                                        data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"> <!-- StaffName -->
+                                                        View
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="7">No bids found</td>
+                                            <td colspan="8">No bids found</td> <!-- Updated column span to 8 -->
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -602,6 +583,10 @@ try {
                     </div>
                     <div class="modal-body">
                         <div class="container">
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Presales:</strong></div>
+                                <div class="col-sm-8" id="modalStaffName">-</div>
+                            </div>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Company/Agency Name:</strong></div>
                                 <div class="col-sm-8" id="modalCustName">-</div>
@@ -729,10 +714,26 @@ try {
                         <form id="updateBidForm">
                             <input type="hidden" name="BidID" id="updateBidID">
                             <input type="hidden" name="TenderID" id="updateTenderID">
+                            <input type="hidden" name="StaffID" id="updateStaffID"> <!-- Hidden StaffID -->
+
                             <div class="container">
                                 <!-- First Slide -->
                                 <div id="firstSlide">
                                     <!-- Existing fields -->
+
+                                    <!-- Staff Section (Dropdown for StaffName) -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
+                                            <select id="updateStaffName" class="form-select" name="StaffID">
+                                                <?php foreach ($staffNames as $staffID => $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($staffID); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Name & HMS Scope -->
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="updateCustName" class="form-label"><strong>Company/Agency Name:</strong></label>
@@ -743,6 +744,7 @@ try {
                                             <input type="text" id="updateHMSScope" class="form-control" name="HMS_Scope">
                                         </div>
                                     </div>
+
                                     <!-- Tender Proposal -->
                                     <div class="row mb-3">
                                         <div class="col-md-12">
@@ -1203,13 +1205,13 @@ try {
         });
     </script>
 
+
     <!-- MODAL Fect Data -->
     <script>
         $(document).ready(function() {
             // Handle View Button Click
             $(document).on('click', '.viewbtn', function() {
                 // Fetch data attributes
-                var custName = $(this).data('updatedate');
                 var custName = $(this).data('custname');
                 var hmsScope = $(this).data('hmsscope');
                 var tenderProposal = $(this).data('tender');
@@ -1242,6 +1244,10 @@ try {
                 var bidID = $(this).data('bidid');
                 var tenderID = $(this).data('tenderid');
 
+                // Fetch the staff ID and name
+                var staffID = $(this).data('staffid');
+                var staffName = $(this).data('staffname');
+
                 // Populate the View Modal
                 $('#modalCustName').text(custName);
                 $('#modalHMSScope').text(hmsScope);
@@ -1272,6 +1278,10 @@ try {
                 $('#modalStatus').html(getStatusBadge(status));
                 $('#modalTenderStatus').text(tenderStatus);
                 $('#modalRemarks').text(remarks);
+
+                // Populate the staff dropdown with the selected staff name and ID
+                $('#modalStaff').text(staffID); // Set hidden field for staff ID
+                $('#modalStaffName').text(staffName); // Set the staff name for display in the dropdown
 
                 // Populate the Update Form in Edit Modal
                 $('#updateCustName').val(custName);
@@ -1304,6 +1314,10 @@ try {
                 $('#updateRemarks').val(remarks);
                 $('#updateBidID').val(bidID);
                 $('#updateTenderID').val(tenderID);
+
+                // Populate the staff dropdown with the selected staff name and ID
+                $('#updateStaff').val(staffID); // Set hidden field for staff ID
+                $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
 
                 // Show the View Modal
                 $('#viewbids').modal('show');
@@ -1355,38 +1369,39 @@ try {
         $.fn.dataTable.ext.errMode = 'throw';
     </script>
 
-<script>
-    document.getElementById("updateBusinessUnit").addEventListener("change", function() {
-      const businessUnit = this.value;
-      const accountSector = document.getElementById("updateAccountSector");
 
-      // Define account sector options based on business unit
-      const options = {
-        "": ["Select account sector"],
-        "TMG (Public Sector)": ["Government"],
-        "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
-        "IMG": ["PBT/SME"],
-        "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
-        "Channel": ["Channel Partner"],
-        "Others": ["Open Market"]
-      };
+    <script>
+        document.getElementById("updateBusinessUnit").addEventListener("change", function() {
+            const businessUnit = this.value;
+            const accountSector = document.getElementById("updateAccountSector");
 
-      // Clear current options
-      accountSector.innerHTML = "";
+            // Define account sector options based on business unit
+            const options = {
+                "": ["Select account sector"],
+                "TMG (Public Sector)": ["Government"],
+                "TMG (Private Sector)": ["Enterprise", "FSI", "sGLC", "eGLC"],
+                "IMG": ["PBT/SME"],
+                "NMG": ["Health Sector", "Defense", "Duta", "HeCo"],
+                "Channel": ["Channel Partner"],
+                "Others": ["Open Market"]
+            };
 
-      // Add default option
-      accountSector.appendChild(new Option("Select account sector", ""));
+            // Clear current options
+            accountSector.innerHTML = "";
 
-      // Populate Account Sector based on selected Business Unit
-      options[businessUnit] ? options[businessUnit].forEach(option => {
-        accountSector.appendChild(new Option(option, option));
-      }) : Object.values(options).forEach(list => {
-        if (list.includes("Open Market")) {
-          accountSector.appendChild(new Option("Open Market", "Open Market"));
-        }
-      });
-    });
-  </script>
+            // Add default option
+            accountSector.appendChild(new Option("Select account sector", ""));
+
+            // Populate Account Sector based on selected Business Unit
+            options[businessUnit] ? options[businessUnit].forEach(option => {
+                accountSector.appendChild(new Option(option, option));
+            }) : Object.values(options).forEach(list => {
+                if (list.includes("Open Market")) {
+                    accountSector.appendChild(new Option("Open Market", "Open Market"));
+                }
+            });
+        });
+    </script>
 
     <!-- DarkMode Toggle -->
     <script>

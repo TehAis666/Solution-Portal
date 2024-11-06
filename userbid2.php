@@ -9,11 +9,11 @@
 include_once 'db/db.php';
 
 try {
-  // Assuming staffID is stored in the session
-  $staffID = $_SESSION['user_id'];
-  $name = $_SESSION['name'];
+  // Assuming the user's name is stored in the session
+  $name = $_SESSION['user_name'];
 
-  // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
+  // Modify the query to calculate TotalValue by summing Value1 to Value4
+  // and filter by presales columns matching the session name
   $stmt = $conn->query("
         SELECT 
             b.*, 
@@ -21,7 +21,7 @@ try {
             (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
-        WHERE b.staffID = $staffID
+        WHERE '$name' IN (t.presales1, t.presales2, t.presales3, t.presales4)
     ");
 
   // Fetch all rows as an associative array
@@ -31,6 +31,7 @@ try {
   echo "Error: " . $e->getMessage();
 }
 ?>
+
 
 
 <head>

@@ -7,7 +7,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
 <!-- ======= Header ======= -->
 <header id="header" class="header fixed-top d-flex align-items-center">
   <div class="d-flex align-items-center justify-content-between">
-    <a href="dashboard.php" class="logo d-flex align-items-center">
+    <a href="dashboard" class="logo d-flex align-items-center">
       <img src="images/logo2.png" alt="" />
       <span class="d-none d-lg-block">Solution Portal</span>
     </a>
@@ -49,7 +49,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
           <li>
             <a
               class="dropdown-item d-flex align-items-center"
-              href="manageprofile.php">
+              href="manageprofile">
               <i class="bi bi-person"></i>
               <span>My Profile</span>
             </a>
@@ -62,7 +62,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
           </li>
 
           <li>
-            <a class="dropdown-item d-flex align-items-center" href="controller/handler/logout.php">
+            <a class="dropdown-item d-flex align-items-center" href="controller/handler/logout">
               <i class="bi bi-box-arrow-right"></i>
               <span>Sign Out</span>
             </a>
@@ -81,7 +81,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
 <aside id="sidebar" class="sidebar">
   <ul class="sidebar-nav" id="sidebar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="dashboard.php">
+      <a class="nav-link" href="dashboard">
         <i class="bi bi-grid"></i>
         <span>Dashboard</span>
       </a>
@@ -121,8 +121,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'head'): // Only Head Presales
         ?>
           <li>
-            <a href="headbid2">
-              <i class="bi bi-circle"></i><span>Head Presales Bid</span>
+            <a href="headbid5">
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V1</span>
             </a>
           </li>
         <?php endif; ?>
@@ -131,7 +131,25 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="userbid">
-              <i class="bi bi-circle"></i><span>Presales Bid</span>
+              <i class="bi bi-circle"></i><span>Manage Bid V1</span>
+            </a>
+          </li>
+        <?php endif; ?>
+
+        <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
+        ?>
+          <li>
+            <a href="userbid2">
+              <i class="bi bi-circle"></i><span>Manage Bid V2</span>
+            </a>
+          </li>
+        <?php endif; ?>
+
+        <?php if ($role == 'presales'): // Only Presales
+        ?>
+          <li>
+            <a href="sectorbid">
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -176,11 +194,11 @@ $role = $_SESSION['user_role']; // Get the role from the session
               <i class="bi bi-circle"></i><span>Manage Team</span>
             </a>
           </li> -->
-        <?php if ($role == 'SO' || $role == 'head'): // Only Service Owner & Head Presales 
+        <?php if ($role == 'SO' || $role == 'head' || $role == 'presales'): // Only Service Owner & Head Presales & Presales
         ?>
           <li>
             <a href="userteam">
-              <i class="bi bi-circle"></i><span>My Team</span>
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Members</span>
             </a>
           </li>
         <?php endif; ?>
@@ -205,7 +223,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
     <?php if ($role == 'admin'): // Only Admin
         ?>
     <li class="nav-item">
-      <a class="nav-link" href="verification.php">
+      <a class="nav-link" href="verification">
         <i class="bi bi-person"></i>
         <span>Signup Request</span>
       </a>
@@ -219,7 +237,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
     <li class="nav-heading">Pages</li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="manageprofile.php">
+      <a class="nav-link collapsed" href="manageprofile">
         <i class="bi bi-person"></i>
         <span>Profile</span>
       </a>
@@ -227,7 +245,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
     <!-- End Profile Page Nav -->
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="controller/handler/logout.php">
+      <a class="nav-link collapsed" href="controller/handler/logout">
         <i class="bi bi-box-arrow-right"></i>
         <span>Sign Out</span>
       </a>

@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize POST data
     $bidID = intval($_POST['BidID']);
     $tenderID = intval($_POST['TenderID']);
+    $staffID = intval($_POST['StaffID']);
     $custName = $conn->real_escape_string($_POST['CustName']);
     $hmsScope = $conn->real_escape_string($_POST['HMS_Scope']);
     $tenderProposal = $conn->real_escape_string($_POST['Tender_Proposal']);
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $debugMessages[] = "TenderID: $tenderID";
     $debugMessages[] = "CustName: $custName";
     $debugMessages[] = "HMS_Scope: $hmsScope";
+    $debugMessages[] = "StaffID (from POST): " . var_export($staffID, true);
     // Add other variables to debug messages here as needed
 
     // Begin transaction
@@ -56,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Update bids table
         $updateBid = "UPDATE bids SET 
+                        StaffID = '$staffID',
                         CustName = '$custName',
                         HMS_Scope = '$hmsScope',
                         Tender_Proposal = '$tenderProposal',
@@ -112,4 +115,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Output the debug messages as a JavaScript alert
     echo "<script>alert('" . implode("\\n", $debugMessages) . "');</script>";
 }
-?>

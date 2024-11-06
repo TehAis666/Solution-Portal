@@ -408,7 +408,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Team Members</h1>
+            <h1><?php echo $sector; ?> Team Members</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -466,7 +466,7 @@ try {
                                     <div class="card-body">
                                         <!-- Team Member's Profile Picture and Name -->
                                         <?php if ($member['staffID'] == $staffID || $isHead) { ?>
-                                            <a href="viewstaffbid.php?staffID=<?php echo htmlspecialchars($member['staffID']); ?>" class="staff-name-link">
+                                            <a href="viewstaffbid?staffID=<?php echo htmlspecialchars($member['staffID']); ?>" class="staff-name-link">
                                             <?php } ?>
                                             <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
                                             <b>
@@ -498,12 +498,6 @@ try {
 
             </div>
         </section>
-
-
-
-
-
-
     </main>
     <!-- End Main -->
 

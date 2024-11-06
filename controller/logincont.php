@@ -28,13 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Status is Pending
                 echo "<script>
                         alert('Your signup request is currently under review. Please contact hr@heitech.com.my for further inquiries.');
-                        window.location.href = '../signup.php';
+                        window.location.href = '../signup';
                       </script>";
             } elseif ($userStatus === 'Rejected') {
                 // Status is Rejected
                 echo "<script>
                         alert('You do not have permission to access this website. Please contact hr@heitech.com.my for further inquiries.');
-                        window.location.href = '../signup.php';
+                        window.location.href = '../signup';
                       </script>";
             } else {
                 // Verify the password
@@ -50,13 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     
                     // Redirect to the dashboard or home page upon success
                     echo "<script>
-                            window.location.href = '../dashboard.php';
+                            window.location.href = '../dashboard';
                           </script>";
                 } else {
                     // Password does not match, show alert and redirect back to login
                     echo "<script>
                             alert('Incorrect password!');
-                            window.location.href = '../signup.php';
+                            window.location.href = '../signup';
                           </script>";
                 }
             }
@@ -64,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Email not found in the database, show alert and redirect back to login
             echo "<script>
                     alert('No account found with that email!');
-                    window.location.href = '../signup.php';
+                    window.location.href = '../signup';
                   </script>";
         }
     } else {
         // Validation error for empty fields, show alert and redirect back to login
         echo "<script>
                 alert('Please fill in all fields!');
-                window.location.href = '../signup.php';
+                window.location.href = '../signup';
               </script>";
     }
 }
