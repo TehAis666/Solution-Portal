@@ -130,17 +130,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="userbid">
-              <i class="bi bi-circle"></i><span>Manage Bid V1</span>
-            </a>
-          </li>
-        <?php endif; ?>
-
-        <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
-        ?>
-          <li>
-            <a href="userbid2">
-              <i class="bi bi-circle"></i><span>Manage Bid V2</span>
+            <a href="userbid3">
+              <i class="bi bi-circle"></i><span>Manage Bid V3</span>
             </a>
           </li>
         <?php endif; ?>
