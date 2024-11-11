@@ -58,7 +58,7 @@ $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
     // Execute tender insertion and check for errors
     if ($stmt_tender->execute()) {
         // On successful insertion, redirect with an alert
-        logActivity($_SESSION['user_id'], $_SESSION['user_name'] , "Added New Bids for: " . $customerName, "bids", $bidID, $conn);
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'] , "Added New Bid: " . $customerName, "bids", $bidID, $conn);
         
         echo "<script>
                 alert('Bids successfully created.');

@@ -498,7 +498,7 @@ try {
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="signupForm"  action="controller/addusercont.php" method="POST">
+                            <form id="signupForm" action="controller/addusercont.php" method="POST">
                                 <div class="container">
                                     <!-- Staff ID -->
                                     <div class="row mb-3">
@@ -507,8 +507,8 @@ try {
                                             <input type="text" id="staff_id" class="form-control" name="staff_id" required>
                                         </div>
                                     </div>
-                                     <!-- Name -->
-                                     <div class="row mb-3">
+                                    <!-- Name -->
+                                    <div class="row mb-3">
                                         <div class="col-md-12">
                                             <label for="name" class="form-label"><strong>Name:</strong></label>
                                             <input type="text" id="name" class="form-control" name="name" required>
@@ -633,133 +633,110 @@ try {
         }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Approve button click
-            document.querySelectorAll('.approvebtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Approved', row); // Pass the row for updating
-                });
-            });
-
-            // Reject button click
-            document.querySelectorAll('.rejectbtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Rejected', row); // Pass the row for updating
-                });
-            });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize DataTable once the document is fully loaded
+        const table = $('#example').DataTable({
+            paging: true,
+            searching: true,
+            info: true,
+            lengthChange: true,
         });
 
-        function changeStatus(staffID, status, row) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'controller/requestcont.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    // Update the status badge in the table in the provided row
+        // Function to calculate the dashboard counts with AJAX
+        function calculateDashboard() {
+            $.ajax({
+                url: 'controller/getDashboardCounts.php', // Server-side script to fetch counts
+                method: 'POST',
+                success: function(response) {
+                    const data = JSON.parse(response);
+                    document.querySelector('.total-request').textContent = data.totalUsers;
+                    document.querySelector('.total-new-request').textContent = data.totalNewRequest;
+                    document.querySelector('.total-approved').textContent = data.totalApproved;
+                    document.querySelector('.total-rejected').textContent = data.totalRejected;
+                },
+                error: function() {
+                    alert("Failed to load dashboard counts.");
+                }
+            });
+        }
+
+        // Delegated event listener for the approve button
+        $(document).on('click', '.approvebtn', function() {
+            const row = $(this).closest('tr');
+            const staffID = row.find('td:first-child').text().trim(); // Get staffID from the first column
+            const name = row.find('td:nth-child(2)').text().trim(); // Get name from the second column
+            changeStatus(staffID, name, 'Approved', row[0]); // Pass the row for updating
+        });
+
+        // Delegated event listener for the reject button
+        $(document).on('click', '.rejectbtn', function() {
+            const row = $(this).closest('tr');
+            const staffID = row.find('td:first-child').text().trim(); // Get staffID from the first column
+            const name = row.find('td:nth-child(2)').text().trim(); // Get name from the second column
+            changeStatus(staffID, name, 'Rejected', row[0]); // Pass the row for updating
+        });
+
+        function changeStatus(staffID, name, status, row) {
+            $.ajax({
+                url: 'controller/requestcont', // The URL to send the request to
+                type: 'POST', // HTTP method
+                data: {
+                    staffID: staffID, // Send staffID
+                    status: status, // Send status
+                    name: name // Send Staff's name
+                },
+                success: function(response) {
+                    console.log(response);
+                    // On success, update the status badge in the table
                     const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
                     if (status === 'Approved') {
                         statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
                     } else if (status === 'Rejected') {
                         statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
                     }
-                } else {
-                    alert('Error updating status');
+                    calculateDashboard(); // Update dashboard counts after status change
+                },
+                error: function(xhr, status, error) {
+                    alert('Error updating status: ' + error);
                 }
-            };
-            xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
+            });
         }
-    </script>
 
+        // Function to filter the DataTable based on status
+        function filterByStatus(status) {
+            table.search(''); // Clear any existing search
 
-    <!-- DataTable Script Initialization -->
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            const table = $('#example').DataTable({
-                paging: true,
-                searching: true,
-                info: true,
-                lengthChange: true,
-            });
-
-            // Function to calculate the dashboard counts
-            function calculateDashboard() {
-                const allRows = table.rows().nodes(); // Include all rows in DataTable
-
-                let totalUsers = 0;
-                let totalNewRequest = 0; // Pending status
-                let totalApproved = 0; // Approved status
-                let totalRejected = 0; // Rejected status
-
-                // Loop through all rows and update counts based on status
-                $(allRows).each(function() {
-                    const statusElement = $(this).find('td:nth-child(6) .badge');
-                    if (statusElement.length > 0) {
-                        const status = statusElement.text().trim();
-                        totalUsers++; // Count every row as a user (total bids/users)
-
-                        // Count based on the status
-                        if (status === 'Pending') {
-                            totalNewRequest++;
-                        } else if (status === 'Approved') {
-                            totalApproved++;
-                        } else if (status === 'Rejected') {
-                            totalRejected++;
-                        }
-                    }
-                });
-
-                // Update the calculated totals in the dashboard elements
-                document.querySelector('.total-request').textContent = totalUsers;
-                document.querySelector('.total-new-request').textContent = totalNewRequest;
-                document.querySelector('.total-approved').textContent = totalApproved;
-                document.querySelector('.total-rejected').textContent = totalRejected;
+            if (status === 'all') {
+                // Show all rows
+                table.column(5).search('').draw();
+            } else {
+                // Filter by specific status
+                table.column(5).search(status).draw();
             }
+        }
 
-            // Function to filter the DataTable based on status
-            function filterByStatus(status) {
-                table.search(''); // Clear any existing search
-
-                if (status === 'all') {
-                    // Show all rows
-                    table.column(5).search('').draw();
-                } else {
-                    // Filter by specific status
-                    table.column(5).search(status).draw();
-                }
-            }
-
-            // Calculate dashboard counts after every DataTable draw event
-            table.on('draw', function() {
-                calculateDashboard();
-            });
-
-            // Event listeners for filtering based on the clicked dashboard element
-            document.querySelector('.total-request').addEventListener('click', function() {
-                filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
-            });
-
-            document.querySelector('.total-new-request').addEventListener('click', function() {
-                filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
-            });
-
-            document.querySelector('.total-approved').addEventListener('click', function() {
-                filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
-            });
-
-            document.querySelector('.total-rejected').addEventListener('click', function() {
-                filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
-            });
-
-            // Call the function once the document is ready and the table is fully loaded
-            calculateDashboard();
+        // Event listeners for filtering based on the clicked dashboard element
+        document.querySelector('.total-request').addEventListener('click', function() {
+            filterByStatus('all'); // Show all users/bids when 'Total User' is clicked
         });
-    </script>
+
+        document.querySelector('.total-new-request').addEventListener('click', function() {
+            filterByStatus('Pending'); // Show only 'Pending' rows when 'Total New Request' is clicked
+        });
+
+        document.querySelector('.total-approved').addEventListener('click', function() {
+            filterByStatus('Approved'); // Show only 'Approved' rows when 'Total Approved' is clicked
+        });
+
+        document.querySelector('.total-rejected').addEventListener('click', function() {
+            filterByStatus('Rejected'); // Show only 'Rejected' rows when 'Total Rejected' is clicked
+        });
+
+        // Call the function once the document is ready and the table is fully loaded
+        calculateDashboard();
+    });
+</script>
 </body>
 
 </html>
