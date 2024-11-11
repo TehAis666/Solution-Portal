@@ -14,7 +14,6 @@ $bidCountsJson = json_encode($bidCounts);
 // Convert the counts array to a JSON string
 $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
-
 ?>
 
 <!DOCTYPE html>
@@ -251,9 +250,27 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
     <section class="section dashboard">
       <!-- Responsive Filter Card -->
-      <div class="card filtering overflow-auto shadow-sm">
+      <div class="card filtering shadow-sm">
+        <div class="filter">
+          <a
+            class="icon"
+            href="#"
+            data-bs-toggle="dropdown"
+            style="font-size: 18px">
+            <i class="bi bi-three-dots"></i>
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+            <li class="dropdown-header text-start">
+              <h6 style="font-size: 12px">Action</h6>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" style="font-size: 12px" id="resetAllCharts">Reset</a>
+            </li>
+          </ul>
+        </div>
         <div class="card-body pb-0">
-          <form action="backup.php" method="GET" id="filterForm">
+          <form action="#" id="filterForm">
             <div class="row g-2">
               <!-- Year Dropdown with label to the left -->
               <div class="col-md-3">
@@ -352,25 +369,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             <!-- Reports -->
             <div class="col-12">
               <div class="card" style="padding: 10px">
-                <div class="filter">
-                  <a
-                    class="icon"
-                    href="#"
-                    data-bs-toggle="dropdown"
-                    style="font-size: 12px">
-                    <i class="bi bi-three-dots"></i>
-                  </a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6 style="font-size: 12px">Action</h6>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#" style="font-size: 12px" id="resetZoom">Reset</a>
-                    </li>
-                  </ul>
-                </div>
-
                 <div class="card-body" style="padding: 10px">
                   <h5 class="card-title" style="font-size: 14px">
                     Total Bids <span style="font-size: 12px">/ Month</span>
@@ -426,15 +424,15 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 <tbody>
                   <tr data-status="WIP">
                     <td>WIP</td>
-                    <td><?php echo $statusData['WIP']; ?></td>
+                    <td id="totalWIP"><?php echo $statusData['WIP']; ?></td>
                   </tr>
                   <tr data-status="Submitted">
                     <td>Submitted</td>
-                    <td><?php echo $statusData['Submitted']; ?></td>
+                    <td id="totalSubmitted"><?php echo $statusData['Submitted']; ?></td>
                   </tr>
                   <tr data-status="Dropped">
                     <td>Dropped</td>
-                    <td><?php echo $statusData['Dropped']; ?></td>
+                    <td id="totalDropped"><?php echo $statusData['Dropped']; ?></td>
                   </tr>
                 </tbody>
               </table>
@@ -582,8 +580,16 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       // Store last selected Pipeline to allow deselection on repeated clicks
       let selectedPipeline = null;
 
-      // Global variable to hold the selected month-year
+      // Store last selected month year to allow deselection on repeated clicks
       let selectedMonthYear = null;
+
+      // Store last selected Solution to allow deselection on repeated clicks
+      let lastSelectedSolution = null;
+
+      // Store date, startDate,endDate
+      // let date = '';
+      // let startDate = '';
+      // let endDate = '';
 
       // Get the JSON-encoded data from PHP
       var bidTypesCounts = <?php echo $bidTypesJson; ?>;
@@ -713,7 +719,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           formatter: function(params) {
             let tooltip = `${params[0].name}<br/>`;
             params.forEach(param => {
-              if (param.seriesName === 'Total Revenue of Bids') {
+              if (param.seriesName === 'Total Bids Revenue') {
                 const value = param.value >= 1 ? `${param.value}M` : `${param.value * 1000}K`;
                 tooltip += `${param.seriesName}: ${value}<br/>`;
               } else {
@@ -724,7 +730,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           }
         },
         legend: {
-          data: ['Number of Bids', 'Total Revenue of Bids']
+          data: ['Number of Bids', 'Total Bids Revenue']
         },
         xAxis: {
           type: 'category',
@@ -762,7 +768,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             color: '#4154f1',
           },
           {
-            name: 'Total Revenue of Bids',
+            name: 'Total Bids Revenue',
             type: 'line',
             data: totalRevenue,
             smooth: true,
@@ -777,7 +783,10 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
       reportsChart.setOption(option);
 
-      // Initialize Bid Types Bar Chart with default data
+      // Call the function to fetch data when the page loads
+      fetchBidPipelineData(null, null, null, null, null, null);
+
+      // Initialize Bid Types Bar Chart with default data before making AJAX call
       const bidTypesBarChart = echarts.init(document.querySelector("#bidTypesBarChart"));
 
       bidTypesBarChart.setOption({
@@ -809,7 +818,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         },
         yAxis: {
           type: "category",
-          data: ["RFQ", "Tender", "Quotation", "RFP", "RFI", "Upstream"],
+          data: ["RFQ", "Tender", "Quotation", "RFP", "RFI", "Upstream", "Strategic Proposal", "Strategic Initiative"],
           axisLabel: {
             fontSize: 10
           },
@@ -817,7 +826,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         series: [{
           name: "Bid Types",
           type: "bar",
-          data: bidTypesData,
+          data: [], // Start with empty data
           color: "#4668E6",
           barWidth: "50%",
         }],
@@ -949,71 +958,113 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       });
 
       // Stacked Bar Chart Code
-      var solutionCounts = <?php echo $solutionCountsJson; ?>;
+      var solutionBusinessUnitCounts = <?php echo $solutionCountsJson; ?>;
       var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"]; // Same labels as bar chart
 
+      // Create dataset for Mix Solution with breakdown information
       var datasets = [{
           label: "Channel",
           data: [
-            solutionCounts['PaduNet']['Channel'],
-            solutionCounts['SecureX']['Channel'],
-            solutionCounts['AwanHeiTech']['Channel'],
-            solutionCounts['iSentrix']['Channel'],
-            solutionCounts['MixSolution']['Channel']
+            solutionBusinessUnitCounts['PaduNet']['Channel'],
+            solutionBusinessUnitCounts['SecureX']['Channel'],
+            solutionBusinessUnitCounts['AwanHeiTech']['Channel'],
+            solutionBusinessUnitCounts['iSentrix']['Channel'],
+            solutionBusinessUnitCounts['MixSolution']['Channel']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#6CC3DF" // Color for Channel
         },
         {
           label: "IMG",
           data: [
-            solutionCounts['PaduNet']['IMG'],
-            solutionCounts['SecureX']['IMG'],
-            solutionCounts['AwanHeiTech']['IMG'],
-            solutionCounts['iSentrix']['IMG'],
-            solutionCounts['MixSolution']['IMG']
+            solutionBusinessUnitCounts['PaduNet']['IMG'],
+            solutionBusinessUnitCounts['SecureX']['IMG'],
+            solutionBusinessUnitCounts['AwanHeiTech']['IMG'],
+            solutionBusinessUnitCounts['iSentrix']['IMG'],
+            solutionBusinessUnitCounts['MixSolution']['IMG']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#FF6B6B" // Color for IMG
         },
         {
           label: "NMG",
           data: [
-            solutionCounts['PaduNet']['NMG'],
-            solutionCounts['SecureX']['NMG'],
-            solutionCounts['AwanHeiTech']['NMG'],
-            solutionCounts['iSentrix']['NMG'],
-            solutionCounts['MixSolution']['NMG']
+            solutionBusinessUnitCounts['PaduNet']['NMG'],
+            solutionBusinessUnitCounts['SecureX']['NMG'],
+            solutionBusinessUnitCounts['AwanHeiTech']['NMG'],
+            solutionBusinessUnitCounts['iSentrix']['NMG'],
+            solutionBusinessUnitCounts['MixSolution']['NMG']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#F9D266" // Color for NMG
         },
         {
           label: "TMG (Private Sector)",
           data: [
-            solutionCounts['PaduNet']['TMG (Private Sector)'],
-            solutionCounts['SecureX']['TMG (Private Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-            solutionCounts['iSentrix']['TMG (Private Sector)'],
-            solutionCounts['MixSolution']['TMG (Private Sector)']
+            solutionBusinessUnitCounts['PaduNet']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['SecureX']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['AwanHeiTech']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['iSentrix']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#4668E6" // Color for TMG (Private Sector)
         },
         {
           label: "TMG (Public Sector)",
           data: [
-            solutionCounts['PaduNet']['TMG (Public Sector)'],
-            solutionCounts['SecureX']['TMG (Public Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-            solutionCounts['iSentrix']['TMG (Public Sector)'],
-            solutionCounts['MixSolution']['TMG (Public Sector)']
+            solutionBusinessUnitCounts['PaduNet']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['SecureX']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['AwanHeiTech']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['iSentrix']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#7EC968" // Color for TMG (Public Sector)
         }
       ];
 
+      // Create a custom tooltip callback function to show the breakdown of "Mix Solution" when hovered
+      const customTooltips = {
+        callbacks: {
+          label: function(tooltipItem) {
+            // Check if the tooltip item corresponds to "Mix Solution"
+            if (tooltipItem.label === 'Mix Solution') {
+              const businessUnit = tooltipItem.dataset.label; // Get the business unit label (e.g., "NMG", "TMG (Public Sector)")
+              const counts = solutionBusinessUnitCounts['MixSolution'][businessUnit]; // Get breakdown for this business unit
+
+              // Format the tooltip text to display individual solution counts
+              let breakdownText = `${businessUnit}:\n`;
+              breakdownText += `AwanHeiTech: ${counts['AwanHeiTech']} | `;
+              breakdownText += `Secure-X: ${counts['SecureX']} | `;
+              breakdownText += `PaduNet: ${counts['PaduNet']} | `;
+              breakdownText += `i-Sentrix: ${counts['iSentrix']}`;
+
+              return breakdownText; // Return the formatted breakdown
+            }
+
+            // Default label for non-Mix Solution entries
+            return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+          }
+        }
+      };
+
+      // Initialize the stacked bar chart with custom tooltip logic
       const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
         type: "bar",
         data: {
-          labels: labels, // Same labels as bar chart
-          datasets: datasets // Data for each business sector per solution
+          labels: labels, // Solution labels for each stack
+          datasets: datasets // Data for each business unit per solution
         },
         options: {
           plugins: {
@@ -1022,7 +1073,8 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             },
             legend: {
               onClick: (e) => e.stopPropagation() // Disable hiding behavior on label click
-            }
+            },
+            tooltip: customTooltips // Use the custom tooltip callback for detailed breakdown
           },
           responsive: true,
           scales: {
@@ -1037,6 +1089,43 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         },
       });
 
+
+      // Define the unified function for making all fetch calls
+      function fetchDataForAllSections(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate) {
+        fetchStatus(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchMarketSectorData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchReportData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchBidPipelineData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchSumSolution(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchInfraSolution(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchBidStatus(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+      }
+
+      // Global variables for filter values
+      let year, startDate, endDate;
+
+      // Select the filter form
+      const filterForm = document.getElementById('filterForm');
+
+      // Listen for form submission (if necessary)
+      filterForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent page reload
+
+        // Capture values from the form
+        year = document.getElementById('year').value;
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+
+        // Log captured values to the console
+        //console.log("Year:", year);
+        //console.log("Start Date:", startDate);
+        //console.log("End Date:", endDate);
+
+        // Call the unified function with the captured values
+        fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+      });
+
+      // Function for handling row click event
       const rows = document.querySelectorAll('.table-hover tbody tr');
       rows.forEach(row => {
         row.addEventListener('click', () => {
@@ -1051,177 +1140,140 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             selectedStatus = status;
           }
 
-          fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-          fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-          fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-          fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-          fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-          fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+          // Use the unified fetch function with the global filter values
+          fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
         });
       });
 
-      // Function to set up click event listeners for capturing sector name on both charts and labels in the stacked bar chart
+      // Function to handle sector selection
       function filterSector() {
-        // Capture clicks on the pie chart
         pieChart.on('click', function(params) {
           if (params.seriesType === 'pie') {
-            if (lastSelectedSector === params.name) {
-              // console.log("Selection cleared (Pie Chart):", params.name);
-              lastSelectedSector = null;
-            } else {
-              // console.log("Selected Sector (Pie Chart):", params.name);
-              lastSelectedSector = params.name;
-            }
-            // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            lastSelectedSector = (lastSelectedSector === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           }
         });
 
-        // Capture clicks on the bar chart
         barChart.on('click', function(params) {
           if (params.seriesType === 'bar') {
-            if (lastSelectedSector === params.name) {
-              // console.log("Selection cleared (Bar Chart):", params.name);
-              lastSelectedSector = null;
-            } else {
-              // console.log("Selected Sector (Bar Chart):", params.name);
-              lastSelectedSector = params.name;
-            }
-            // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            lastSelectedSector = (lastSelectedSector === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           }
         });
 
-        // Capture clicks on the legend labels of the stacked bar chart
         stackedBarChart.options.plugins.legend = {
           onClick: function(e, legendItem) {
             const clickedLabel = legendItem.text;
 
-            if (lastSelectedSector === clickedLabel) {
-              // console.log("Selection cleared (Stacked Bar Chart Label)");
-              lastSelectedSector = null;
-            } else {
-              // console.log("Selected Label (Stacked Bar Chart):", clickedLabel);
-              lastSelectedSector = clickedLabel;
-            }
-            // Call AJAX functions after updating lastSelectedSector
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            lastSelectedSector = (lastSelectedSector === clickedLabel) ? null : clickedLabel;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           },
         };
-
-        stackedBarChart.update(); // Ensure chart updates to use the new legend click behavior
+        stackedBarChart.update();
       }
 
-      // Call the function to activate event listeners on both charts
-      filterSector();
-
-      // Function to set up click event listener for capturing the bid type on the Bid Types Bar Chart
+      // Function to handle bid type selection
       function filterBidType() {
-        // Capture clicks on the bid types bar chart
         bidTypesBarChart.on('click', function(params) {
           if (params.seriesType === 'bar') {
-            // Check if the clicked bid type is already selected
-            if (selectedBidType === params.name) {
-              // Deselect if the same bid type is clicked again
-              selectedBidType = null;
-              //console.log("Deselected:", params.name);
-            } else {
-              // Set selectedBidType to the clicked bid type
-              selectedBidType = params.name;
-              //console.log("Selected:", params.name);
-            }
+            selectedBidType = (selectedBidType === params.name) ? null : params.name;
 
-            // Call AJAX function after updating selectedBidType
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           }
         });
       }
 
-      // Call the function to activate event listeners on both charts
-      filterBidType();
-
-      // Function to set up click event listener for capturing the Pipeline on the Pipeline Bar Chart
+      // Function to handle pipeline selection
       function filterPipeline() {
-        // Capture clicks on the bid types bar chart
         pipelinesBarChart.on('click', function(params) {
           if (params.seriesType === 'bar') {
-            // Check if the clicked bid type is already selected
-            if (selectedPipeline === params.name) {
-              // Deselect if the same bid type is clicked again
-              selectedPipeline = null;
-              //console.log("Deselected:", selectedPipeline);
-            } else {
-              // Set selectedBidType to the clicked bid type
-              selectedPipeline = params.name;
-              //console.log("Selected:", selectedPipeline);
-            }
+            selectedPipeline = (selectedPipeline === params.name) ? null : params.name;
 
-            // Call AJAX function after updating selectedBidType
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           }
         });
       }
 
-      // Call the function to activate event listeners on both charts
-      filterPipeline();
-
-      // Function to set up click event listener for capturing the Month Year on the Report Chart
+      // Function to handle month-year selection
       function filterMonthYear() {
-        // Capture clicks on the reports chart
         reportsChart.on('click', function(params) {
-          // Check if the clicked series is part of the x-axis category (Month Year)
           if (params.seriesType === 'line' || params.seriesType === 'bar') {
-            // Check if the clicked month-year is already selected
-            if (selectedMonthYear === params.name) {
-              // Deselect if the same month-year is clicked again
-              selectedMonthYear = null;
-              console.log("Deselected Month-Year:", selectedMonthYear);
-            } else {
-              // Set selectedMonthYear to the clicked month-year
-              selectedMonthYear = params.name;
-              console.log("Selected Month-Year:", selectedMonthYear);
-            }
+            selectedMonthYear = (selectedMonthYear === params.name) ? null : params.name;
 
-            // Call AJAX functions or update charts after updating selectedMonthYear
-            fetchStatus(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchMarketSectorData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchReportData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchBidPipelineData(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchSumSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
-            fetchInfraSolution(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear);
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
           }
         });
       }
 
-      // Call the function to activate event listeners on both charts
-      filterMonthYear();
+      // Function to handle solution selection
+      function filterSolution() {
+        document.querySelector("#stakedBarChart").onclick = function(evt) {
+          const activePoints = stackedBarChart.getElementsAtEventForMode(evt, 'nearest', {
+            intersect: true
+          }, true);
+          if (activePoints.length) {
+            const {
+              index
+            } = activePoints[0];
+            const label = stackedBarChart.data.labels[index];
 
-      function fetchMarketSectorData(status, sector, bidtype, ppline, monthYear) {
+            lastSelectedSolution = (lastSelectedSolution === label) ? null : label;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        };
+
+        document.querySelector("#barChart").onclick = function(evt) {
+          const activePoints = barSumChart.getElementsAtEventForMode(evt, 'nearest', {
+            intersect: true
+          }, true);
+          if (activePoints.length) {
+            const {
+              index
+            } = activePoints[0];
+            const label = barSumChart.data.labels[index];
+
+            lastSelectedSolution = (lastSelectedSolution === label) ? null : label;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        };
+      }
+
+      // Reset button event listener
+      document.getElementById('resetAllCharts').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent default link behavior
+
+        // Reset all filter variables to null or empty strings
+        selectedStatus = '';
+        lastSelectedSector = null;
+        selectedBidType = null;
+        selectedPipeline = null;
+        selectedMonthYear = null;
+        lastSelectedSolution = null;
+        year = '';
+        startDate = '';
+        endDate = '';
+
+        // Remove active highlight from all rows
+        const rows = document.querySelectorAll('.table-hover tbody tr');
+        rows.forEach(row => row.classList.remove('table-active'));
+
+        // Call the unified fetch function with null values to reset all charts
+        fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+      });
+
+      // Initialize all event handlers
+      filterSector();
+      filterBidType();
+      filterPipeline();
+      filterMonthYear();
+      filterSolution();
+
+      function fetchMarketSectorData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
         // Set sector to an empty string if it is null
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1242,6 +1294,20 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           monthYear = ''; // Convert null to an empty string
         }
 
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        //     console.log("AJAX Data being sent:", {
+        //     status: status,
+        //     sector: sector,
+        //     bidtype: bidtype,
+        //     ppline: ppline,
+        //     monthYear: monthYear,
+        //     solutionn: solutionn
+        // });
+
         $.ajax({
           url: 'controller/updateMarketSector.php',
           method: 'GET',
@@ -1250,12 +1316,16 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             sector: sector, // Include the sector in the request
             bidtype: bidtype, // Include the bidtype in the request
             ppline: ppline, // Include the pipeline in the request
-            monthYear: monthYear // Include the monthYear in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           dataType: 'json',
           success: function(response) {
             // Log the response for debugging
-            // console.log("Fetched Data:", response); 
+            //console.log("Market Sector:", response); 
 
             // Convert response data into the format needed for the charts
             const pieData = Object.keys(response).map(key => ({
@@ -1279,7 +1349,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchReportData(status, sector, bidtype, ppline, monthYear) {
+      function fetchReportData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
         // Set sector to an empty string if it is null
         if (sector === null) {
@@ -1301,6 +1371,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           monthYear = ''; // Convert null to an empty string
         }
 
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
         // Debug: Log the values of status and sector
         //console.log("Status:", status);
         //console.log("Sector:", sector);
@@ -1313,7 +1388,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             sector: sector, // Include the sector in the request
             bidtype: bidtype, // Include the bidtype in the request
             ppline: ppline,
-            monthYear: monthYear // Include the monthYear in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           dataType: 'json', // Assuming your response is in JSON format
           success: function(response) {
@@ -1334,7 +1413,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   data: totalBids.map(val => parseInt(val)), // Ensure bids are integers
                 },
                 {
-                  name: 'Total Revenue of Bids',
+                  name: 'Total Bids Revenue',
                   data: totalRevenue,
                 }
               ]
@@ -1346,7 +1425,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchBidPipelineData(status, sector, bidtype, ppline, monthYear) {
+      function fetchBidPipelineData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
         // Set sector to an empty string if it is null
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1363,6 +1442,10 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         if (monthYear === null) {
           monthYear = ''; // Convert null to an empty string
         }
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
         $.ajax({
           url: 'controller/updatebidType.php',
           method: 'GET',
@@ -1371,7 +1454,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             sector: sector, // Include the sector in the request
             bidtype: bidtype, // Include the bidtype in the request
             ppline: ppline,
-            monthYear: monthYear // Include the monthYear in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           dataType: 'json',
           success: function(response) {
@@ -1384,7 +1471,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               parseInt(response.bidTypesCounts['Quotation'] || 0),
               parseInt(response.bidTypesCounts['RFP'] || 0),
               parseInt(response.bidTypesCounts['RFI'] || 0),
-              parseInt(response.bidTypesCounts['Upstream'] || 0)
+              parseInt(response.bidTypesCounts['Upstream'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Proposal'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Initiative'] || 0)
             ];
 
             // Update Bid Types Bar Chart
@@ -1410,6 +1499,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 data: pipelinesData
               }]
             });
+            //console.log("Bid Types Data:", bidTypesData);
           },
           error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
@@ -1417,7 +1507,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
 
-      function fetchSumSolution(status, sector, bidtype, ppline, monthYear) {
+      function fetchSumSolution(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1438,6 +1528,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           monthYear = ''; // Convert null to an empty string
         }
 
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+
         $.ajax({
           url: 'controller/updateSumSolution.php',
           method: 'GET',
@@ -1446,7 +1542,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             sector: sector, // Include sector in the request
             bidtype: bidtype,
             ppline: ppline,
-            monthYear: monthYear // Include the monthYear in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           dataType: 'json',
           success: function(response) {
@@ -1470,7 +1570,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         });
       }
       // Function to fetch InfraSolution data
-      function fetchInfraSolution(status, sector, bidtype, ppline, monthYear) {
+      function fetchInfraSolution(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1490,6 +1590,13 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         if (monthYear === null) {
           monthYear = ''; // Convert null to an empty string
         }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        //console.log("Sector", solutionn); 
 
         $.ajax({
           url: 'controller/updateInfraSolution.php',
@@ -1499,84 +1606,133 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             sector: sector,
             bidtype: bidtype, // Include the bidtype in the request
             ppline: ppline,
-            monthYear: monthYear // Include the monthYear in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           dataType: 'json',
           success: function(response) {
-            // console.log("Fetched Data:", response);debug
+            //console.log("Infra Solution:", response);
 
             // Extract solution counts from the response
-            var solutionCounts = response.solutionBusinessUnitCounts;
+             // Extract solution counts from the response
+      var solutionCounts = response.solutionBusinessUnitCounts;
 
-            // Prepare datasets for the chart
-            const datasets = [{
-                label: "Channel",
-                data: [
-                  solutionCounts['PaduNet']['Channel'],
-                  solutionCounts['SecureX']['Channel'],
-                  solutionCounts['AwanHeiTech']['Channel'],
-                  solutionCounts['iSentrix']['Channel'],
-                  solutionCounts['MixSolution']['Channel']
-                ],
-                backgroundColor: "#6CC3DF" // Color for Channel
-              },
-              {
-                label: "IMG",
-                data: [
-                  solutionCounts['PaduNet']['IMG'],
-                  solutionCounts['SecureX']['IMG'],
-                  solutionCounts['AwanHeiTech']['IMG'],
-                  solutionCounts['iSentrix']['IMG'],
-                  solutionCounts['MixSolution']['IMG']
-                ],
-                backgroundColor: "#FF6B6B" // Color for IMG
-              },
-              {
-                label: "NMG",
-                data: [
-                  solutionCounts['PaduNet']['NMG'],
-                  solutionCounts['SecureX']['NMG'],
-                  solutionCounts['AwanHeiTech']['NMG'],
-                  solutionCounts['iSentrix']['NMG'],
-                  solutionCounts['MixSolution']['NMG']
-                ],
-                backgroundColor: "#F9D266" // Color for NMG
-              },
-              {
-                label: "TMG (Private Sector)",
-                data: [
-                  solutionCounts['PaduNet']['TMG (Private Sector)'],
-                  solutionCounts['SecureX']['TMG (Private Sector)'],
-                  solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-                  solutionCounts['iSentrix']['TMG (Private Sector)'],
-                  solutionCounts['MixSolution']['TMG (Private Sector)']
-                ],
-                backgroundColor: "#4668E6" // Color for TMG (Private Sector)
-              },
-              {
-                label: "TMG (Public Sector)",
-                data: [
-                  solutionCounts['PaduNet']['TMG (Public Sector)'],
-                  solutionCounts['SecureX']['TMG (Public Sector)'],
-                  solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-                  solutionCounts['iSentrix']['TMG (Public Sector)'],
-                  solutionCounts['MixSolution']['TMG (Public Sector)']
-                ],
-                backgroundColor: "#7EC968" // Color for TMG (Public Sector)
-              }
-            ];
+      // Prepare datasets for the chart, with summed values for MixSolution
+      const datasets = [{
+          label: "Channel",
+          data: [
+            solutionCounts['PaduNet']['Channel'],
+            solutionCounts['SecureX']['Channel'],
+            solutionCounts['AwanHeiTech']['Channel'],
+            solutionCounts['iSentrix']['Channel'],
+            // Sum of each sub-solution within MixSolution for "Channel"
+            solutionCounts['MixSolution']['Channel']['AwanHeiTech'] +
+            solutionCounts['MixSolution']['Channel']['SecureX'] +
+            solutionCounts['MixSolution']['Channel']['PaduNet'] +
+            solutionCounts['MixSolution']['Channel']['iSentrix']
+          ],
+          backgroundColor: "#6CC3DF"
+        },
+        {
+          label: "IMG",
+          data: [
+            solutionCounts['PaduNet']['IMG'],
+            solutionCounts['SecureX']['IMG'],
+            solutionCounts['AwanHeiTech']['IMG'],
+            solutionCounts['iSentrix']['IMG'],
+            // Sum of each sub-solution within MixSolution for "IMG"
+            solutionCounts['MixSolution']['IMG']['AwanHeiTech'] +
+            solutionCounts['MixSolution']['IMG']['SecureX'] +
+            solutionCounts['MixSolution']['IMG']['PaduNet'] +
+            solutionCounts['MixSolution']['IMG']['iSentrix']
+          ],
+          backgroundColor: "#FF6B6B"
+        },
+        {
+          label: "NMG",
+          data: [
+            solutionCounts['PaduNet']['NMG'],
+            solutionCounts['SecureX']['NMG'],
+            solutionCounts['AwanHeiTech']['NMG'],
+            solutionCounts['iSentrix']['NMG'],
+            // Sum of each sub-solution within MixSolution for "NMG"
+            solutionCounts['MixSolution']['NMG']['AwanHeiTech'] +
+            solutionCounts['MixSolution']['NMG']['SecureX'] +
+            solutionCounts['MixSolution']['NMG']['PaduNet'] +
+            solutionCounts['MixSolution']['NMG']['iSentrix']
+          ],
+          backgroundColor: "#F9D266"
+        },
+        {
+          label: "TMG (Private Sector)",
+          data: [
+            solutionCounts['PaduNet']['TMG (Private Sector)'],
+            solutionCounts['SecureX']['TMG (Private Sector)'],
+            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
+            solutionCounts['iSentrix']['TMG (Private Sector)'],
+            // Sum of each sub-solution within MixSolution for "TMG (Private Sector)"
+            solutionCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
+            solutionCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
+            solutionCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
+            solutionCounts['MixSolution']['TMG (Private Sector)']['iSentrix']
+          ],
+          backgroundColor: "#4668E6"
+        },
+        {
+          label: "TMG (Public Sector)",
+          data: [
+            solutionCounts['PaduNet']['TMG (Public Sector)'],
+            solutionCounts['SecureX']['TMG (Public Sector)'],
+            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
+            solutionCounts['iSentrix']['TMG (Public Sector)'],
+            // Sum of each sub-solution within MixSolution for "TMG (Public Sector)"
+            solutionCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
+            solutionCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
+            solutionCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
+            solutionCounts['MixSolution']['TMG (Public Sector)']['iSentrix']
+          ],
+          backgroundColor: "#7EC968"
+        }
+      ];
 
-            // Update the chart with the new datasets
-            stackedBarChart.data.datasets = datasets;
-            stackedBarChart.update(); // Refresh the chart to display the new data
-          },
+      // Update the chart with the new datasets
+      stackedBarChart.data.datasets = datasets;
+      stackedBarChart.update(); // Refresh the chart to display the new data
+    },
           error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
           }
         });
       }
 
-      function fetchStatus(status, sector, bidtype, ppline, monthYear) {
+      function animateValue(element, start, end, duration, format = false) {
+        const range = end - start;
+        const increment = range / (duration / 10); // Calculate the increment per step
+        let current = start;
+        const stepTime = Math.abs(Math.floor(duration / range));
+
+        // Function to format the number with commas and RM symbol
+        function formatNumber(value) {
+          return format ? 'RM ' + value.toLocaleString() : value.toLocaleString(); // Format with 'RM' and thousand separator
+        }
+
+        function step() {
+          current += increment;
+          if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end; // Stop when target is reached
+          }
+          element.text(formatNumber(Math.floor(current))); // Update element with formatted value
+          if (current !== end) {
+            requestAnimationFrame(step); // Continue the animation until target is reached
+          }
+        }
+        requestAnimationFrame(step);
+      }
+
+      function fetchStatus(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
         if (sector === null) {
           sector = ''; // Convert null to an empty string
@@ -1595,6 +1751,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         // Set monthYear to an empty string if it is null
         if (monthYear === null) {
           monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
         }
 
         $.ajax({
@@ -1606,17 +1767,81 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             bidtype: bidtype, // Include the bidtype in the request
             ppline: ppline,
             monthYear: monthYear,
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
           },
           success: function(response) {
-            // Parse and insert the new values for bids and revenue
-            $('#totalBids').replaceWith($(response).filter('#totalBids'));
-            $('#totalRevenue').replaceWith($(response).filter('#totalRevenue'));
+            //console.log("Total Bids and Money:", response);
+            // Get new values from response
+            const newTotalBids = parseInt($(response).filter('#totalBids').text().replace(/[^0-9]/g, ''), 10);
+            const newTotalRevenue = parseInt($(response).filter('#totalRevenue').text().replace(/[^0-9]/g, ''), 10);
+
+            // Get current values (ensure they're formatted correctly)
+            const currentTotalBids = parseInt($('#totalBids').text().replace(/[^0-9]/g, ''), 10);
+            const currentTotalRevenue = parseInt($('#totalRevenue').text().replace(/[^0-9]/g, ''), 10);
+
+            // Animate Total Bids with a simple animation (no currency format)
+            animateValue($('#totalBids'), currentTotalBids, newTotalBids, 1000); // 1000ms duration
+
+            // Animate Total Bids Revenue with the formatted value
+            animateValue($('#totalRevenue'), currentTotalRevenue, newTotalRevenue, 1000, true); // 1000ms duration with formatting
           },
           error: function(xhr, status, error) {
             console.error('Error fetching filtered data:', error);
           }
         });
       }
+
+      function fetchBidStatus(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+        if (sector === null) sector = '';
+        if (bidtype === null) bidtype = '';
+        if (ppline === null) ppline = '';
+        if (monthYear === null) monthYear = '';
+        if (solutionn === null) solutionn = '';
+
+        $.ajax({
+          url: 'controller/updateBidStatus.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector,
+            bidtype: bidtype,
+            ppline: ppline,
+            monthYear: monthYear,
+            solutionn: solutionn,
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          success: function(response) {
+            //console.log("Status:", response); // This will be a JSON object
+
+            const newWIP = parseInt(response.WIP, 10);
+            const newSubmitted = parseInt(response.Submitted, 10);
+            const newDropped = parseInt(response.Dropped, 10);
+
+            // Get current values (ensure they're formatted correctly)
+            const currentWIP = parseInt($('#totalWIP').text().replace(/[^0-9]/g, ''), 10);
+            const currentSubmitted = parseInt($('#totalSubmitted').text().replace(/[^0-9]/g, ''), 10);
+            const currentDropped = parseInt($('#totalDropped').text().replace(/[^0-9]/g, ''), 10);
+
+            // Animate WIP
+            animateValue($('#totalWIP'), currentWIP, newWIP, 1000); // 1000ms duration
+
+            // Animate Submitted
+            animateValue($('#totalSubmitted'), currentSubmitted, newSubmitted, 1000); // 1000ms duration
+
+            // Animate Dropped
+            animateValue($('#totalDropped'), currentDropped, newDropped, 1000); // 1000ms duration
+        },
+          error: function(xhr, status, error) {
+            console.error('Error fetching filtered data:', error);
+          }
+        });
+      }
+
 
     });
   </script>

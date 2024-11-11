@@ -1,6 +1,8 @@
 <?php
 // Include database connection
 include_once '../db/db.php'; // Adjust the path as necessary
+include 'handler/activitylog.php';
+//include 'handler/session.php';
 session_start();
 
 // Check if the user is logged in
@@ -87,10 +89,11 @@ if (isset($_SESSION['user_id'])) {
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sssi", $name, $email, $phone, $staffID);
         if ($stmt->execute()) {
+            logActivity($_SESSION['user_id'], $_SESSION['user_name'] , "Updated profile details", "user", $staffID, $conn);
             $_SESSION['update_success'] = true; // Set session variable for success
 
             // Redirect if profile picture was also updated or after details update
-            header("Location: ../manageprofile.php");
+            header("Location: ../manageprofile");
             exit(); // Ensure no further code is executed
         } else {
             echo "Error updating profile details.";

@@ -74,7 +74,7 @@ function buildWhereClause($filters, $conn) {
 
 // Fetch total bids
 $totalBidsSql = "
-    SELECT COUNT(DISTINCT b.BidID) as total_bids 
+    SELECT COUNT(b.BidID) as total_bids 
     FROM bids b
     JOIN tender t ON t.BidID = b.BidID
     WHERE 1=1

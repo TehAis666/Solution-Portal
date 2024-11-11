@@ -200,7 +200,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
 
               <img src="<?php echo $user_data['profile_picture']; ?>" alt="Profile" class="rounded-circle">
               <h2><?php echo $user_data['name']; ?></h2>
-              <h3><?php echo $user_data['role']; ?></h3>
+              <h3><?php echo ucfirst($user_data['role']); ?> of <?php echo $user_data['sector']; ?></h3>
             </div>
           </div>
 
