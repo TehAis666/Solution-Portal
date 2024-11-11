@@ -122,16 +122,25 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="headbid5">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V1</span>
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V5</span>
             </a>
           </li>
         <?php endif; ?>
 
-        <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
+        <?php if ($role == 'head'): // Only Head Presales
         ?>
           <li>
-            <a href="userbid3">
-              <i class="bi bi-circle"></i><span>Manage Bid V3</span>
+            <a href="headbid6">
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V6</span>
+            </a>
+          </li>
+        <?php endif; ?>
+
+        <?php if ($role == 'head'): // Only Head Presales
+        ?>
+          <li>
+            <a href="headbid7">
+              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V7</span>
             </a>
           </li>
         <?php endif; ?>
@@ -145,12 +154,14 @@ $role = $_SESSION['user_role']; // Get the role from the session
           </li>
         <?php endif; ?>
 
-
-        <!-- <li>
-            <a href="bossbid.php">
-              <i class="bi bi-circle"></i><span>BossBid</span>
+        <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
+        ?>
+          <li>
+            <a href="userbid3">
+              <i class="bi bi-circle"></i><span>Manage Bid</span>
             </a>
-          </li> -->
+          </li>
+        <?php endif; ?>
 
         <?php if ($role != 'presales' && $role != 'head' && $role != 'admin'): // Only SO/SA/CTO
         ?>

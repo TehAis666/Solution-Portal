@@ -34,9 +34,40 @@ try {
             JOIN tender t ON b.BidID = t.BidID
             LEFT JOIN user u ON b.staffID = u.staffID
             WHERE 
-                (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
-                OR 
-                (b.staffID IN (SELECT staffID FROM user WHERE sector = '$sector'))
+                -- Ensure the sector solution is present for the bid
+                t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL
+                
+                -- If the bid is created by staff in the same sector, always display
+                AND (
+                    b.staffID IN (SELECT staffID FROM user WHERE sector = '$sector')
+                    OR
+                    -- If not created by same sector staff, ensure only one non-null solution
+                    (
+                        -- Check for exactly one non-null solution for the selected sector
+                        SELECT COUNT(*) 
+                        FROM tender 
+                        WHERE BidID = b.BidID 
+                        AND (
+                            Solution1 IS NOT NULL AND Solution1 != '' OR 
+                            Solution2 IS NOT NULL AND Solution2 != '' OR
+                            Solution3 IS NOT NULL AND Solution3 != '' OR
+                            Solution4 IS NOT NULL AND Solution4 != ''
+                        )
+                    ) = 1
+
+                    -- Ensure only one solution for the selected sector, 
+                    -- and the solution matches the sector's column
+                    AND NOT EXISTS (
+                        SELECT 1 FROM tender
+                        WHERE BidID = b.BidID 
+                        AND (
+                            (Solution1 IS NOT NULL AND Solution1 != '' AND Solution1 != t.$solutionColumn) OR 
+                            (Solution2 IS NOT NULL AND Solution2 != '' AND Solution2 != t.$solutionColumn) OR
+                            (Solution3 IS NOT NULL AND Solution3 != '' AND Solution3 != t.$solutionColumn) OR
+                            (Solution4 IS NOT NULL AND Solution4 != '' AND Solution4 != t.$solutionColumn)
+                        )
+                    )
+                )
         ";
 
         // Prepare and execute the SQL statement
@@ -79,6 +110,8 @@ try {
     // Handle any errors
     echo "Error: " . $e->getMessage();
 }
+
+
 ?>
 
 
@@ -695,11 +728,278 @@ try {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
                     </div>
                 </div>
             </div>
         </div>
         <!-- End View Modal -->
+
+        <!-- Update Bids Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Bid Details</h5>
+                        <button type="button" class="btn-close" data-bs-toggle="modal" data-bs-target="#viewbids" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateBidForm">
+                            <input type="hidden" name="BidID" id="updateBidID">
+                            <input type="hidden" name="TenderID" id="updateTenderID">
+                            <input type="hidden" name="StaffID" id="updateStaffID"> <!-- Hidden StaffID -->
+
+                            <div class="container">
+                                <!-- First Slide -->
+                                <div id="firstSlide">
+                                    <!-- Existing fields -->
+
+                                    <!-- Staff Section (Dropdown for StaffName) -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
+                                            <select id="updateStaffName" class="form-select" name="StaffID">
+                                                <?php foreach ($staffNames as $staffID => $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($staffID); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Name & HMS Scope -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateCustName" class="form-label"><strong>Company/Agency Name:</strong></label>
+                                            <input type="text" id="updateCustName" class="form-control" name="CustName">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateHMSScope" class="form-label"><strong>HMS Scope:</strong></label>
+                                            <input type="text" id="updateHMSScope" class="form-control" name="HMS_Scope">
+                                        </div>
+                                    </div>
+
+                                    <!-- Tender Proposal -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="updateTenderProposal" class="form-label"><strong>Tender Proposal Title:</strong></label>
+                                            <input type="text" id="updateTenderProposal" class="form-control" name="Tender_Proposal" rows="3">
+                                        </div>
+                                    </div>
+                                    <!-- Business Unit and Account Sector -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateBusinessUnit" class="form-label"><strong>Business Unit:</strong></label>
+                                            <select id="updateBusinessUnit" class="form-select" name="BusinessUnit">
+                                                <option value="">Select business unit</option>
+                                                <option value="TMG (Private Sector)">TMG (Private Sector)</option>
+                                                <option value="TMG (Public Sector)">TMG (Public Sector)</option>
+                                                <option value="IMG">IMG</option>
+                                                <option value="NMG">NMG</option>
+                                                <option value="Channel">Channel</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateAccountSector" class="form-label"><strong>Account Sector:</strong></label>
+                                            <select id="updateAccountSector" class="form-select" name="AccountSector">
+                                                <option value="Enterprise">Enterprise</option>
+                                                <option value="Government">Government</option>
+                                                <option value="FSI">FSI</option>
+                                                <option value="eGLC">eGLC</option>
+                                                <option value="sGLC">sGLC</option>
+                                                <option value="PBT/SME">PBT/SME</option>
+                                                <option value="Health Sector">Health Sector</option>
+                                                <option value="Defense">Defense</option>
+                                                <option value="Duta">Duta</option>
+                                                <option value="HeCo">HeCo</option>
+                                                <option value="Channel Partner">Channel Partner</option>
+                                                <option value="Open Market">Open Market</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Account Manager and Type -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateType" class="form-label"><strong>Type:</strong></label>
+                                            <select id="updateType" class="form-select" name="Type">
+                                                <option value="">Select type</option>
+                                                <option value="RFQ">RFQ</option>
+                                                <option value="RFI">RFI</option>
+                                                <option value="RFP">RFP</option>
+                                                <option value="Tender">Tender</option>
+                                                <option value="Upstream">Upstream</option>
+                                                <option value="Quotation">Quotation</option>
+                                                <option value="Strategic Initiative">Strategic Initiative</option>
+                                                <option value="Strategic Proposal">Strategic Proposal</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateAccountManager" class="form-label"><strong>Account Manager:</strong></label>
+                                            <input type="text" id="updateAccountManager" class="form-control" name="AccountManager">
+
+                                        </div>
+                                    </div>
+                                    <!-- Dates -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateRequestDate" class="form-label"><strong>Request Date:</strong></label>
+                                            <input type="date" id="updateRequestDate" class="form-control" name="RequestDate">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateSubmissionDate" class="form-label"><strong>Submission Date:</strong></label>
+                                            <input type="date" id="updateSubmissionDate" class="form-control" name="SubmissionDate" min="<?php echo date('Y-m-d'); ?>">
+                                        </div>
+                                    </div>
+                                    <!-- Status and Tender Status -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateStatus" class="form-label"><strong>Status:</strong></label>
+                                            <select id="updateStatus" class="form-select" name="Status">
+                                                <option value="">Select Bid Status</option>
+                                                <option value="Submitted">Submitted</option>
+                                                <option value="Dropped">Dropped</option>
+                                                <option value="WIP">WIP</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateTenderStatus" class="form-label"><strong>Tender Status:</strong></label>
+                                            <select id="updateTenderStatus" class="form-select" name="TenderStatus">
+                                                <option value="">Select tender status</option>
+                                                <option value="Clarification">Clarification</option>
+                                                <option value="Close">Close</option>
+                                                <option value="Intro">Intro</option>
+                                                <option value="KIV">KIV</option>
+                                                <option value="Lose">Lose</option>
+                                                <option value="Unknown">Unknown</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Remarks -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="updateRemarks" class="form-label"><strong>Remarks:</strong></label>
+                                            <textarea id="updateRemarks" class="form-control" name="Remarks" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <!-- HMS Solutions Button -->
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-primary" id="nextSlideButton">HMS Solutions</button>
+                                    </div>
+                                </div>
+                                <!-- Second Slide -->
+                                <div id="secondSlide" style="display: none;">
+                                    <!-- Solutions, Presales, and Values -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="updateSolution1" class="form-label"><strong>HMS Solution Owner:</strong></label>
+                                            <select id="updateSolution1" class="form-select" name="Solution1">
+                                                <option value="">Select solution</option>
+                                                <option value="AwanHeiTech">AwanHeiTech</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
+                                            <select id="updatePresales1" class="form-control" name="Presales1">
+                                                <?php foreach ($presalesBySector['AwanHeiTech'] as $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updateValue1" class="form-label"><strong>Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateValue1" class="form-control" name="Value1">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="updateSolution2" class="form-label"><strong>HMS Solution Owner:</strong></label>
+                                            <select id="updateSolution2" class="form-select" name="Solution2">
+                                                <option value="">Select solution</option>
+                                                <option value="PaduNet">PaduNet</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
+                                            <select id="updatePresales2" class="form-control" name="Presales2">
+                                                <?php foreach ($presalesBySector['PaduNet'] as $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updateValue2" class="form-label"><strong>Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateValue2" class="form-control" name="Value2">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="updateSolution3" class="form-label"><strong>HMS Solution Owner:</strong></label>
+                                            <select id="updateSolution3" class="form-select" name="Solution3">
+                                                <option value="">Select solution</option>
+                                                <option value="Secure-X">Secure-X</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
+                                            <select id="updatePresales3" class="form-control" name="Presales3">
+                                                <?php foreach ($presalesBySector['Secure-X'] as $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updateValue3" class="form-label"><strong>Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateValue3" class="form-control" name="Value3">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label for="updateSolution4" class="form-label"><strong>HMS Solution Owner:</strong></label>
+                                            <select id="updateSolution4" class="form-select" name="Solution4">
+                                                <option value="">Select solution</option>
+                                                <option value="i-Sentrix">i-Sentrix</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
+                                            <select id="updatePresales4" class="form-control" name="Presales4">
+                                                <?php foreach ($presalesBySector['i-Sentrix'] as $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="updateValue4" class="form-label"><strong>Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateValue4" class="form-control" name="Value4">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="updateTotalValue" class="form-label"><strong>Total Request Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateTotalValue" class="form-control" name="TotalValue">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="updateRMValue" class="form-label"><strong>Submission Value Value (RM):</strong></label>
+                                            <input type="number" step="0.01" id="updateRMValue" class="form-control" name="RMValue">
+                                        </div>
+                                    </div>
+                                    <!-- Button Slide & calculate -->
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-secondary" id="backSlideButton">Bid Info</button>
+                                        <button type="button" class="btn btn-primary" id="calculateButton">Calculate</button>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#viewbids">Back</button>
+                                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Modal -->
     </main>
     <!-- End #main -->
 
@@ -733,6 +1033,124 @@ try {
 
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+
+    <!-- Slide Button -->
+    <script>
+        document.getElementById("nextSlideButton").addEventListener("click", function() {
+            document.getElementById("firstSlide").style.display = "none";
+            document.getElementById("secondSlide").style.display = "block";
+        });
+
+        document.getElementById("backSlideButton").addEventListener("click", function() {
+            document.getElementById("secondSlide").style.display = "none";
+            document.getElementById("firstSlide").style.display = "block";
+        });
+    </script>
+
+    <!-- ReadOnly And Disable -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const statusSelect = document.getElementById("updateStatus");
+            const secondSlide = document.getElementById("secondSlide");
+            const secondSlideInputs = secondSlide.querySelectorAll("input[type='text'], input[type='number']");
+            const secondSlideSelects = secondSlide.querySelectorAll("select");
+
+            function toggleSecondSlideInputs() {
+                const isDropped = statusSelect.value === "Dropped";
+
+                // Set text and number inputs to read-only
+                secondSlideInputs.forEach(input => {
+                    input.readOnly = isDropped; // Set to readonly for text and number inputs
+                });
+
+                // Disable select elements if status is "Dropped"
+                secondSlideSelects.forEach(select => {
+                    if (isDropped) {
+                        select.setAttribute("style", "pointer-events: none;");
+                        select.setAttribute("onclick", "return false;");
+                        select.setAttribute("onkeydown", "return false;");
+                    } else {
+                        select.removeAttribute("style");
+                        select.removeAttribute("onclick");
+                        select.removeAttribute("onkeydown");
+                    }
+                });
+
+                // Always make TotalValue read-only
+                const totalValueInput = document.getElementById("updateTotalValue");
+                totalValueInput.readOnly = true; // Always read-only
+            }
+
+            // Check the status when the modal opens
+            $('#editModal').on('shown.bs.modal', function() {
+                toggleSecondSlideInputs(); // Run when the modal is shown
+            });
+
+            // Check the status on change
+            statusSelect.addEventListener("change", toggleSecondSlideInputs);
+
+            // Save Changes button logic
+            document.getElementById("saveChangesBtn").addEventListener("click", function() {
+                // Implement your save logic here.
+                console.log("Save Changes clicked!");
+
+                // Optionally show a success message or handle the save operation.
+                $('#editModal').modal('hide'); // Close the modal
+            });
+        });
+
+        let originalValues = {}; // Store original values for select elements
+
+        // Modify the toggle function to save original values
+        function toggleSecondSlideInputs() {
+            const isDropped = statusSelect.value === "Dropped";
+
+            secondSlideInputs.forEach(input => {
+                input.readOnly = isDropped; // Set to readonly for text and number inputs
+            });
+
+            secondSlideSelects.forEach(select => {
+                if (isDropped) {
+                    // Store the original value if not stored
+                    if (!originalValues[select.id]) {
+                        originalValues[select.id] = select.value;
+                    }
+                    select.value = originalValues[select.id]; // Reset to original value
+                } else {
+                    delete originalValues[select.id]; // Clear stored value when not dropped
+                }
+            });
+
+            // Always make TotalValue read-only
+            const totalValueInput = document.getElementById("updateTotalValue");
+            totalValueInput.readOnly = true; // Always read-only
+        }
+    </script>
+
+    <!-- Calculate Total Value-->
+    <script>
+        document.getElementById('calculateButton').addEventListener('click', function() {
+            // Get the value from the RM Value input
+            const rmValue = parseFloat(document.getElementById('updateRMValue').value) || 0;
+
+            // Assuming you have values for Value1 to Value4 from somewhere, for example:
+            const value1 = parseFloat(document.getElementById('updateValue1').value) || 0;
+            const value2 = parseFloat(document.getElementById('updateValue2').value) || 0;
+            const value3 = parseFloat(document.getElementById('updateValue3').value) || 0;
+            const value4 = parseFloat(document.getElementById('updateValue4').value) || 0;
+
+            // Calculate the Total Value
+            const totalValue = value1 + value2 + value3 + value4;
+
+            // Set the Total Value in the Total Value input
+            document.getElementById('updateTotalValue').value = totalValue.toFixed(2); // Format to two decimal places
+        });
+    </script>
+
+    <!-- Data Table -->
+    <!-- <script>
+    new DataTable('#example');
+  </script> -->
 
     <!-- DataTable Script Initialization -->
     <script>
@@ -898,6 +1316,42 @@ try {
                 $('#modalStaff').text(staffID); // Set hidden field for staff ID
                 $('#modalStaffName').text(staffName); // Set the staff name for display in the dropdown
 
+                // Populate the Update Form in Edit Modal
+                $('#updateCustName').val(custName);
+                $('#updateHMSScope').val(hmsScope);
+                $('#updateTenderProposal').val(tenderProposal);
+                $('#updateType').val(type);
+                $('#updateBusinessUnit').val(businessUnit);
+                $('#updateAccountSector').val(accountSector);
+                $('#updateAccountManager').val(accountManager);
+
+                // Populate solution and presales fields in the update form
+                $('#updateSolution1').val(solution1);
+                $('#updateSolution2').val(solution2);
+                $('#updateSolution3').val(solution3);
+                $('#updateSolution4').val(solution4);
+                $('#updatePresales1').val(presales1);
+                $('#updatePresales2').val(presales2);
+                $('#updatePresales3').val(presales3);
+                $('#updatePresales4').val(presales4);
+                $('#updateRequestDate').val(requestDate);
+                $('#updateSubmissionDate').val(submissionDate ? submissionDate : null);
+                $('#updateValue1').val(value1);
+                $('#updateValue2').val(value2);
+                $('#updateValue3').val(value3);
+                $('#updateValue4').val(value4);
+                $('#updateTotalValue').val(totalValue);
+                $('#updateRMValue').val(rmValue);
+                $('#updateStatus').val(status);
+                $('#updateTenderStatus').val(tenderStatus);
+                $('#updateRemarks').val(remarks);
+                $('#updateBidID').val(bidID);
+                $('#updateTenderID').val(tenderID);
+
+                // Populate the staff dropdown with the selected staff name and ID
+                $('#updateStaff').val(staffID); // Set hidden field for staff ID
+                $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
+
                 // Show the View Modal
                 $('#viewbids').modal('show');
             });
@@ -943,6 +1397,7 @@ try {
                 });
             });
         });
+        console.log('Presales2 Value:', $('#updatePresales2').val());
 
         $.fn.dataTable.ext.errMode = 'throw';
     </script>
