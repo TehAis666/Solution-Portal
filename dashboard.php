@@ -270,7 +270,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           </ul>
         </div>
         <div class="card-body pb-0">
-          <form action="#" id="filterForm">
+          <form id="filterForm">
             <div class="row g-2">
               <!-- Year Dropdown with label to the left -->
               <div class="col-md-3">
@@ -312,7 +312,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <!-- Filter Button -->
               <div class="col-md-2 d-flex align-items-center justify-content">
                 <button type="submit" class="btn btn-primary">Filter</button>
-                <!-- <button type="button" class="btn btn-light">Export to PDF</button> -->
+                <button id="exportToPDF" type="button" class="btn btn-primary">Export to PDF</button>
               </div>
             </div>
           </form>
@@ -585,6 +585,33 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
       // Store last selected Solution to allow deselection on repeated clicks
       let lastSelectedSolution = null;
+
+      let marketSectorData = [];
+      let monthsData = [];
+      let totalRevenueData = [];
+      let totalBidsData = [];
+      // Global variables to store the fetched data
+      let bidTypesDatas = [];
+      let pipelinesDatas = [];
+      let solutionsData = [];
+
+      // Define a global variable to store InfraSolution data
+      var infraSolutionData = null;
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (solutionsData.length === 0) {
+        fetchSumSolution(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (marketSectorData.length === 0) {
+        fetchMarketSectorData(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (monthsData.length === 0 || totalRevenueData.length === 0 || totalBidsData.length === 0) {
+        fetchReportData(null, null, null, null, null, null, null, null, null);
+      }
 
       // Store date, startDate,endDate
       // let date = '';
@@ -1342,6 +1369,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             // Update bar chart data
             barOption.series[0].data = barData;
             barChart.setOption(barOption);
+
+            // Store data in marketSectorData for PDF
+            marketSectorData = pieData; // Store pieData for table format
           },
           error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
@@ -1397,7 +1427,9 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           dataType: 'json', // Assuming your response is in JSON format
           success: function(response) {
             //console.log("Fetched Data:", response); // Debug
-
+            totalBidsData = response.totalBids;
+            totalRevenueData = response.totalRevenue;
+            monthsData = response.months;
             // Assume the response contains totalBids and totalRevenue arrays
             const totalBids = response.totalBids; // Update this line based on your actual response structure
             const totalRevenue = response.totalRevenue; // Update this line based on your actual response structure
@@ -1463,6 +1495,27 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           dataType: 'json',
           success: function(response) {
             // console.log("Fetched Data:", response); // Debug
+
+            bidTypesDatas = [
+              parseInt(response.bidTypesCounts['RFQ'] || 0),
+              parseInt(response.bidTypesCounts['Tender'] || 0),
+              parseInt(response.bidTypesCounts['Quotation'] || 0),
+              parseInt(response.bidTypesCounts['RFP'] || 0),
+              parseInt(response.bidTypesCounts['RFI'] || 0),
+              parseInt(response.bidTypesCounts['Upstream'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Proposal'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Initiative'] || 0)
+            ];
+
+            // Format data for Pipelines Bar Chart from the fetched response
+            pipelinesDatas = [
+              parseInt(response.pipelineCounts['Unknown'] || 0),
+              parseInt(response.pipelineCounts['Loss'] || 0),
+              parseInt(response.pipelineCounts['Close'] || 0),
+              parseInt(response.pipelineCounts['KIV'] || 0),
+              parseInt(response.pipelineCounts['Intro'] || 0),
+              parseInt(response.pipelineCounts['Clarification'] || 0)
+            ];
 
             // Format data for Bid Types Bar Chart from the fetched response
             const bidTypesData = [
@@ -1552,6 +1605,14 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           success: function(response) {
             // console.log("Fetched Data:", response); debug
 
+            solutionsData = {
+              PaduNet: response.PaduNet || 0, // Fallback value of 0 if response is undefined
+              SecureX: response.SecureX || 0,
+              AwanHeiTech: response.AwanHeiTech || 0,
+              iSentrix: response.iSentrix || 0,
+              MixSolution: response.MixSolution || 0
+            };
+
             // Update the chart's data with the response values
             barSumChart.data.datasets[0].data = [
               response.PaduNet || 0, // Use fallback value of 0 if response is undefined
@@ -1617,91 +1678,94 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             //console.log("Infra Solution:", response);
 
             // Extract solution counts from the response
-             // Extract solution counts from the response
-      var solutionCounts = response.solutionBusinessUnitCounts;
+            // Extract solution counts from the response
+            var solutionCounts = response.solutionBusinessUnitCounts;
 
-      // Prepare datasets for the chart, with summed values for MixSolution
-      const datasets = [{
-          label: "Channel",
-          data: [
-            solutionCounts['PaduNet']['Channel'],
-            solutionCounts['SecureX']['Channel'],
-            solutionCounts['AwanHeiTech']['Channel'],
-            solutionCounts['iSentrix']['Channel'],
-            // Sum of each sub-solution within MixSolution for "Channel"
-            solutionCounts['MixSolution']['Channel']['AwanHeiTech'] +
-            solutionCounts['MixSolution']['Channel']['SecureX'] +
-            solutionCounts['MixSolution']['Channel']['PaduNet'] +
-            solutionCounts['MixSolution']['Channel']['iSentrix']
-          ],
-          backgroundColor: "#6CC3DF"
-        },
-        {
-          label: "IMG",
-          data: [
-            solutionCounts['PaduNet']['IMG'],
-            solutionCounts['SecureX']['IMG'],
-            solutionCounts['AwanHeiTech']['IMG'],
-            solutionCounts['iSentrix']['IMG'],
-            // Sum of each sub-solution within MixSolution for "IMG"
-            solutionCounts['MixSolution']['IMG']['AwanHeiTech'] +
-            solutionCounts['MixSolution']['IMG']['SecureX'] +
-            solutionCounts['MixSolution']['IMG']['PaduNet'] +
-            solutionCounts['MixSolution']['IMG']['iSentrix']
-          ],
-          backgroundColor: "#FF6B6B"
-        },
-        {
-          label: "NMG",
-          data: [
-            solutionCounts['PaduNet']['NMG'],
-            solutionCounts['SecureX']['NMG'],
-            solutionCounts['AwanHeiTech']['NMG'],
-            solutionCounts['iSentrix']['NMG'],
-            // Sum of each sub-solution within MixSolution for "NMG"
-            solutionCounts['MixSolution']['NMG']['AwanHeiTech'] +
-            solutionCounts['MixSolution']['NMG']['SecureX'] +
-            solutionCounts['MixSolution']['NMG']['PaduNet'] +
-            solutionCounts['MixSolution']['NMG']['iSentrix']
-          ],
-          backgroundColor: "#F9D266"
-        },
-        {
-          label: "TMG (Private Sector)",
-          data: [
-            solutionCounts['PaduNet']['TMG (Private Sector)'],
-            solutionCounts['SecureX']['TMG (Private Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-            solutionCounts['iSentrix']['TMG (Private Sector)'],
-            // Sum of each sub-solution within MixSolution for "TMG (Private Sector)"
-            solutionCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
-            solutionCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
-            solutionCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
-            solutionCounts['MixSolution']['TMG (Private Sector)']['iSentrix']
-          ],
-          backgroundColor: "#4668E6"
-        },
-        {
-          label: "TMG (Public Sector)",
-          data: [
-            solutionCounts['PaduNet']['TMG (Public Sector)'],
-            solutionCounts['SecureX']['TMG (Public Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-            solutionCounts['iSentrix']['TMG (Public Sector)'],
-            // Sum of each sub-solution within MixSolution for "TMG (Public Sector)"
-            solutionCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
-            solutionCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
-            solutionCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
-            solutionCounts['MixSolution']['TMG (Public Sector)']['iSentrix']
-          ],
-          backgroundColor: "#7EC968"
-        }
-      ];
+            // Prepare datasets for the chart, with summed values for MixSolution
+            const datasets = [{
+                label: "Channel",
+                data: [
+                  solutionCounts['PaduNet']['Channel'],
+                  solutionCounts['SecureX']['Channel'],
+                  solutionCounts['AwanHeiTech']['Channel'],
+                  solutionCounts['iSentrix']['Channel'],
+                  // Sum of each sub-solution within MixSolution for "Channel"
+                  solutionCounts['MixSolution']['Channel']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['Channel']['SecureX'] +
+                  solutionCounts['MixSolution']['Channel']['PaduNet'] +
+                  solutionCounts['MixSolution']['Channel']['iSentrix']
+                ],
+                backgroundColor: "#6CC3DF"
+              },
+              {
+                label: "IMG",
+                data: [
+                  solutionCounts['PaduNet']['IMG'],
+                  solutionCounts['SecureX']['IMG'],
+                  solutionCounts['AwanHeiTech']['IMG'],
+                  solutionCounts['iSentrix']['IMG'],
+                  // Sum of each sub-solution within MixSolution for "IMG"
+                  solutionCounts['MixSolution']['IMG']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['IMG']['SecureX'] +
+                  solutionCounts['MixSolution']['IMG']['PaduNet'] +
+                  solutionCounts['MixSolution']['IMG']['iSentrix']
+                ],
+                backgroundColor: "#FF6B6B"
+              },
+              {
+                label: "NMG",
+                data: [
+                  solutionCounts['PaduNet']['NMG'],
+                  solutionCounts['SecureX']['NMG'],
+                  solutionCounts['AwanHeiTech']['NMG'],
+                  solutionCounts['iSentrix']['NMG'],
+                  // Sum of each sub-solution within MixSolution for "NMG"
+                  solutionCounts['MixSolution']['NMG']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['NMG']['SecureX'] +
+                  solutionCounts['MixSolution']['NMG']['PaduNet'] +
+                  solutionCounts['MixSolution']['NMG']['iSentrix']
+                ],
+                backgroundColor: "#F9D266"
+              },
+              {
+                label: "TMG (Private Sector)",
+                data: [
+                  solutionCounts['PaduNet']['TMG (Private Sector)'],
+                  solutionCounts['SecureX']['TMG (Private Sector)'],
+                  solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
+                  solutionCounts['iSentrix']['TMG (Private Sector)'],
+                  // Sum of each sub-solution within MixSolution for "TMG (Private Sector)"
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['iSentrix']
+                ],
+                backgroundColor: "#4668E6"
+              },
+              {
+                label: "TMG (Public Sector)",
+                data: [
+                  solutionCounts['PaduNet']['TMG (Public Sector)'],
+                  solutionCounts['SecureX']['TMG (Public Sector)'],
+                  solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
+                  solutionCounts['iSentrix']['TMG (Public Sector)'],
+                  // Sum of each sub-solution within MixSolution for "TMG (Public Sector)"
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['iSentrix']
+                ],
+                backgroundColor: "#7EC968"
+              }
+            ];
 
-      // Update the chart with the new datasets
-      stackedBarChart.data.datasets = datasets;
-      stackedBarChart.update(); // Refresh the chart to display the new data
-    },
+            // Store the datasets globally for PDF usage
+            infraSolutionData = datasets;
+
+            // Update the chart with the new datasets
+            stackedBarChart.data.datasets = datasets;
+            stackedBarChart.update(); // Refresh the chart to display the new data
+          },
           error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
           }
@@ -1835,12 +1899,88 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
             // Animate Dropped
             animateValue($('#totalDropped'), currentDropped, newDropped, 1000); // 1000ms duration
-        },
+          },
           error: function(xhr, status, error) {
             console.error('Error fetching filtered data:', error);
           }
         });
       }
+
+      document.getElementById("exportToPDF").addEventListener("click", function() {
+        const formData = new FormData(document.getElementById("filterForm"));
+
+        // Helper function to format numbers as K or M
+        function formatSum(value) {
+          if (value >= 1000000) {
+            return (value / 1000000).toFixed(2) + ' M';
+          } else if (value >= 1000) {
+            return (value / 1000).toFixed(2) + ' K';
+          } else {
+            return value.toString();
+          }
+        }
+
+        // Format solutionsData
+        const formattedSolutionsData = {};
+        for (const [key, value] of Object.entries(solutionsData)) {
+          formattedSolutionsData[key] = formatSum(value);
+        }
+
+        formData.append('totalBids', document.getElementById('totalBids').innerText);
+        formData.append('totalRevenue', document.getElementById('totalRevenue').innerText);
+        formData.append('totalWIP', document.getElementById('totalWIP').innerText);
+        formData.append('totalSubmitted', document.getElementById('totalSubmitted').innerText);
+        formData.append('totalDropped', document.getElementById('totalDropped').innerText);
+        formData.append('marketSectorData', JSON.stringify(marketSectorData));
+        formData.append('totalBidsData', JSON.stringify(totalBidsData));
+        formData.append('totalRevenueData', JSON.stringify(totalRevenueData));
+        formData.append('monthsData', JSON.stringify(monthsData));
+        formData.append('bidTypesDatas', JSON.stringify(bidTypesDatas));
+        formData.append('pipelinesDatas', JSON.stringify(pipelinesDatas));
+
+        // Add formatted solutionsData to form data
+        formData.append('solutionsData', JSON.stringify(formattedSolutionsData));
+
+        const chartIDs = [
+          "reportsChart",
+          "stakedBarChart",
+          "sectorChart",
+          "horizontalBarChart",
+          "barChart",
+          "bidTypesBarChart",
+          "pipelinesBarChart"
+        ];
+
+        chartIDs.forEach((chartID) => {
+          const chartElement = document.getElementById(chartID);
+
+          if (chartElement) {
+            let chartImage;
+            if (chartElement.tagName === "CANVAS") {
+              chartImage = chartElement.toDataURL("image/png");
+            } else if (chartElement.classList.contains("echart")) {
+              const echartInstance = echarts.getInstanceByDom(chartElement);
+              chartImage = echartInstance ? echartInstance.getDataURL() : null;
+            }
+
+            if (chartImage) {
+              formData.append(chartID + "Image", chartImage);
+            }
+          }
+        });
+
+        fetch("controller/generatePDF.php", {
+            method: "POST",
+            body: formData
+          })
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            window.open(url);
+          })
+          .catch(error => console.error("Error generating PDF:", error));
+      });
+
 
 
     });
