@@ -496,7 +496,7 @@ try {
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Staff Name</th> <!-- New column for Staff Name -->
+                                        <th>Presales</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>
                                         <th>Request Value (RM)</th>
@@ -1350,11 +1350,11 @@ try {
                 console.log("showtag num", showtag);
 
                 
-                if (showtag == '0') {
-                    $('.edit-btn').show(); // Show Edit button
-                } else {
-                    $('.edit-btn').hide(); // Hide Edit button
-                }
+                // if (showtag == '0') {
+                //     $('.edit-btn').show(); // Show Edit button
+                // } else {
+                //     $('.edit-btn').hide(); // Hide Edit button
+                // }
 
                 // Show the View Modal
                 $('#viewbids').modal('show');

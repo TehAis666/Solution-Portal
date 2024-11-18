@@ -59,6 +59,7 @@ try {
     // Query to retrieve presales staff names by sector
     $presalesStmt = $conn->query("SELECT name, sector FROM user");
 
+    
     // Populate the presales array with names organized by sector
     while ($row = $presalesStmt->fetch_assoc()) {
         if (isset($presalesBySector[$row['sector']])) {
@@ -469,8 +470,8 @@ try {
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Creator</th> <!-- New column for Staff Name -->
-                                        <th>Affiliate</th> <!-- New column for Staff Name -->
+                                        <th>Owner</th> <!-- New column for Staff Name -->
+                                        <th>Sub-Presales</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>
                                         <th>Request Value (RM)</th>
@@ -498,7 +499,7 @@ try {
                                                     <?php if ($bid['role'] == 'partner'): ?>
                                                         <span class="badge bg-info">Partner</span>
                                                     <?php elseif ($bid['role'] == 'affiliate'): ?>
-                                                        <span class="badge bg-warning">Affiliate</span>
+                                                        <span class="badge bg-warning">Sub-Presales</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
@@ -585,11 +586,11 @@ try {
                     <div class="modal-body">
                         <div class="container">
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Presales:</strong></div>
+                                <div class="col-sm-4"><strong>Owner:</strong></div>
                                 <div class="col-sm-8" id="modalStaffName">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Affiliate:</strong></div>
+                                <div class="col-sm-4"><strong>Sub-Presales:</strong></div>
                                 <div class="col-sm-8" id="modalAffiliateName">-</div>
                             </div>
                             <div class="row mb-3">
@@ -719,20 +720,26 @@ try {
                         <form id="updateBidForm">
                             <input type="hidden" name="BidID" id="updateBidID">
                             <input type="hidden" name="TenderID" id="updateTenderID">
+                            <div id="role" data-role="creator" style="display:none;"></div>
                             <div class="container">
                                 <!-- First Slide -->
                                 <div id="firstSlide">
                                     <!-- Owner && Affiliate -->
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="updateStaffName" class="form-label"><strong>Owner</strong></label>
-                                            <input type="text" id="updateStaffName" class="form-control" name="StaffName">
+                                    <div class="row mb-3 align-items-center">
+                                        <div class="col-md-4">
+                                            <label for="updateStaffName" class="form-label"><strong>Owner:</strong></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <input type="text" id="updateStaffName" class="form-control-plaintext" name="StaffName" value="John Doe" readonly>
                                         </div>
                                     </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="updateAffiliateName" class="form-label"><strong>Affiliate</strong></label>
-                                            <input type="text" id="updateAffiliateName" class="form-control" name="AffiliateName">
+
+                                    <div class="row mb-3 align-items-center sub-presales-field">
+                                        <div class="col-md-4">
+                                            <label  class="form-label"><strong>Sub-Presales:</strong></label>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <a id="updateAffiliateName" class="form-control-plaintext text-primary">Edit Permission</a>
                                         </div>
                                     </div>
                                     <!-- Existing fields -->
@@ -1319,9 +1326,14 @@ try {
                 $('#updateStaffName').val(staffName); // Set the staff name for display in the dropdown
                 $('#updateAffiliateName').val(affiliateName); // Set the staff name for display in the dropdown
 
-
+                if (role === 'creator') {
+                    $('.sub-presales-field').show(); // Show Sub-Presales field
+                } else {
+                    $('.sub-presales-field').hide(); // Hide Sub-Presales field
+                }
                 console.log("role num", role);
-
+                console.log("BIDID", bidID);
+                document.getElementById('updateAffiliateName').href = 'updaterequest?BidID=' + bidID;
                 // Show the View Modal
                 $('#viewbids').modal('show');
             });

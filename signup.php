@@ -402,8 +402,8 @@
 </head>
 
 <body>
+    
     <div class="form-structor">
-
         <div class="login">
             <div class="logo-container">
                 <img src="images/logo3.png" alt="Logo 2" class="logo" />

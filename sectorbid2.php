@@ -31,27 +31,30 @@ try {
     if ($solutionColumn) {
         // Construct SQL query to retrieve bids, staff names, role tags (creator, partner, affiliate), and other details
         $sql = "
-            SELECT 
-                b.*, 
-                t.*, 
-                u.staffID, 
-                u.name AS StaffName,
-                (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
-                CASE 
-                    WHEN b.staffID = ? THEN 'creator'
-                    WHEN ? IN (t.Presales1, t.Presales2, t.Presales3, t.Presales4) THEN 'partner'
-                    WHEN rb.requestID IS NOT NULL THEN 'affiliate' -- User is affiliated with the bid
-                    ELSE 'others'
-                END AS role
-            FROM bids b
-            JOIN tender t ON b.BidID = t.BidID
-            LEFT JOIN user u ON b.staffID = u.staffID
-            LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? -- Check if session user is affiliated
-            WHERE 
-                (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
-                OR 
-                (b.staffID IN (SELECT staffID FROM user WHERE sector = ?))
-        ";
+    SELECT 
+        b.*, 
+        t.*, 
+        u.staffID, 
+        u.name AS StaffName,
+        (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
+        CASE 
+            WHEN b.staffID = ? THEN 'creator'
+            WHEN ? IN (t.Presales1, t.Presales2, t.Presales3, t.Presales4) THEN 'partner'
+            WHEN rb.status = 'Accepted' THEN 'affiliate' -- User is an affiliate
+            WHEN rb.status = 'requested' THEN 'requested' -- User has requested access
+            WHEN rb.status = 'Rejected' THEN 'rejected' -- User's request was rejected
+            ELSE 'others'
+        END AS role
+    FROM bids b
+    JOIN tender t ON b.BidID = t.BidID
+    LEFT JOIN user u ON b.staffID = u.staffID
+    LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? -- Check the session user's status
+    WHERE 
+        (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
+        OR 
+        (b.staffID IN (SELECT staffID FROM user WHERE sector = ?))
+";
+
 
         // Prepare and execute the SQL statement
         $stmt = $conn->prepare($sql);
@@ -499,7 +502,7 @@ try {
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Staff Name</th> <!-- New column for Staff Name -->
+                                        <th>Presales</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>
                                         <th>Request Value (RM)</th>
@@ -517,15 +520,20 @@ try {
                                                 <td>
                                                     <?php echo htmlspecialchars($bid['CustName']); ?>
                                                     <?php
-                                                    if ($bid['role'] == 'creator'): ?>
+                                                     if ($bid['role'] == 'creator'): ?>
                                                         <span class="badge bg-primary">Creator</span>
                                                     <?php elseif ($bid['role'] == 'partner'): ?>
                                                         <span class="badge bg-success">Partner</span>
-                                                        <?php elseif ($bid['role'] == 'affiliate'): ?>
-                                                            <span class="badge bg-warning">Affiliate</span>
+                                                    <?php elseif ($bid['role'] == 'affiliate'): ?>
+                                                        <span class="badge bg-warning">Sub-Presales</span>
+                                                    <?php elseif ($bid['role'] == 'requested'): ?>
+                                                        <span class="badge bg-info">Requested</span>
+                                                    <?php elseif ($bid['role'] == 'rejected'): ?>
+                                                        <span class="badge bg-danger">Rejected</span>
                                                     <?php else: ?>
                                                         <span class="badge bg-secondary">Others</span>
                                                     <?php endif; ?>
+                                                    
                                                 </td>
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                                                 <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
@@ -749,7 +757,7 @@ try {
                                     <!-- Existing fields -->
 
                                     <!-- Staff Section (Dropdown for StaffName) -->
-                                    <div class="row mb-3">
+                                    <div class="row mb-3 sub-presales-field">
                                         <div class="col-md-12">
                                             <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
                                             <select id="updateStaffName" class="form-select" name="StaffID">
@@ -1359,6 +1367,12 @@ try {
                 } else {
                     $('.edit-btn').hide(); // Hide Edit button for other roles
                     $('#requestBtn').hide(); // Hide Request Edit button for other roles
+                }
+
+                if (role === 'creator') {
+                    $('.sub-presales-field').show(); // Show Sub-Presales field
+                } else {
+                    $('.sub-presales-field').hide(); // Hide Sub-Presales field
                 }
 
                 // Show the View Modal

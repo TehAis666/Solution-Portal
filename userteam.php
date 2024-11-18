@@ -10,6 +10,7 @@ include_once 'db/db.php';
 $staffID = $_SESSION['user_id'];
 $sector = $_SESSION['user_sector'];
 $isHead = ($_SESSION['user_role'] === 'head');
+$name = $_SESSION['user_name'];
 
 try {
     // Get the head of the sector
@@ -22,21 +23,63 @@ try {
 
     // Get team members with the same sector but with a 'normal' role, including bid counts for each status
     $stmtTeam = $conn->query("
-        SELECT u.*, 
-               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID) AS bid_count,
-               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'Submitted') AS submitted_count,
-               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'Dropped') AS dropped_count,
-               (SELECT COUNT(*) FROM bids WHERE staffID = u.staffID AND Status = 'WIP') AS wip_count
-        FROM user u 
-        WHERE u.sector = '$sector' AND u.role = 'presales' AND  u.status = 'Approved'
-    ");
+    SELECT u.*, 
+           -- Count bids where the staff is either the creator, partner, or affiliate
+           (SELECT COUNT(*) 
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'
+            LEFT JOIN user ra ON ra.staffID = r.staffID
+            WHERE (b.staffID = u.staffID OR 
+                  FIND_IN_SET(u.staffID, CONCAT(t.presales1, ',', t.presales2, ',', t.presales3, ',', t.presales4)) > 0 
+                  OR u.name IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Use the staff's name here
+                  OR r.staffID = u.staffID AND r.status = 'Accepted') 
+           ) AS bid_count,
+
+           -- Count 'Submitted' bids
+           (SELECT COUNT(*) 
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'
+            LEFT JOIN user ra ON ra.staffID = r.staffID
+            WHERE (b.staffID = u.staffID OR 
+                  FIND_IN_SET(u.staffID, CONCAT(t.presales1, ',', t.presales2, ',', t.presales3, ',', t.presales4)) > 0 
+                  OR u.name IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Use the staff's name here
+                  OR r.staffID = u.staffID AND r.status = 'Accepted') 
+                  AND b.Status = 'Submitted') AS submitted_count,
+           
+           -- Count 'Dropped' bids
+           (SELECT COUNT(*) 
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'
+            LEFT JOIN user ra ON ra.staffID = r.staffID
+            WHERE (b.staffID = u.staffID OR 
+                  FIND_IN_SET(u.staffID, CONCAT(t.presales1, ',', t.presales2, ',', t.presales3, ',', t.presales4)) > 0 
+                  OR u.name IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Use the staff's name here
+                  OR r.staffID = u.staffID AND r.status = 'Accepted') 
+                  AND b.Status = 'Dropped') AS dropped_count,
+           
+           -- Count 'WIP' bids
+           (SELECT COUNT(*) 
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'
+            LEFT JOIN user ra ON ra.staffID = r.staffID
+            WHERE (b.staffID = u.staffID OR 
+                  FIND_IN_SET(u.staffID, CONCAT(t.presales1, ',', t.presales2, ',', t.presales3, ',', t.presales4)) > 0 
+                  OR u.name IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Use the staff's name here
+                  OR r.staffID = u.staffID AND r.status = 'Accepted') 
+                  AND b.Status = 'WIP') AS wip_count
+    FROM user u 
+    WHERE u.sector = '$sector' AND u.role = 'presales' AND u.status = 'Approved'
+");
+
     $teamMembers = $stmtTeam->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
 ?>
-
-
 
 <head>
     <meta charset="utf-8" />
@@ -466,7 +509,7 @@ try {
                                     <div class="card-body">
                                         <!-- Team Member's Profile Picture and Name -->
                                         <?php if ($member['staffID'] == $staffID || $isHead) { ?>
-                                            <a href="viewstaffbid?staffID=<?php echo htmlspecialchars($member['staffID']); ?>" class="staff-name-link">
+                                            <a href="viewstaffbid.php?staffID=<?php echo htmlspecialchars($member['staffID']); ?>&name=<?php echo urlencode($member['name']); ?>" class="staff-name-link">
                                             <?php } ?>
                                             <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
                                             <b>

@@ -4,7 +4,6 @@
 // Include the database connection file
 include_once 'db/db.php';
 
-
 // Retrieve the current session staffID
 $staffID = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
@@ -17,24 +16,24 @@ if ($staffID === null) {
 
 if (isset($_GET['BidID'])) {
     $bidID = $_GET['BidID'];
-    echo "<script>console.log('BidID received on acceptrequest.php:', $bidID);</script>";
+    echo "<script>console.log('BidID received on updaterequest:', $bidID);</script>";
 } else {
     echo "<script>console.log('No BidID provided in the query string.');</script>";
 }
 
 try {
-    // Fetch all requests made by the session user for their own bids along with CustName and Tender_Proposal
+    // Fetch the request information based on the BidID and the session staffID
     $stmt = $conn->prepare("
         SELECT u.name, u.email, u.phonenum, u.staffID, r.requestID, r.BidID, r.status,
                b.CustName, b.Tender_Proposal
         FROM user u
         JOIN requestbids r ON u.staffID = r.staffID
         JOIN bids b ON r.BidID = b.BidID
-        WHERE b.staffID = ?
+        WHERE b.staffID = ? AND r.BidID = ?
     ");
 
-    // Bind the parameter for session staffID
-    $stmt->bind_param("i", $staffID);  // Only binding the staffID now, no status filter
+    // Bind the parameters: session staffID and the BidID from the URL
+    $stmt->bind_param("ii", $staffID, $bidID);
     $stmt->execute();
 
     // Fetch the results as an associative array
@@ -45,6 +44,7 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
+
 
 
 

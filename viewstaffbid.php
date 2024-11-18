@@ -9,43 +9,55 @@
 include_once 'db/db.php';
 
 try {
-    // Get staffID from the URL (e.g., staff_bid_list.php?staffID=1)
-    $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : $_SESSION['user_id'];
-    // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
-    $stmt = $conn->query("
+  // Get staffID and staff name from the URL or session
+  $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : $_SESSION['user_id'];
+  $name = isset($_GET['name']) ? $_GET['name'] : '';  // Get the staff name from the URL
+
+  // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
+  $stmt = $conn->query("
         SELECT 
             b.*, 
             t.*, 
-            (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue 
+            (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
+            CASE 
+                WHEN b.staffID = $staffID THEN 'creator' 
+                WHEN t.presales1 = '$name' OR t.presales2 = '$name' OR t.presales3 = '$name' OR t.presales4 = '$name' THEN 'partner'
+                WHEN r.staffID = $staffID AND r.status = 'Accepted' THEN 'affiliate'
+            END AS role
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
-        WHERE b.staffID = $staffID
+        LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'  -- Only affiliates with 'Accepted' status
+        WHERE b.staffID = $staffID  -- Staff is the creator
+           OR t.presales1 = '$name' OR t.presales2 = '$name' OR t.presales3 = '$name' OR t.presales4 = '$name'  -- Staff is a partner
+           OR (r.staffID = $staffID AND r.status = 'Accepted')  -- Staff is an affiliate with 'Accepted' status
     ");
 
-    // Fetch all rows as an associative array
-    $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+  // Fetch all rows as an associative array
+  $bids = $stmt->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
-    // Handle any errors
-    echo "Error: " . $e->getMessage();
+  // Handle any errors
+  echo "Error: " . $e->getMessage();
 }
 
 try {
-    // Assuming you have the staffID from the URL
-    $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : 0;
+  // Get the staff member's name
+  $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : 0;
+  $stmt = $conn->prepare("SELECT name FROM user WHERE staffID = ?");
+  $stmt->bind_param("i", $staffID);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-    // Query to get the staff member's name
-    $stmt = $conn->prepare("SELECT name FROM user WHERE staffID = ?");
-    $stmt->bind_param("i", $staffID);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Fetch the staff member's name
-    $staffName = $result->fetch_assoc()['name'] ?? 'Staff Member';
+  // Fetch the staff member's name
+  $staffName = $result->fetch_assoc()['name'] ?? 'Staff Member';
 } catch (Exception $e) {
-    // Handle any errors
-    echo "Error: " . $e->getMessage();
+  // Handle any errors
+  echo "Error: " . $e->getMessage();
 }
 ?>
+
+
+
+
 
 
 <head>
@@ -382,7 +394,7 @@ try {
 
   <main id="main" class="main">
     <div class="pagetitle">
-    <h1><?php echo htmlspecialchars($staffName); ?>'s Bids</h1>
+      <h1><?php echo htmlspecialchars($staffName); ?>'s Bids</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -459,7 +471,14 @@ try {
                     <?php foreach ($bids as $bid): ?>
                       <tr>
                         <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
-                        <td><?php echo htmlspecialchars($bid['CustName']); ?></td>
+                        <td>
+                          <?php echo htmlspecialchars($bid['CustName']); ?>
+                          <?php if ($bid['role'] == 'partner'): ?>
+                            <span class="badge bg-info">Partner</span>
+                          <?php elseif ($bid['role'] == 'affiliate'): ?>
+                            <span class="badge bg-warning">Sub-Presales</span>
+                          <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                         <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
                         <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
@@ -1270,10 +1289,10 @@ try {
       });
     });
 
-     $.fn.dataTable.ext.errMode = 'throw';
+    $.fn.dataTable.ext.errMode = 'throw';
   </script>
 
-<script>
+  <script>
     document.getElementById("updateBusinessUnit").addEventListener("change", function() {
       const businessUnit = this.value;
       const accountSector = document.getElementById("updateAccountSector");
