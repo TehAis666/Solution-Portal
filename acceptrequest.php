@@ -1,31 +1,48 @@
 <?php include_once 'controller/handler/session.php'; ?>
 
-
-<!DOCTYPE html>
-<html lang="en">
-
-
-
 <?php
 // Include the database connection file
 include_once 'db/db.php';
-$managerID = $_SESSION['user_id']; // Assuming the manager is logged in and has their session stored
+
+// Retrieve the current session staffID
+$staffID = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+// Check if staffID is correctly retrieved from session
+if ($staffID === null) {
+    echo "<script>console.log('Error: Session user_id is not set or is null.');</script>";
+} else {
+    echo "<script>console.log('Session Staff ID Retrieved: " . $staffID . "');</script>";
+}
 
 try {
-    // Fetch the requests for this manager
+    // Fetch all requests made by the session user for their own bids along with CustName and Tender_Proposal
     $stmt = $conn->prepare("
-        SELECT u.name, u.email, u.phonenum, u.request_status, u.staffID
+        SELECT u.name, u.email, u.phonenum, u.staffID, r.requestID, r.BidID, r.status,
+               b.CustName, b.Tender_Proposal
         FROM user u
-        WHERE u.request = ?
+        JOIN requestbids r ON u.staffID = r.staffID
+        JOIN bids b ON r.BidID = b.BidID
+        WHERE b.staffID = ?
     ");
-    $stmt->bind_param("s", $managerID);
+
+    // Bind the parameter for session staffID
+    $stmt->bind_param("i", $staffID);  // Only binding the staffID now, no status filter
     $stmt->execute();
+
+    // Fetch the results as an associative array
     $users = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 } catch (Exception $e) {
     // Handle any errors
     echo "Error: " . $e->getMessage();
 }
 ?>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+</html>
 
 <head>
     <meta charset="utf-8" />
@@ -361,7 +378,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Find Team</h1>
+            <h1>Accept Affiliate</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -378,7 +395,7 @@ try {
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Manager List</h5>
+                        <h5 class="card-title">Presales List</h5>
                         <!-- New Table with stripped rows -->
                         <table id="example" class="table table-striped" style="width:100%">
                             <thead>
@@ -386,36 +403,36 @@ try {
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th style="text-align:center">Phone Number</th>
+                                    <th style="text-align:center">Bid Request</th>
+                                    <th style="text-align:center">Bid Proposal</th>
                                     <th style="text-align:center">Request Status</th>
                                     <th style="text-align:center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                            <?php if (!empty($users)): ?>
-    <?php foreach ($users as $user): ?>
-        <?php if ($user['request_status'] == 'Pending'): // Only show if request_status is 'Pending' ?>
-            <tr>
-                <td><?php echo htmlspecialchars($user['name']); ?></td>
-                <td><?php echo htmlspecialchars($user['email']); ?></td>
-                <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
-                <td style="text-align:center"><?php echo htmlspecialchars($user['request_status']); ?></td>
-                <td style="text-align:center">
-                    <!-- Accept and Reject buttons -->
-                    <button type="button" class="btn btn-success acceptbtn" data-user-id="<?php echo $user['staffID']; ?>">Accept</button>
-                    <button type="button" class="btn btn-danger rejectbtn" data-user-id="<?php echo $user['staffID']; ?>">Reject</button>
-                </td>
-            </tr>
-        <?php endif; ?>
-    <?php endforeach; ?>
-<?php else: ?>
-    <tr>
-        <td colspan="5">No pending requests found.</td>
-    </tr>
-<?php endif; ?>
-
+                                <?php if (!empty($users)): ?>
+                                    <?php foreach ($users as $user): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($user['name']); ?></td>
+                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
+                                            <td style="text-align:center"><?php echo htmlspecialchars($user['CustName']); ?></td>
+                                            <td style="text-align:center"><?php echo htmlspecialchars($user['Tender_Proposal']); ?></td>
+                                            <td style="text-align:center"><?php echo htmlspecialchars($user['status']); ?></td>
+                                            <td style="text-align:center">
+                                                <!-- Accept and Reject buttons -->
+                                                <button type="button" class="btn btn-success acceptbtn" data-user-id="<?php echo $user['staffID']; ?>">Accept</button>
+                                                <button type="button" class="btn btn-danger rejectbtn" data-user-id="<?php echo $user['staffID']; ?>">Reject</button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5">No pending requests found.</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
-
                     </div>
                 </div>
             </div>
@@ -462,54 +479,53 @@ try {
     </script>
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Accept button logic
-    document.querySelectorAll('.acceptbtn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userID = this.getAttribute('data-user-id');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Accept button logic
+            document.querySelectorAll('.acceptbtn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userID = this.getAttribute('data-user-id');
 
-            // Send an AJAX POST request to accept the request
-            fetch('controller/acceptrequest.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `userID=${userID}&action=accept`,
-                })
-                .then(response => response.text())
-                .then(data => {
-                    // Handle successful acceptance
-                    console.log(data);
-                    this.closest('tr').querySelector('td:nth-child(4)').textContent = 'Accepted';
-                })
-                .catch(error => console.error('Error:', error));
+                    // Send an AJAX POST request to accept the request
+                    fetch('controller/acceptrequest.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `userID=${userID}&action=accept`,
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            // Handle successful acceptance
+                            console.log(data);
+                            this.closest('tr').querySelector('td:nth-child(6)').textContent = 'Accepted';
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            });
+
+            // Reject button logic
+            document.querySelectorAll('.rejectbtn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userID = this.getAttribute('data-user-id');
+
+                    // Send an AJAX POST request to reject the request
+                    fetch('controller/acceptrequest.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `userID=${userID}&action=reject`,
+                        })
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log(data); // Optional: Check response from the server
+                            // Optionally, update the UI to reflect the change
+                            this.closest('tr').querySelector('td:nth-child(6)').textContent = 'Rejected';
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            });
         });
-    });
-
-    // Reject button logic
-    document.querySelectorAll('.rejectbtn').forEach(button => {
-        button.addEventListener('click', function() {
-            const userID = this.getAttribute('data-user-id');
-
-            // Send an AJAX POST request to reject the request
-            fetch('controller/acceptrequest.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `userID=${userID}&action=reject`,
-                })
-                .then(response => response.text())
-                .then(data => {
-                    console.log(data); // Optional: Check response from the server
-                    // Optionally, update the UI to reflect the change
-                    this.closest('tr').querySelector('td:nth-child(4)').textContent = 'Rejected';
-                })
-                .catch(error => console.error('Error:', error));
-        });
-    });
-});
-
     </script>
 
 

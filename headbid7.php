@@ -40,7 +40,7 @@ try {
                 ) > 1 
                 AND b.staffID NOT IN (SELECT staffID FROM user WHERE sector = '$sector') THEN 1
                 ELSE 0
-            END AS showTag
+            END AS showtag
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
         LEFT JOIN user u ON b.staffID = u.staffID
@@ -517,7 +517,7 @@ try {
                                                     echo $bid['StaffName'] ? htmlspecialchars($bid['StaffName']) : 'null';
 
                                                     // Check if the showTag is set to 1, indicating multiple solutions
-                                                    if ($bid['showTag'] == 1) {
+                                                    if ($bid['showtag'] == 1) {
                                                         echo ' <span class="badge bg-warning">Multiple Solutions</span>';
                                                     }
                                                     ?>
@@ -547,7 +547,7 @@ try {
                                                     <button type="button" class="btn btn-primary viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
-                                                        data-showTag="<?php echo htmlspecialchars($bid['showTag']); ?>"
+                                                        data-showtag="<?php echo htmlspecialchars($bid['showtag']); ?>"
                                                         data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
                                                         data-hmsscope="<?php echo htmlspecialchars($bid['HMS_Scope']); ?>"
                                                         data-tender="<?php echo htmlspecialchars($bid['Tender_Proposal']); ?>"
@@ -1257,7 +1257,7 @@ try {
                 var presales4 = $(this).data('presales4');
 
                 // Fetch user role
-                var showTag = $(this).data('showTag'); // Get user role from data attribute
+                var showtag = $(this).data('showtag'); // Get user role from data attribute
 
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
@@ -1347,10 +1347,10 @@ try {
                 // Populate the staff dropdown with the selected staff name and ID
                 $('#updateStaff').val(staffID); // Set hidden field for staff ID
                 $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
-                console.log("showtag num", showTag);
+                console.log("showtag num", showtag);
 
                 
-                if (showTag === '1') {
+                if (showtag == '0') {
                     $('.edit-btn').show(); // Show Edit button
                 } else {
                     $('.edit-btn').hide(); // Hide Edit button

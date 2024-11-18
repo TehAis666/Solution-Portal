@@ -1,44 +1,68 @@
 <?php include_once 'controller/handler/session.php'; ?>
 
 
-<!DOCTYPE html>
-<html lang="en">
-
 <?php
 // Include the database connection file
 include_once 'db/db.php';
 
 try {
-    $staffID = $_SESSION['user_id'];
-    $name = $_SESSION['user_name'];
+    // Assuming sector and staff ID are stored in the session
+    $sector = $_SESSION['user_sector'];
+    $staffID = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    $userName = $_SESSION['user_name'];
+    // Check if staffID is correctly retrieved from session
+    if ($staffID === null) {
+        echo "<script>console.log('Error: Session user_id is not set or is null.');</script>";
+    } else {
+        echo "<script>console.log('Session Staff ID Retrieved: " . $staffID . "');</script>";
+    }
 
-    // Query to fetch bids along with staff and affiliate names
-    $stmt = $conn->query("
-    SELECT 
-        b.*, 
-        t.*, 
-        u.name AS StaffName,  -- Staff name from the user table
-        GROUP_CONCAT(DISTINCT ra.name ORDER BY ra.name SEPARATOR ', ') AS AffiliateName,  -- Concatenate affiliate names without duplicates
-        (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
-        CASE 
-            WHEN b.staffID = $staffID THEN 'creator' 
-            WHEN '$name' IN (t.presales1, t.presales2, t.presales3, t.presales4) THEN 'partner'
-            WHEN r.status = 'Accepted' THEN 'affiliate'  -- Only include affiliates with 'Accepted' status
-        END AS role 
-    FROM bids b
-    JOIN tender t ON b.BidID = t.BidID
-    JOIN user u ON u.staffID = b.staffID  -- Get the creator's name
-    LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'  -- Only include affiliates with 'Accepted' status
-    LEFT JOIN user ra ON ra.staffID = r.staffID  -- Get affiliate's name if they are accepted
-    WHERE b.staffID = $staffID  -- Include bids created by the user (creator)
-        OR r.staffID = $staffID AND r.status = 'Accepted'  -- Include bids where the user is an affiliate with 'Accepted' status
-        OR '$name' IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Include bids where the user is a partner
-    GROUP BY b.BidID, t.TenderID, u.name, r.status  -- Group by BidID to ensure unique rows
-");
+    // Map sectors to the correct solution columns
+    $solutionColumns = [
+        'AwanHeiTech' => 'Solution1',
+        'PaduNet' => 'Solution2',
+        'Secure-X' => 'Solution3',
+        'i-Sentrix' => 'Solution4',
+    ];
 
+    // Get the solution column for the user's sector
+    $solutionColumn = $solutionColumns[$sector] ?? null;
 
-    // Fetch all rows as an associative array
-    $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+    if ($solutionColumn) {
+        // Construct SQL query to retrieve bids, staff names, role tags (creator, partner, affiliate), and other details
+        $sql = "
+            SELECT 
+                b.*, 
+                t.*, 
+                u.staffID, 
+                u.name AS StaffName,
+                (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
+                CASE 
+                    WHEN b.staffID = ? THEN 'creator'
+                    WHEN ? IN (t.Presales1, t.Presales2, t.Presales3, t.Presales4) THEN 'partner'
+                    WHEN rb.requestID IS NOT NULL THEN 'affiliate' -- User is affiliated with the bid
+                    ELSE 'others'
+                END AS role
+            FROM bids b
+            JOIN tender t ON b.BidID = t.BidID
+            LEFT JOIN user u ON b.staffID = u.staffID
+            LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? -- Check if session user is affiliated
+            WHERE 
+                (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
+                OR 
+                (b.staffID IN (SELECT staffID FROM user WHERE sector = ?))
+        ";
+
+        // Prepare and execute the SQL statement
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("isss", $staffID, $userName, $staffID, $sector);
+        $stmt->execute();
+
+        // Fetch the bid data as an associative array
+        $bids = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    } else {
+        echo "Invalid sector.";
+    }
 
     // Fetching staff names
     $staffNames = [];
@@ -70,6 +94,12 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -405,7 +435,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>User Bid</h1>
+            <h1><?php echo $sector; ?> Bid</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
@@ -464,13 +494,12 @@ try {
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Bids List</h5>
-                            <!-- New Table with stripped rows -->
+                            <!-- Table to display only the BidID based on the sector's solution -->
                             <table id="example" class="table table-striped" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Creator</th> <!-- New column for Staff Name -->
-                                        <th>Affiliate</th> <!-- New column for Staff Name -->
+                                        <th>Staff Name</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>
                                         <th>Request Value (RM)</th>
@@ -484,21 +513,18 @@ try {
                                         <?php foreach ($bids as $bid): ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
-                                                <td>
-                                                    <?php
-                                                    // Display staff name or 'null' if no staff
-                                                    echo $bid['StaffName'] ? htmlspecialchars($bid['StaffName']) : 'null';
-                                                    ?>
-                                                </td>
-                                                <td>
-                                                    <?php echo htmlspecialchars($bid['AffiliateName'] ?? 'N/A'); ?> <!-- Display all affiliate names in one cell -->
-                                                </td>
+                                                <td><?php echo $bid['StaffName'] ? htmlspecialchars($bid['StaffName']) : 'null'; ?></td> <!-- Display staff name, or 'null' if no staff -->
                                                 <td>
                                                     <?php echo htmlspecialchars($bid['CustName']); ?>
-                                                    <?php if ($bid['role'] == 'partner'): ?>
-                                                        <span class="badge bg-info">Partner</span>
-                                                    <?php elseif ($bid['role'] == 'affiliate'): ?>
-                                                        <span class="badge bg-warning">Affiliate</span>
+                                                    <?php
+                                                    if ($bid['role'] == 'creator'): ?>
+                                                        <span class="badge bg-primary">Creator</span>
+                                                    <?php elseif ($bid['role'] == 'partner'): ?>
+                                                        <span class="badge bg-success">Partner</span>
+                                                        <?php elseif ($bid['role'] == 'affiliate'): ?>
+                                                            <span class="badge bg-warning">Affiliate</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary">Others</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
@@ -519,6 +545,7 @@ try {
                                                     ?>
                                                 </td>
                                                 <td>
+                                                    <!-- View Button with Data Attributes for Each Bid -->
                                                     <button type="button" class="btn btn-primary viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-role="<?php echo htmlspecialchars($bid['role']); ?>"
@@ -551,8 +578,8 @@ try {
                                                         data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
                                                         data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
                                                         data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>"
-                                                        data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"
-                                                        data-affiliatename="<?php echo htmlspecialchars($bid['AffiliateName'] ?? 'N/A'); ?>"> <!-- StaffName -->
+                                                        data-staffid="<?php echo htmlspecialchars($bid['staffID']); ?>"
+                                                        data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"> <!-- StaffName -->
                                                         View
                                                     </button>
                                                 </td>
@@ -560,17 +587,17 @@ try {
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="6">No bids found</td>
+                                            <td colspan="8">No bids found</td> <!-- Updated column span to 8 -->
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
 
-
                         </div>
                     </div>
                 </div>
             </div>
+
         </section>
         <!-- End Data Table -->
 
@@ -584,14 +611,8 @@ try {
                     </div>
                     <div class="modal-body">
                         <div class="container">
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Presales:</strong></div>
-                                <div class="col-sm-8" id="modalStaffName">-</div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Affiliate:</strong></div>
-                                <div class="col-sm-8" id="modalAffiliateName">-</div>
-                            </div>
+                            <input type="hidden" name="BidID" id="modalBidID">
+                            <input type="hidden" name="StaffID" id="modalstaffID"> <!-- Hidden StaffID -->
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Company/Agency Name:</strong></div>
                                 <div class="col-sm-8" id="modalCustName">-</div>
@@ -701,6 +722,7 @@ try {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
+                        <button type="button" class="btn btn-primary" id="requestBtn">Request Edit</button>
                     </div>
                 </div>
             </div>
@@ -719,23 +741,26 @@ try {
                         <form id="updateBidForm">
                             <input type="hidden" name="BidID" id="updateBidID">
                             <input type="hidden" name="TenderID" id="updateTenderID">
+                            <input type="hidden" name="StaffID" id="updateStaffID"> <!-- Hidden StaffID -->
+
                             <div class="container">
                                 <!-- First Slide -->
                                 <div id="firstSlide">
-                                    <!-- Owner && Affiliate -->
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="updateStaffName" class="form-label"><strong>Owner</strong></label>
-                                            <input type="text" id="updateStaffName" class="form-control" name="StaffName">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <label for="updateAffiliateName" class="form-label"><strong>Affiliate</strong></label>
-                                            <input type="text" id="updateAffiliateName" class="form-control" name="AffiliateName">
-                                        </div>
-                                    </div>
                                     <!-- Existing fields -->
+
+                                    <!-- Staff Section (Dropdown for StaffName) -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
+                                            <select id="updateStaffName" class="form-select" name="StaffID">
+                                                <?php foreach ($staffNames as $staffID => $name): ?>
+                                                    <option value="<?php echo htmlspecialchars($staffID); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Company Name & HMS Scope -->
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="updateCustName" class="form-label"><strong>Company/Agency Name:</strong></label>
@@ -746,6 +771,7 @@ try {
                                             <input type="text" id="updateHMSScope" class="form-control" name="HMS_Scope">
                                         </div>
                                     </div>
+
                                     <!-- Tender Proposal -->
                                     <div class="row mb-3">
                                         <div class="col-md-12">
@@ -1143,7 +1169,7 @@ try {
 
                 // Loop through all rows and update counts
                 $(allRows).each(function() {
-                    const statusElement = $(this).find('td:nth-child(8) .badge');
+                    const statusElement = $(this).find('td:nth-child(7) .badge');
                     if (statusElement.length > 0) {
                         const status = statusElement.text().trim();
                         totalBids++; // Count every row as a bid
@@ -1172,10 +1198,10 @@ try {
 
                 if (status === 'all') {
                     // Show all rows if 'Total Bids' is clicked
-                    table.column(7).search('').draw();
+                    table.column(6).search('').draw();
                 } else {
                     // Filter by the specific status
-                    table.column(7).search(status).draw();
+                    table.column(6).search(status).draw();
                 }
             }
 
@@ -1212,7 +1238,6 @@ try {
             // Handle View Button Click
             $(document).on('click', '.viewbtn', function() {
                 // Fetch data attributes
-                var custName = $(this).data('updatedate');
                 var custName = $(this).data('custname');
                 var hmsScope = $(this).data('hmsscope');
                 var tenderProposal = $(this).data('tender');
@@ -1231,11 +1256,6 @@ try {
                 var presales3 = $(this).data('presales3');
                 var presales4 = $(this).data('presales4');
 
-                // Fetch user role
-                var role = $(this).data('role'); // Get user role from data attribute
-                var staffName = $(this).data('staffname');
-                var affiliateName = $(this).data('affiliatename');
-
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
                 var value1 = $(this).data('value1');
@@ -1249,6 +1269,12 @@ try {
                 var remarks = $(this).data('remarks');
                 var bidID = $(this).data('bidid');
                 var tenderID = $(this).data('tenderid');
+
+                // Fetch the staff ID and name
+                var staffID = $(this).data('staffid');
+                var staffName = $(this).data('staffname');
+
+                var role = $(this).data('role'); // Get user role from data attribute
 
                 // Populate the View Modal
                 $('#modalCustName').text(custName);
@@ -1269,9 +1295,6 @@ try {
                 $('#modalPresales3').text(presales3);
                 $('#modalPresales4').text(presales4);
 
-                $('#modalStaffName').text(staffName); // Set the staff name for display in the dropdown
-                $('#modalAffiliateName').text(affiliateName);
-
                 $('#modalRequestDate').text(requestDate);
                 $('#modalSubmissionDate').text(submissionDate);
                 $('#modalValue1').text(value1);
@@ -1283,6 +1306,12 @@ try {
                 $('#modalStatus').html(getStatusBadge(status));
                 $('#modalTenderStatus').text(tenderStatus);
                 $('#modalRemarks').text(remarks);
+
+                // Populate the staff dropdown with the selected staff name and ID
+                $('#modalStaffName').text(staffName); // Set the staff name for display in the dropdown
+
+                $('#modalBidID').text(bidID);
+                $('#modalstaffID').text(staffID);
 
                 // Populate the Update Form in Edit Modal
                 $('#updateCustName').val(custName);
@@ -1316,16 +1345,25 @@ try {
                 $('#updateBidID').val(bidID);
                 $('#updateTenderID').val(tenderID);
 
-                $('#updateStaffName').val(staffName); // Set the staff name for display in the dropdown
-                $('#updateAffiliateName').val(affiliateName); // Set the staff name for display in the dropdown
-
-
+                // Populate the staff dropdown with the selected staff name and ID
+                $('#updateStaff').val(staffID); // Set hidden field for staff ID
+                $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
                 console.log("role num", role);
+
+                if (role === 'creator' || role === 'affiliate' || role === 'partner') {
+                    $('.edit-btn').show(); // Show Edit button
+                    $('#requestBtn').hide(); // Hide Request Edit button
+                } else if (role === 'others') {
+                    $('.edit-btn').hide(); // Hide Edit button
+                    $('#requestBtn').show(); // Show Request Edit button
+                } else {
+                    $('.edit-btn').hide(); // Hide Edit button for other roles
+                    $('#requestBtn').hide(); // Hide Request Edit button for other roles
+                }
 
                 // Show the View Modal
                 $('#viewbids').modal('show');
             });
-
 
             // Function to return HTML for status badges
             function getStatusBadge(status) {
@@ -1353,7 +1391,7 @@ try {
                 // alert('Form Data: ' + formData); // Display all serialized form data in alert
 
                 $.ajax({
-                    url: 'controller/updateuserbidcont.php',
+                    url: 'controller/updatebidcont.php',
                     type: 'POST',
                     data: formData,
                     success: function(response) {
@@ -1368,8 +1406,35 @@ try {
                 });
             });
         });
+        console.log('Presales2 Value:', $('#updatePresales2').val());
 
         $.fn.dataTable.ext.errMode = 'throw';
+    </script>
+
+    <script>
+        // Now, pass the PHP session variable to JavaScript
+        $('#requestBtn').click(function() {
+            var bidID = $('#modalBidID').text(); // Get bidID from modal or relevant element
+            console.log('Bid ID:', bidID); // Debug: Log BidID
+
+            $.ajax({
+                url: 'controller/requestbidcont', // Adjust to your controller path
+                type: 'POST',
+                data: {
+                    bidID: bidID
+                }, // Send only bidID
+                success: function(response) {
+                    console.log('Response from server:', response); // Log server response
+                    alert('Request submitted successfully!');
+                    $('#viewbids').modal('hide'); // Hide modal after successful request
+                    location.reload(); // Reload page to reflect changes
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error:', error); // Log errors for debugging
+                    alert('Failed to submit request. Please try again.');
+                }
+            });
+        });
     </script>
 
     <script>
@@ -1404,6 +1469,7 @@ try {
             });
         });
     </script>
+
 
     <!-- DarkMode Toggle -->
     <script>

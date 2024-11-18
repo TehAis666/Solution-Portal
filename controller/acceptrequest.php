@@ -1,50 +1,38 @@
 <?php
-// Start the session
-session_start();
 
-// Include your database connection file
-include '../db/db.php';
+// Include the database connection file
+include_once '../db/db.php';
 
-// Check if the request method is POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get the manager's staffID from the session
-    if (isset($_SESSION['user_id'])) {
-        $managerID = $_SESSION['user_id']; // This is the current logged-in manager
-    } else {
-        die("Error: Manager is not logged in.");
-    }
-
-    // Get the user ID of the person who applied and the action (accept or reject)
-    $userID = $_POST['userID'];
+// Check if the request method is POST and necessary data is provided
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['action'])) {
+    $userID = intval($_POST['userID']);
     $action = $_POST['action'];
 
-    // Determine the request status based on the action
-    if ($action == 'accept') {
-        $request_status = 'Accepted';
-        // Update the applied person's managerID with the current manager's ID
-        $sql_update = "UPDATE user SET request_status = ?, managerID = ? WHERE staffID = ?";
-        $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param("sss", $request_status, $managerID, $userID);
-    } elseif ($action == 'reject') {
-        $request_status = 'Rejected';
-        // Update the request_status for rejection
-        $sql_update = "UPDATE user SET request_status = ? WHERE staffID = ?";
-        $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param("ss", $request_status, $userID);
-    } else {
-        die("Invalid action.");
+    // Validate the action is either 'accept' or 'reject'
+    if (!in_array($action, ['accept', 'reject'])) {
+        echo "Invalid action.";
+        exit;
     }
 
-    // Execute the update and check for success
-    if ($stmt_update->execute()) {
-        echo "Request status updated successfully.";
-    } else {
-        die("Error updating request status: " . $stmt_update->error);
-    }
+    // Determine the new status based on the action
+    $newStatus = ($action === 'accept') ? 'Accepted' : 'Rejected';
 
-    // Close the statement and connection
-    $stmt_update->close();
-    $conn->close();
+    try {
+        // Prepare the SQL statement to update the status
+        $stmt = $conn->prepare("UPDATE requestbids SET status = ? WHERE staffID = ?");
+        $stmt->bind_param("si", $newStatus, $userID);
+
+        if ($stmt->execute()) {
+            echo "Request successfully $newStatus.";
+        } else {
+            echo "Error updating request status.";
+        }
+
+        $stmt->close();
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    }
 } else {
-    echo "No POST data received.";
+    echo "Invalid request.";
 }
+?>

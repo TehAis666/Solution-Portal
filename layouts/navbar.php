@@ -121,24 +121,6 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'head'): // Only Head Presales
         ?>
           <li>
-            <a href="headbid5">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V5</span>
-            </a>
-          </li>
-        <?php endif; ?>
-
-        <?php if ($role == 'head'): // Only Head Presales
-        ?>
-          <li>
-            <a href="headbid6">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V6</span>
-            </a>
-          </li>
-        <?php endif; ?>
-
-        <?php if ($role == 'head'): // Only Head Presales
-        ?>
-          <li>
             <a href="headbid7">
               <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid V7</span>
             </a>
@@ -148,7 +130,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales'): // Only Presales
         ?>
           <li>
-            <a href="sectorbid">
+            <a href="sectorbid2">
               <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
