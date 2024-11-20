@@ -442,7 +442,7 @@ try {
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
-                                        <th>Department</th>
+                                        <th>Sector</th>
                                         <th>Phone Number</th>
                                         <th>Request Status</th>
                                         <th>Action</th>

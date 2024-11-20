@@ -730,7 +730,7 @@ try {
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
-                        <button type="button" class="btn btn-primary" id="requestBtn">Request Edit</button>
+                        <button type="button" class="btn btn-primary" id="requestBtn">Request Access</button>
                     </div>
                 </div>
             </div>
@@ -1425,6 +1425,7 @@ try {
         $.fn.dataTable.ext.errMode = 'throw';
     </script>
 
+<!-- Request Access -->
     <script>
         // Now, pass the PHP session variable to JavaScript
         $('#requestBtn').click(function() {
@@ -1451,6 +1452,7 @@ try {
         });
     </script>
 
+<!-- Business Unit -->
     <script>
         document.getElementById("updateBusinessUnit").addEventListener("change", function() {
             const businessUnit = this.value;

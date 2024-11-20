@@ -387,7 +387,7 @@ try {
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Accept Affiliate</h1>
+            <h1>Bid Access Control</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>

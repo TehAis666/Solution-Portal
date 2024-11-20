@@ -518,7 +518,7 @@ try {
 
                                                     // Check if the showTag is set to 1, indicating multiple solutions
                                                     if ($bid['showtag'] == 1) {
-                                                        echo ' <span class="badge bg-warning">Multiple Solutions</span>';
+                                                        echo ' <span class="badge bg-dark">Multiple Solutions</span>';
                                                     }
                                                     ?>
                                                 </td>

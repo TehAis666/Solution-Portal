@@ -53,6 +53,24 @@ try {
 
   $stmt = $conn->query($query);
   $bids = $stmt->fetch_all(MYSQLI_ASSOC);
+
+  // Prepare an array for presales names by sector
+  $presalesBySector = [
+    'AwanHeiTech' => [],
+    'PaduNet' => [],
+    'Secure-X' => [],
+    'i-Sentrix' => []
+  ];
+
+  // Query to retrieve presales staff names by sector
+  $presalesStmt = $conn->query("SELECT name, sector FROM user");
+
+  // Populate the presales array with names organized by sector
+  while ($row = $presalesStmt->fetch_assoc()) {
+    if (isset($presalesBySector[$row['sector']])) {
+      $presalesBySector[$row['sector']][] = $row['name'];
+    }
+  }
 } catch (Exception $e) {
   echo "Error: " . $e->getMessage();
 }
@@ -873,7 +891,11 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
-                      <input type="text" id="updatePresales1" class="form-control" name="Presales1">
+                      <select id="updatePresales1" class="form-control" name="Presales1">
+                        <?php foreach ($presalesBySector['AwanHeiTech'] as $name): ?>
+                          <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue1" class="form-label"><strong>Value (RM):</strong></label>
@@ -890,7 +912,11 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
-                      <input type="text" id="updatePresales2" class="form-control" name="Presales2">
+                      <select id="updatePresales2" class="form-control" name="Presales2">
+                        <?php foreach ($presalesBySector['PaduNet'] as $name): ?>
+                          <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue2" class="form-label"><strong>Value (RM):</strong></label>
@@ -907,7 +933,11 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
-                      <input type="text" id="updatePresales3" class="form-control" name="Presales3">
+                      <select id="updatePresales3" class="form-control" name="Presales3">
+                        <?php foreach ($presalesBySector['Secure-X'] as $name): ?>
+                          <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue3" class="form-label"><strong>Value (RM):</strong></label>
@@ -924,13 +954,18 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
-                      <input type="text" id="updatePresales4" class="form-control" name="Presales4">
+                      <select id="updatePresales4" class="form-control" name="Presales4">
+                        <?php foreach ($presalesBySector['i-Sentrix'] as $name): ?>
+                          <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
+                        <?php endforeach; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue4" class="form-label"><strong>Value (RM):</strong></label>
                       <input type="number" step="0.01" id="updateValue4" class="form-control" name="Value4">
                     </div>
                   </div>
+
                   <div class="row mb-3">
                     <div class="col-md-6">
                       <label for="updateTotalValue" class="form-label"><strong>Total Request Value (RM):</strong></label>
@@ -1111,121 +1146,129 @@ try {
 
   <!-- DataTable Script Initialization -->
   <script>
-$(document).ready(function() {
-  // Initialize DataTable
-  const table = $('#example').DataTable({
-    paging: true,
-    searching: true,
-    info: true,
-    lengthChange: true,
-  });
+    $(document).ready(function() {
+      // Initialize DataTable
+      const table = $('#example').DataTable({
+        paging: true,
+        searching: true,
+        info: true,
+        lengthChange: true,
+      });
 
-  // Solution Mapping for Display Names
-  const solutionMapping = {
-    'Solution1': 'AwanHeiTech',
-    'Solution2': 'PaduNet',
-    'Solution3': 'Secure-X',
-    'Solution4': 'i-Sentrix'
-  };
+      // Solution Mapping for Display Names
+      const solutionMapping = {
+        'Solution1': 'AwanHeiTech',
+        'Solution2': 'PaduNet',
+        'Solution3': 'Secure-X',
+        'Solution4': 'i-Sentrix'
+      };
 
-  // Variables to store the initial counts
-  let initialTotalBids = 0, initialTotalNewRequest = 0, initialTotalSubmitted = 0, initialTotalDropped = 0;
+      // Variables to store the initial counts
+      let initialTotalBids = 0,
+        initialTotalNewRequest = 0,
+        initialTotalSubmitted = 0,
+        initialTotalDropped = 0;
 
-  // Function to calculate initial dashboard counts based on all data
-  function calculateInitialDashboard() {
-    const allRows = table.rows().nodes(); // All rows regardless of filter
+      // Function to calculate initial dashboard counts based on all data
+      function calculateInitialDashboard() {
+        const allRows = table.rows().nodes(); // All rows regardless of filter
 
-    $(allRows).each(function() {
-      const statusElement = $(this).find('td:nth-child(7) .badge');
-      if (statusElement.length > 0) {
-        const status = statusElement.text().trim();
-        initialTotalBids++;
-        if (status === 'WIP') initialTotalNewRequest++;
-        else if (status === 'Submitted') initialTotalSubmitted++;
-        else if (status === 'Dropped') initialTotalDropped++;
+        $(allRows).each(function() {
+          const statusElement = $(this).find('td:nth-child(7) .badge');
+          if (statusElement.length > 0) {
+            const status = statusElement.text().trim();
+            initialTotalBids++;
+            if (status === 'WIP') initialTotalNewRequest++;
+            else if (status === 'Submitted') initialTotalSubmitted++;
+            else if (status === 'Dropped') initialTotalDropped++;
+          }
+        });
+
+        // Set initial counts in dashboard
+        document.querySelector('.total-bids').textContent = initialTotalBids;
+        document.querySelector('.total-new-request').textContent = initialTotalNewRequest;
+        document.querySelector('.total-submitted').textContent = initialTotalSubmitted;
+        document.querySelector('.total-dropped').textContent = initialTotalDropped;
       }
-    });
 
-    // Set initial counts in dashboard
-    document.querySelector('.total-bids').textContent = initialTotalBids;
-    document.querySelector('.total-new-request').textContent = initialTotalNewRequest;
-    document.querySelector('.total-submitted').textContent = initialTotalSubmitted;
-    document.querySelector('.total-dropped').textContent = initialTotalDropped;
-  }
+      // Function to calculate dashboard counts based on the current filtered view
+      function calculateFilteredDashboard() {
+        const filteredRows = table.rows({
+          filter: 'applied'
+        }).nodes();
 
-  // Function to calculate dashboard counts based on the current filtered view
-  function calculateFilteredDashboard() {
-    const filteredRows = table.rows({ filter: 'applied' }).nodes();
+        let totalBids = 0,
+          totalNewRequest = 0,
+          totalSubmitted = 0,
+          totalDropped = 0;
 
-    let totalBids = 0, totalNewRequest = 0, totalSubmitted = 0, totalDropped = 0;
+        $(filteredRows).each(function() {
+          const statusElement = $(this).find('td:nth-child(7) .badge');
+          if (statusElement.length > 0) {
+            const status = statusElement.text().trim();
+            totalBids++;
+            if (status === 'WIP') totalNewRequest++;
+            else if (status === 'Submitted') totalSubmitted++;
+            else if (status === 'Dropped') totalDropped++;
+          }
+        });
 
-    $(filteredRows).each(function() {
-      const statusElement = $(this).find('td:nth-child(7) .badge');
-      if (statusElement.length > 0) {
-        const status = statusElement.text().trim();
-        totalBids++;
-        if (status === 'WIP') totalNewRequest++;
-        else if (status === 'Submitted') totalSubmitted++;
-        else if (status === 'Dropped') totalDropped++;
+        // Update the filtered counts in the dashboard display
+        document.querySelector('.total-bids').textContent = totalBids;
+        document.querySelector('.total-new-request').textContent = totalNewRequest;
+        document.querySelector('.total-submitted').textContent = totalSubmitted;
+        document.querySelector('.total-dropped').textContent = totalDropped;
       }
+
+      // Function to filter by status without changing dashboard counts
+      function filterByStatus(status) {
+        table.search('');
+        status === 'all' ? table.column(6).search('').draw() : table.column(6).search(status).draw();
+      }
+
+      // Function to filter by solutions and reset dashboard status filters
+      function filterBySolutions() {
+        // Clear any existing status filters
+        filterByStatus('all');
+
+        const selectedSolutions = $('.solution-checkbox:checked').map(function() {
+          return solutionMapping[$(this).val()];
+        }).get();
+
+        const selectedSolutionDisplay = selectedSolutions.length ? selectedSolutions.join(', ') : 'All Solutions';
+        $('.card-title').text(`${selectedSolutionDisplay}'s Bids`);
+
+        if (!selectedSolutions.length) {
+          table.column(5).search('').draw();
+        } else {
+          const searchQuery = selectedSolutions.join('|');
+          table.column(5).search(searchQuery, true, false).draw();
+        }
+
+        // Recalculate dashboard counts based on the filtered solution data
+        calculateFilteredDashboard();
+      }
+
+      // Toggle all solutions checkboxes
+      function toggleAllSolutions() {
+        const isChecked = $('#allSolutions').is(':checked');
+        $('.solution-checkbox').prop('checked', isChecked);
+        filterBySolutions();
+      }
+
+      // Event listeners for dashboard and solution filtering
+      $('.total-bids').click(() => filterByStatus('all'));
+      $('.total-new-request').click(() => filterByStatus('WIP'));
+      $('.total-submitted').click(() => filterByStatus('Submitted'));
+      $('.total-dropped').click(() => filterByStatus('Dropped'));
+
+      $('.solution-checkbox').on('change', filterBySolutions);
+      $('#allSolutions').on('change', toggleAllSolutions);
+
+      // Calculate initial dashboard counts when document is ready
+      calculateInitialDashboard();
     });
-
-    // Update the filtered counts in the dashboard display
-    document.querySelector('.total-bids').textContent = totalBids;
-    document.querySelector('.total-new-request').textContent = totalNewRequest;
-    document.querySelector('.total-submitted').textContent = totalSubmitted;
-    document.querySelector('.total-dropped').textContent = totalDropped;
-  }
-
-  // Function to filter by status without changing dashboard counts
-  function filterByStatus(status) {
-    table.search('');
-    status === 'all' ? table.column(6).search('').draw() : table.column(6).search(status).draw();
-  }
-
-  // Function to filter by solutions and reset dashboard status filters
-  function filterBySolutions() {
-    // Clear any existing status filters
-    filterByStatus('all');
-
-    const selectedSolutions = $('.solution-checkbox:checked').map(function() {
-      return solutionMapping[$(this).val()];
-    }).get();
-
-    const selectedSolutionDisplay = selectedSolutions.length ? selectedSolutions.join(', ') : 'All Solutions';
-    $('.card-title').text(`${selectedSolutionDisplay}'s Bids`);
-
-    if (!selectedSolutions.length) {
-      table.column(5).search('').draw();
-    } else {
-      const searchQuery = selectedSolutions.join('|');
-      table.column(5).search(searchQuery, true, false).draw();
-    }
-
-    // Recalculate dashboard counts based on the filtered solution data
-    calculateFilteredDashboard(); 
-  }
-
-  // Toggle all solutions checkboxes
-  function toggleAllSolutions() {
-    const isChecked = $('#allSolutions').is(':checked');
-    $('.solution-checkbox').prop('checked', isChecked);
-    filterBySolutions();
-  }
-
-  // Event listeners for dashboard and solution filtering
-  $('.total-bids').click(() => filterByStatus('all'));
-  $('.total-new-request').click(() => filterByStatus('WIP'));
-  $('.total-submitted').click(() => filterByStatus('Submitted'));
-  $('.total-dropped').click(() => filterByStatus('Dropped'));
-
-  $('.solution-checkbox').on('change', filterBySolutions);
-  $('#allSolutions').on('change', toggleAllSolutions);
-
-  // Calculate initial dashboard counts when document is ready
-  calculateInitialDashboard();
-});
-</script>
+  </script>
 
 
   <!-- MODAL Fect Data -->
@@ -1379,7 +1422,7 @@ $(document).ready(function() {
     $.fn.dataTable.ext.errMode = 'throw';
   </script>
 
-<script>
+  <script>
     document.getElementById("updateBusinessUnit").addEventListener("change", function() {
       const businessUnit = this.value;
       const accountSector = document.getElementById("updateAccountSector");

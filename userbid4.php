@@ -18,7 +18,7 @@ try {
         b.*, 
         t.*, 
         u.name AS StaffName,  -- Staff name from the user table
-        GROUP_CONCAT(DISTINCT ra.name ORDER BY ra.name SEPARATOR ', ') AS AffiliateName,  -- Concatenate affiliate names without duplicates
+        GROUP_CONCAT(DISTINCT CONCAT(ra.name, ' (', ra.sector, ')') ORDER BY ra.name SEPARATOR ', ') AS AffiliateName,  -- Concatenate affiliate names with sector
         (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
         CASE 
             WHEN b.staffID = $staffID THEN 'creator' 
@@ -29,12 +29,13 @@ try {
     JOIN tender t ON b.BidID = t.BidID
     JOIN user u ON u.staffID = b.staffID  -- Get the creator's name
     LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'  -- Only include affiliates with 'Accepted' status
-    LEFT JOIN user ra ON ra.staffID = r.staffID  -- Get affiliate's name if they are accepted
+    LEFT JOIN user ra ON ra.staffID = r.staffID  -- Get affiliate's name and sector if they are accepted
     WHERE b.staffID = $staffID  -- Include bids created by the user (creator)
         OR r.staffID = $staffID AND r.status = 'Accepted'  -- Include bids where the user is an affiliate with 'Accepted' status
         OR '$name' IN (t.presales1, t.presales2, t.presales3, t.presales4)  -- Include bids where the user is a partner
     GROUP BY b.BidID, t.TenderID, u.name, r.status  -- Group by BidID to ensure unique rows
-");
+    ");
+
 
 
     // Fetch all rows as an associative array
@@ -59,7 +60,7 @@ try {
     // Query to retrieve presales staff names by sector
     $presalesStmt = $conn->query("SELECT name, sector FROM user");
 
-    
+
     // Populate the presales array with names organized by sector
     while ($row = $presalesStmt->fetch_assoc()) {
         if (isset($presalesBySector[$row['sector']])) {
@@ -492,8 +493,11 @@ try {
                                                     ?>
                                                 </td>
                                                 <td>
-                                                    <?php echo htmlspecialchars($bid['AffiliateName'] ?? 'N/A'); ?> <!-- Display all affiliate names in one cell -->
+                                                    <?php
+                                                    echo $bid['AffiliateName'] ? htmlspecialchars($bid['AffiliateName']) : 'N/A';
+                                                    ?> <!-- Display affiliate names along with their sectors -->
                                                 </td>
+
                                                 <td>
                                                     <?php echo htmlspecialchars($bid['CustName']); ?>
                                                     <?php if ($bid['role'] == 'partner'): ?>
@@ -736,11 +740,11 @@ try {
 
                                     <div class="row mb-3 align-items-center sub-presales-field">
                                         <div class="col-md-4">
-                                            <label  class="form-label"><strong>Sub-Presales:</strong></label>
+                                            <label class="form-label"><strong>Sub-Presales:</strong></label>
                                         </div>
                                         <div class="col-md-8">
                                             <a id="updateAffiliateName" class="form-control-plaintext text-primary">Edit Permission</a>
-                                        </div> 
+                                        </div>
                                     </div>
                                     <!-- Existing fields -->
                                     <div class="row mb-3">
