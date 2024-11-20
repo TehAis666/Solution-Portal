@@ -1,49 +1,36 @@
 <?php
 include_once 'db/db.php'; // Assuming this file sets up the $conn variable
 
-// Get filter inputs from the URL (GET method)
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
-
-// Fetch Bid Types from the `bids` table where Status is 'Submitted'
+// Fetch Bid Types from the `bids` table 
 $sqlBidTypes = "
     SELECT Type, COUNT(*) as type_count 
     FROM bids b
     JOIN tender t ON t.BidID = b.BidID
+    
 ";
 
-// Apply filters based on the selected year, start date, and end date
-if (!empty($year)) {
-    $sqlBidTypes .= " AND YEAR(b.RequestDate) = $year"; // Filter by year
-}
-if (!empty($startDate) && !empty($endDate)) {
-    $sqlBidTypes .= " AND b.RequestDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
-} elseif (!empty($startDate)) {
-    $sqlBidTypes .= " AND b.RequestDate >= '$startDate'"; // Filter from start date
-} elseif (!empty($endDate)) {
-    $sqlBidTypes .= " AND b.RequestDate <= '$endDate'"; // Filter up to end date
-}
-
-$sqlBidTypes .= " GROUP BY Type"; // Group by bid Type
+// Group by bid Type
+$sqlBidTypes .= " GROUP BY Type"; 
 
 $resultBidTypes = $conn->query($sqlBidTypes);
 
-// Initialize an array to hold the counts for bid types
+// Initialize counts for bid types
 $bidTypesCounts = [
     "RFQ" => 0,
     "Tender" => 0,
     "Quotation" => 0,
     "RFP" => 0,
     "RFI" => 0,
-    "Upstream" => 0
+    "Upstream" => 0,
+    "Strategic Proposal" => 0, // New bid type
+    "Strategic Initiative" => 0  // New bid type
 ];
 
 if ($resultBidTypes->num_rows > 0) {
     while ($row = $resultBidTypes->fetch_assoc()) {
         $type = $row['Type'];
         if (array_key_exists($type, $bidTypesCounts)) {
-            $bidTypesCounts[$type] = $row['type_count'];
+            $bidTypesCounts[$type] = (int)$row['type_count']; // Explicitly cast to int
         }
     }
 }
@@ -55,19 +42,8 @@ $sqlPipelines = "
     JOIN bids b ON t.BidID = b.BidID
 ";
 
-// Apply filters based on the selected year, start date, and end date
-if (!empty($year)) {
-    $sqlPipelines .= " AND YEAR(b.RequestDate) = $year"; // Filter by year
-}
-if (!empty($startDate) && !empty($endDate)) {
-    $sqlPipelines .= " AND b.RequestDate BETWEEN '$startDate' AND '$endDate'"; // Filter by date range
-} elseif (!empty($startDate)) {
-    $sqlPipelines .= " AND b.RequestDate >= '$startDate'"; // Filter from start date
-} elseif (!empty($endDate)) {
-    $sqlPipelines .= " AND b.RequestDate <= '$endDate'"; // Filter up to end date
-}
-
-$sqlPipelines .= " GROUP BY t.TenderStatus"; // Group by tender status
+// Group by tender status
+$sqlPipelines .= " GROUP BY t.TenderStatus"; 
 
 $resultPipelines = $conn->query($sqlPipelines);
 
@@ -85,7 +61,7 @@ if ($resultPipelines->num_rows > 0) {
     while ($row = $resultPipelines->fetch_assoc()) {
         $pipelineStage = $row['TenderStatus'];
         if (array_key_exists($pipelineStage, $pipelineCounts)) {
-            $pipelineCounts[$pipelineStage] = $row['pipeline_count'];
+            $pipelineCounts[$pipelineStage] = (int)$row['pipeline_count']; // Explicitly cast to int
         }
     }
 }
@@ -95,5 +71,5 @@ $bidTypesJson = json_encode($bidTypesCounts);
 $pipelineCountsJson = json_encode($pipelineCounts);
 
 // Close the connection
-// $conn->close();
+//$conn->close(); // Uncommented the connection closing
 ?>

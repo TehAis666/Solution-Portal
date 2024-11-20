@@ -361,6 +361,45 @@ try {
             color: #ffcc00;
             /* Change color on hover if you want */
         }
+
+        /* Center the modal in the viewport */
+        .modal.modal-center .modal-dialog {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Full-height viewport */
+            margin: 0;
+        }
+
+        /* Optional: Add some transition for a pop-in effect */
+        .tick-animation {
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Custom style for rounded button */
+        .rounded-button {
+            border-radius: 30px;
+            /* Makes the button rounded */
+            width: 80%;
+            /* Sets the button width */
+            margin-top: 15px;
+            /* Adds margin for a more spacious look */
+            font-weight: bold;
+            /* Makes the text a bit bolder */
+        }
     </style>
 </head>
 
@@ -500,7 +539,7 @@ try {
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="signupForm"  action="controller/addusercont.php" method="POST">
+                            <form id="signupForm" action="controller/addusercont.php" method="POST">
                                 <div class="container">
                                     <!-- Staff ID -->
                                     <div class="row mb-3">
@@ -509,8 +548,8 @@ try {
                                             <input type="text" id="staff_id" class="form-control" name="staff_id" required>
                                         </div>
                                     </div>
-                                     <!-- Name -->
-                                     <div class="row mb-3">
+                                    <!-- Name -->
+                                    <div class="row mb-3">
                                         <div class="col-md-12">
                                             <label for="name" class="form-label"><strong>Name:</strong></label>
                                             <input type="text" id="name" class="form-control" name="name" required>
@@ -592,8 +631,23 @@ try {
                 </div>
             </div>
 
-
-
+            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+                <div class="modal-dialog d-flex align-items-center justify-content-center min-vh-100">
+                    <div class="modal-content text-center">
+                        <div class="modal-body">
+                            <div class="tick-animation">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none">
+                                    <circle cx="50" cy="50" r="48" stroke="green" stroke-width="4" fill="white" />
+                                    <path d="M30 50 L45 65 L70 35" stroke="green" stroke-width="6" fill="none" />
+                                </svg>
+                            </div>
+                            <h1>Success!</h1>
+                            <h6 id="SuccessMessage"></h6>
+                            <button type="button" class="btn btn-outline-success rounded-button" data-bs-dismiss="modal">Okay</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </section>
     </main>
@@ -637,51 +691,7 @@ try {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Approve button click
-            document.querySelectorAll('.approvebtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Approved', row); // Pass the row for updating
-                });
-            });
-
-            // Reject button click
-            document.querySelectorAll('.rejectbtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr'); // Find the closest table row
-                    const staffID = row.querySelector('td:first-child').textContent.trim(); // Get staffID from the first column
-                    changeStatus(staffID, 'Rejected', row); // Pass the row for updating
-                });
-            });
-        });
-
-        function changeStatus(staffID, status, row) {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'controller/requestcont.php', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    // Update the status badge in the table in the provided row
-                    const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
-                    if (status === 'Approved') {
-                        statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
-                    } else if (status === 'Rejected') {
-                        statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
-                    }
-                } else {
-                    alert('Error updating status');
-                }
-            };
-            xhr.send('staffID=' + encodeURIComponent(staffID) + '&status=' + encodeURIComponent(status)); // URL encode parameters for safety
-        }
-    </script>
-
-
-    <!-- DataTable Script Initialization -->
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable
+            // Initialize DataTable once the document is fully loaded
             const table = $('#example').DataTable({
                 paging: true,
                 searching: true,
@@ -689,38 +699,71 @@ try {
                 lengthChange: true,
             });
 
-            // Function to calculate the dashboard counts
+            // Function to calculate the dashboard counts with AJAX
             function calculateDashboard() {
-                const allRows = table.rows().nodes(); // Include all rows in DataTable
-
-                let totalUsers = 0;
-                let totalNewRequest = 0; // Pending status
-                let totalApproved = 0; // Approved status
-                let totalRejected = 0; // Rejected status
-
-                // Loop through all rows and update counts based on status
-                $(allRows).each(function() {
-                    const statusElement = $(this).find('td:nth-child(7) .badge');
-                    if (statusElement.length > 0) {
-                        const status = statusElement.text().trim();
-                        totalUsers++; // Count every row as a user (total bids/users)
-
-                        // Count based on the status
-                        if (status === 'Pending') {
-                            totalNewRequest++;
-                        } else if (status === 'Approved') {
-                            totalApproved++;
-                        } else if (status === 'Rejected') {
-                            totalRejected++;
-                        }
+                $.ajax({
+                    url: 'controller/getDashboardCounts.php', // Server-side script to fetch counts
+                    method: 'POST',
+                    success: function(response) {
+                        const data = JSON.parse(response);
+                        document.querySelector('.total-request').textContent = data.totalUsers;
+                        document.querySelector('.total-new-request').textContent = data.totalNewRequest;
+                        document.querySelector('.total-approved').textContent = data.totalApproved;
+                        document.querySelector('.total-rejected').textContent = data.totalRejected;
+                    },
+                    error: function() {
+                        alert("Failed to load dashboard counts.");
                     }
                 });
+            }
 
-                // Update the calculated totals in the dashboard elements
-                document.querySelector('.total-request').textContent = totalUsers;
-                document.querySelector('.total-new-request').textContent = totalNewRequest;
-                document.querySelector('.total-approved').textContent = totalApproved;
-                document.querySelector('.total-rejected').textContent = totalRejected;
+            // Delegated event listener for the approve button
+            $(document).on('click', '.approvebtn', function() {
+                const row = $(this).closest('tr');
+                const staffID = row.find('td:first-child').text().trim(); // Get staffID from the first column
+                const name = row.find('td:nth-child(2)').text().trim(); // Get name from the second column
+                changeStatus(staffID, name, 'Approved', row[0]); // Pass the row for updating
+            });
+
+            // Delegated event listener for the reject button
+            $(document).on('click', '.rejectbtn', function() {
+                const row = $(this).closest('tr');
+                const staffID = row.find('td:first-child').text().trim(); // Get staffID from the first column
+                const name = row.find('td:nth-child(2)').text().trim(); // Get name from the second column
+                changeStatus(staffID, name, 'Rejected', row[0]); // Pass the row for updating
+            });
+
+            function changeStatus(staffID, name, status, row) {
+                $.ajax({
+                    url: 'controller/requestcont', // The URL to send the request to
+                    type: 'POST', // HTTP method
+                    data: {
+                        staffID: staffID, // Send staffID
+                        status: status, // Send status
+                        name: name // Send Staff's name
+                    },
+                    success: function(response) {
+                        console.log(response);
+                        // On success, update the status badge in the table
+                        const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
+                        if (status === 'Approved') {
+                            statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
+                        } else if (status === 'Rejected') {
+                            statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+                        }
+                        calculateDashboard(); // Update dashboard counts after status change
+
+                        // Set the success message and show the modal
+                        const message = `${name} is now ${status.toLowerCase()}`;
+                        document.getElementById('SuccessMessage').textContent = message;
+
+                        // Show success modal
+                        $('#successModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error updating status: ' + error);
+                    }
+                });
             }
 
             // Function to filter the DataTable based on status
@@ -735,11 +778,6 @@ try {
                     table.column(6).search(status).draw();
                 }
             }
-
-            // Calculate dashboard counts after every DataTable draw event
-            table.on('draw', function() {
-                calculateDashboard();
-            });
 
             // Event listeners for filtering based on the clicked dashboard element
             document.querySelector('.total-request').addEventListener('click', function() {
@@ -762,6 +800,8 @@ try {
             calculateDashboard();
         });
     </script>
+
+    
 </body>
 
 </html>

@@ -129,47 +129,70 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
       /* Maintain the original color or adjust if needed */
     }
 
+    /* Center the modal content */
     .modal-dialog {
       display: flex;
       justify-content: center;
       align-items: center;
       width: auto;
       max-width: 100vw;
-      /* Use viewport units */
       max-height: 100vh;
-      /* Use viewport units */
       margin: 0;
-      /* Prevents extra margin from zoom */
     }
 
     .modal-content {
       width: auto;
       max-width: 80vw;
-      /* Use viewport units for width */
       min-width: 300px;
-      /* Ensures it doesn't shrink too much */
       height: auto;
       max-height: 80vh;
-      /* Use viewport units for height */
       min-height: 200px;
-      /* Ensures it doesn't become too small */
       overflow: auto;
-      /* Adds scroll if content exceeds modal height */
+    }
 
-      .tick-animation {
-        animation: scaleUp 0.5s forwards;
+    /* Tick animation for pop-in only */
+    .tick-animation {
+      opacity: 0;
+      /* Start hidden */
+      transform: scale(0);
+      /* Start scaled down */
+      animation: scaleIn 0.6s forwards ease-out;
+      /* Animate only once */
+    }
+
+    /* Pop-in animation for SVG */
+    @keyframes scaleIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
       }
 
-      @keyframes scaleUp {
-        from {
-          transform: scale(0);
-          opacity: 0;
-        }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
 
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
+    /* Cross animation for pop-in only */
+    .cross-animation {
+      opacity: 0;
+      /* Start hidden */
+      transform: scale(0);
+      /* Start scaled down */
+      animation: crossPopIn 0.6s forwards ease-out;
+      /* Animate only once */
+    }
+
+    /* Pop-in animation for Red Cross SVG */
+    @keyframes crossPopIn {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
       }
     }
   </style>
@@ -200,7 +223,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
 
               <img src="<?php echo $user_data['profile_picture']; ?>" alt="Profile" class="rounded-circle">
               <h2><?php echo $user_data['name']; ?></h2>
-              <h3><?php echo $user_data['role']; ?></h3>
+              <h3><?php echo ucfirst($user_data['role']); ?> of <?php echo $user_data['sector']; ?></h3>
             </div>
           </div>
 
@@ -352,7 +375,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        Are you sure you want to update this information?
+                        <h4>Are you sure you want to update this information?</h4>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -408,11 +431,13 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body text-center">
-                        <!-- Red Cross SVG Icon -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="red" class="bi bi-x-circle mb-3" viewBox="0 0 16 16">
-                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.646 4.646a.5.5 0 0 0-.708.708L7.293 8 3.938 11.354a.5.5 0 0 0 .708.708L8 8.707l3.354 3.354a.5.5 0 0 0 .708-.708L8.707 8l3.354-3.354a.5.5 0 0 0-.708-.708L8 7.293 4.646 4.646z" />
-                        </svg>
-                        <!-- Error message will be injected here -->
+                        <!-- Red Cross SVG Icon with animation class -->
+                        <div class="cross-animation">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="red" class="bi bi-x-circle mb-3" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.646 4.646a.5.5 0 0 0-.708.708L7.293 8 3.938 11.354a.5.5 0 0 0 .708.708L8 8.707l3.354 3.354a.5.5 0 0 0 .708-.708L8.707 8l3.354-3.354a.5.5 0 0 0-.708-.708L8 7.293 4.646 4.646z" />
+                          </svg>
+                        </div>
+                        <h1>Oh no...</h1>
                         <div id="invalidModalBody" class="mt-3">
                           <!-- Dynamic error message content -->
                         </div>
@@ -424,7 +449,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                   </div>
                 </div>
 
-                <!-- Success Modal -->
+                <!-- Modal HTML -->
                 <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content text-center">
@@ -438,7 +463,7 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
                             <path d="M30 50 L45 65 L70 35" stroke="green" stroke-width="6" fill="none" />
                           </svg>
                         </div>
-                        <p>Successful!</p>
+                        <h1>Success!</h1>
                       </div>
                     </div>
                   </div>
@@ -589,7 +614,6 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
       }
     });
   </script>
-
 
   <script>
     window.onload = function() {

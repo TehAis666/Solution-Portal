@@ -1,6 +1,9 @@
 <?php
 // Include your database connection file
 include '../db/db.php';
+include 'handler/activitylog.php';
+
+session_start();
 
 // Check if the request method is POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -55,9 +58,11 @@ $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
     // Execute tender insertion and check for errors
     if ($stmt_tender->execute()) {
         // On successful insertion, redirect with an alert
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'] , "Added New Bid: " . $customerName, "bids", $bidID, $conn);
+        
         echo "<script>
                 alert('Bids successfully created.');
-                window.location.href = '../userbid.php';
+                window.location.href = '../userbid';
               </script>";
     } else {
         die("Error inserting tender: " . $stmt_tender->error);

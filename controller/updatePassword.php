@@ -1,6 +1,8 @@
 <?php
 // Include database connection
 include_once '../db/db.php'; // Adjust the path as necessary
+include 'handler/activitylog.php';
+//include 'handler/session.php';
 session_start();
 
 // Check if the user is logged in
@@ -13,7 +15,7 @@ if (isset($_SESSION['user_id'])) {
     // Check if new passwords match
     if ($newPassword !== $renewPassword) {
         $_SESSION['error'] = "New passwords do not match.";
-        header("Location: ../manageprofile.php?error=1");
+        header("Location: ../manageprofile?error=1");
         exit;
     }
 
@@ -28,8 +30,9 @@ if (isset($_SESSION['user_id'])) {
 
     // Verify current password
     if (!password_verify($currentPassword, $hashedPassword)) {
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Failed Attempt to Change Password", "user", $staffID, $conn);
         $_SESSION['error'] = "Current password is incorrect.";
-        header("Location: ../manageprofile.php?error=1");
+        header("Location: ../manageprofile?error=1");
         exit;
     }
 
@@ -42,10 +45,11 @@ if (isset($_SESSION['user_id'])) {
     $stmt->bind_param("si", $newHashedPassword, $staffID);
     if ($stmt->execute()) {
         $_SESSION['update_success'] = true;
-        header("Location: ../manageprofile.php");
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Change Password", "user", $staffID, $conn);
+        header("Location: ../manageprofile");
     } else {
         $_SESSION['error'] = "Error updating password.";
-        header("Location: ../manageprofile.php?error=1");
+        header("Location: ../manageprofile?error=1");
     }
     $stmt->close();
 } else {

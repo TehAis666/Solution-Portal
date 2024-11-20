@@ -1,6 +1,9 @@
 <?php
 // Include the database connection
 include '../db/db.php'; 
+include 'handler/activitylog.php';
+
+session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Collect and sanitize input data
@@ -53,7 +56,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the query
     if ($stmt->execute()) {
-        echo "<script>alert('Staff successfully created.'); window.location.href = '../verification.php';</script>";
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Created New User: " . $name, "user", $staff_id, $conn);
+        echo "<script>alert('Staff successfully created.'); window.location.href = '../verification';</script>";
     } else {
         echo "Error: " . $stmt->error;
     }

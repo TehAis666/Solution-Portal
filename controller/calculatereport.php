@@ -1,11 +1,6 @@
 <?php
 include_once 'db/db.php';
 
-// Initialize filter inputs
-$year = isset($_GET['year']) ? $_GET['year'] : '';
-$startDate = isset($_GET['startDate']) ? $_GET['startDate'] : '';
-$endDate = isset($_GET['endDate']) ? $_GET['endDate'] : '';
-
 // Start building the SQL query without filtering by Status
 $sql = "
     SELECT
@@ -15,22 +10,6 @@ $sql = "
     FROM tender t
     JOIN bids b ON t.BidID = b.BidID
 ";
-
-// Add conditions based on filter inputs
-$conditions = [];
-if (!empty($year)) {
-    $conditions[] = "YEAR(b.RequestDate) = '$year'";
-}
-if (!empty($startDate)) {
-    $conditions[] = "b.RequestDate >= '$startDate'";
-}
-if (!empty($endDate)) {
-    $conditions[] = "b.RequestDate <= '$endDate'";
-}
-
-if (!empty($conditions)) {
-    $sql .= ' WHERE ' . implode(' AND ', $conditions);
-}
 
 // Group by month and order the results
 $sql .= "

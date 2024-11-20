@@ -49,6 +49,11 @@ if (mysqli_num_rows($result) > 0) {
     $user = mysqli_fetch_assoc($result);
     
     // Store user details in session if not already set
+
+    if (!isset($_SESSION['user_id'])) {
+        $_SESSION['user_id'] = $user['StaffID'];
+    }
+
     if (!isset($_SESSION['user_name'])) {
         $_SESSION['user_name'] = $user['name'];
     }

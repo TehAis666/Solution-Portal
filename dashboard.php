@@ -250,9 +250,27 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
     <section class="section dashboard">
       <!-- Responsive Filter Card -->
-      <div class="card filtering overflow-auto shadow-sm">
+      <div class="card filtering shadow-sm">
+        <div class="filter">
+          <a
+            class="icon"
+            href="#"
+            data-bs-toggle="dropdown"
+            style="font-size: 18px">
+            <i class="bi bi-three-dots"></i>
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+            <li class="dropdown-header text-start">
+              <h6 style="font-size: 12px">Action</h6>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" style="font-size: 12px" id="resetAllCharts">Reset</a>
+            </li>
+          </ul>
+        </div>
         <div class="card-body pb-0">
-          <form action="dashboard.php" method="GET" id="filterForm">
+          <form id="filterForm">
             <div class="row g-2">
               <!-- Year Dropdown with label to the left -->
               <div class="col-md-3">
@@ -294,14 +312,14 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <!-- Filter Button -->
               <div class="col-md-2 d-flex align-items-center justify-content">
                 <button type="submit" class="btn btn-primary">Filter</button>
-                <!-- <button type="button" class="btn btn-light">Export to PDF</button> -->
+                <button id="exportToPDF" type="button" class="btn btn-primary">Export to PDF</button>
               </div>
             </div>
           </form>
         </div>
       </div>
 
-      <div class="row">
+      <div class="row" id="Statuscontainer">
         <!-- Left side columns -->
         <div class="col-lg-8">
           <div class="row">
@@ -317,7 +335,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                       <i class="bi bi-cart"></i>
                     </div>
                     <div class="ps-3">
-                      <h6><?php echo $totalBids; ?></h6>
+                      <h6 id="totalBids"><?php echo $totalBids; ?></h6>
                     </div>
                   </div>
                 </div>
@@ -340,7 +358,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                       <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>RM <?php echo number_format($totalRevenue ?? 0, 0); ?></h6>
+                      <h6 id="totalRevenue">RM <?php echo number_format($totalRevenue ?? 0, 0); ?></h6>
                     </div>
                   </div>
                 </div>
@@ -351,32 +369,13 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             <!-- Reports -->
             <div class="col-12">
               <div class="card" style="padding: 10px">
-                <div class="filter">
-                  <a
-                    class="icon"
-                    href="#"
-                    data-bs-toggle="dropdown"
-                    style="font-size: 12px">
-                    <i class="bi bi-three-dots"></i>
-                  </a>
-                  <ul
-                    class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6 style="font-size: 12px">Action</h6>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#" style="font-size: 12px" id="resetZoom">Reset</a>
-                    </li>
-                  </ul>
-                </div>
-
                 <div class="card-body" style="padding: 10px">
                   <h5 class="card-title" style="font-size: 14px">
                     Total Bids <span style="font-size: 12px">/ Month</span>
                   </h5>
 
                   <!-- Line Chart -->
-                  <div id="reportsChart" style="height: 250px"></div>
+                  <div id="reportsChart" style="height: 270px" class="echart"></div>
 
                   <!-- End Line Chart -->
                 </div>
@@ -425,15 +424,15 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 <tbody>
                   <tr data-status="WIP">
                     <td>WIP</td>
-                    <td><?php echo $statusData['WIP']; ?></td>
+                    <td id="totalWIP"><?php echo $statusData['WIP']; ?></td>
                   </tr>
                   <tr data-status="Submitted">
                     <td>Submitted</td>
-                    <td><?php echo $statusData['Submitted']; ?></td>
+                    <td id="totalSubmitted"><?php echo $statusData['Submitted']; ?></td>
                   </tr>
                   <tr data-status="Dropped">
                     <td>Dropped</td>
-                    <td><?php echo $statusData['Dropped']; ?></td>
+                    <td id="totalDropped"><?php echo $statusData['Dropped']; ?></td>
                   </tr>
                 </tbody>
               </table>
@@ -504,10 +503,10 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           <!-- Responsive container for Bid Types and Pipelines Bar Charts -->
           <div class="chart-container">
             <!-- Bid Types Bar Chart -->
-            <div id="bidTypesBarChart"></div>
+            <div id="bidTypesBarChart" class="echart"></div>
 
             <!-- Pipelines Bar Chart -->
-            <div id="pipelinesBarChart"></div>
+            <div id="pipelinesBarChart" class="echart"></div>
           </div>
         </div>
       </div>
@@ -552,55 +551,371 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
   <script src="assets/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="assets/vendor/tinymce/tinymce.min.js"></script>
   <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-
-  
-  <script>
-  let selectedStatus = ''; // Variable to hold the selected status
-
-  // Add click event to the rows of the table
-  const rows = document.querySelectorAll('.table-hover tbody tr');
-
-  rows.forEach(row => {
-    row.addEventListener('click', () => {
-      // Get the status from the clicked row
-      const status = row.getAttribute('data-status');
-
-      // Check if the clicked row is already the selected one
-      if (selectedStatus === status) {
-        // If it is, remove the selection and class
-        selectedStatus = ''; // Reset selected status
-        row.classList.remove('table-active'); // Remove the active class
-      } else {
-        // If it is a different row, remove "table-active" from all rows
-        rows.forEach(r => r.classList.remove('table-active'));
-
-        // Add "table-active" class to the clicked row
-        row.classList.add('table-active');
-
-        // Update selected status
-        selectedStatus = status;
-      }
-
-      // Log the selected status to the console (you can replace this with your filtering logic)
-      console.log("Selected Status:", selectedStatus);
-
-      // Here you can call a function to filter your dashboard based on the selected status
-      // filterDashboardByStatus(selectedStatus);
-    });
-  });
-</script>
 
   <!-- HorizontalBarChart and StackedBarChart -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Store the currently selected label
       let currentSelectedLabel = null;
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let selectedStatus = ''; // Holds the selected status for filtering
+      let lastClickedSector = null; // Tracks the last clicked sector
+
+      // Store last selected sector to allow deselection on repeated clicks
+      let lastSelectedSector = null;
+      // Store the currently selected label
+      let currentSelectedLabel = null;
+
+      // Store last selected Bid Type to allow deselection on repeated clicks
+      let selectedBidType = null;
+
+      // Store last selected Pipeline to allow deselection on repeated clicks
+      let selectedPipeline = null;
+
+      // Store last selected month year to allow deselection on repeated clicks
+      let selectedMonthYear = null;
+
+      // Store last selected Solution to allow deselection on repeated clicks
+      let lastSelectedSolution = null;
+
+      let marketSectorData = [];
+      let monthsData = [];
+      let totalRevenueData = [];
+      let totalBidsData = [];
+      // Global variables to store the fetched data
+      let bidTypesDatas = [];
+      let pipelinesDatas = [];
+      let solutionsData = [];
+
+      // Define a global variable to store InfraSolution data
+      var infraSolutionData = null;
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (solutionsData.length === 0) {
+        fetchSumSolution(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (marketSectorData.length === 0) {
+        fetchMarketSectorData(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Check if marketSectorData is empty and fetch data if true
+      if (monthsData.length === 0 || totalRevenueData.length === 0 || totalBidsData.length === 0) {
+        fetchReportData(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Store date, startDate,endDate
+      // let date = '';
+      // let startDate = '';
+      // let endDate = '';
+
+      // Get the JSON-encoded data from PHP
+      var bidTypesCounts = <?php echo $bidTypesJson; ?>;
+      var pipelineCounts = <?php echo $pipelineCountsJson; ?>;
+
+      // Data for Bid Types Chart
+      var bidTypesData = [
+        bidTypesCounts['RFQ'],
+        bidTypesCounts['Tender'],
+        bidTypesCounts['Quotation'],
+        bidTypesCounts['RFP'],
+        bidTypesCounts['RFI'],
+        bidTypesCounts['Upstream']
+      ];
+
+      //Report Data
+      var months = <?php echo $monthsJson; ?>;
+      var totalBids = <?php echo $totalBidsJson; ?>;
+      var totalRevenue = <?php echo $totalRevenueJson; ?>;
+
+      const bidCounts = <?php echo $bidCountsJson; ?>;
+
+      // Initialize charts
+      var pieChart = echarts.init(document.querySelector("#sectorChart"));
+      var barChart = echarts.init(document.querySelector("#horizontalBarChart"));
+
+      var pieOption = {
+        tooltip: {
+          trigger: "item"
+        },
+        legend: {
+          top: "5%",
+          left: "center",
+          itemGap: 5,
+          textStyle: {
+            fontSize: 10
+          }
+        },
+        series: [{
+          name: "Bids",
+          type: "pie",
+          radius: ["30%", "60%"],
+          label: {
+            show: false
+          },
+          data: [{
+              value: bidCounts["TMG (Private Sector)"],
+              name: "TMG (Private Sector)"
+            },
+            {
+              value: bidCounts["TMG (Public Sector)"],
+              name: "TMG (Public Sector)"
+            },
+            {
+              value: bidCounts["NMG"],
+              name: "NMG"
+            },
+            {
+              value: bidCounts["IMG"],
+              name: "IMG"
+            },
+            {
+              value: bidCounts["Channel"],
+              name: "Channel"
+            },
+          ],
+        }],
+      };
+
+      var barOption = {
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow"
+          }
+        },
+        grid: {
+          left: "5%",
+          right: "5%",
+          bottom: "5%",
+          top: "10%",
+          containLabel: true
+        },
+        xAxis: {
+          type: "value",
+          boundaryGap: [0, 0.01],
+          axisLabel: {
+            fontSize: 10
+          }
+        },
+        yAxis: {
+          type: "category",
+          data: ["TMG (Private Sector)", "TMG (Public Sector)", "NMG", "IMG", "Channel"],
+          axisLabel: {
+            fontSize: 10
+          },
+        },
+        series: [{
+          name: "Bids",
+          type: "bar",
+          data: [
+            bidCounts["TMG (Private Sector)"],
+            bidCounts["TMG (Public Sector)"],
+            bidCounts["NMG"],
+            bidCounts["IMG"],
+            bidCounts["Channel"]
+          ],
+          barWidth: "40%",
+          itemStyle: {
+            color: "#3398DB"
+          },
+          label: {
+            show: false
+          },
+        }],
+      };
+
+      pieChart.setOption(pieOption);
+      barChart.setOption(barOption);
+
+      // Initialize ECharts instance
+      const reportsChart = echarts.init(document.querySelector("#reportsChart"));
+
+      const option = {
+        tooltip: {
+          trigger: 'axis',
+          formatter: function(params) {
+            let tooltip = `${params[0].name}<br/>`;
+            params.forEach(param => {
+              if (param.seriesName === 'Total Bids Revenue') {
+                const value = param.value >= 1 ? `${param.value}M` : `${param.value * 1000}K`;
+                tooltip += `${param.seriesName}: ${value}<br/>`;
+              } else {
+                tooltip += `${param.seriesName}: ${param.value}<br/>`;
+              }
+            });
+            return tooltip;
+          }
+        },
+        legend: {
+          data: ['Number of Bids', 'Total Bids Revenue']
+        },
+        xAxis: {
+          type: 'category',
+          data: months,
+        },
+        yAxis: [{
+            type: 'value',
+            name: 'Number of Bids',
+            min: 0,
+            max: 60,
+            interval: 15,
+            axisLabel: {
+              formatter: '{value}',
+            }
+          },
+          {
+            type: 'value',
+            name: 'Total Revenue (Mil)',
+            min: 0,
+            interval: 50,
+            position: 'right',
+            axisLabel: {
+              formatter: function(value) {
+                return value >= 1 ? `${value}M` : `${value * 1000}K`;
+              }
+            }
+          }
+        ],
+        series: [{
+            name: 'Number of Bids',
+            type: 'line',
+            data: totalBids.map(val => parseInt(val)),
+            areaStyle: {},
+            smooth: true,
+            color: '#4154f1',
+          },
+          {
+            name: 'Total Bids Revenue',
+            type: 'line',
+            data: totalRevenue,
+            smooth: true,
+            yAxisIndex: 1,
+            lineStyle: {
+              type: 'dashed',
+              color: '#ff771d',
+            },
+          }
+        ]
+      };
+
+      reportsChart.setOption(option);
+
+      // Call the function to fetch data when the page loads
+      fetchBidPipelineData(null, null, null, null, null, null);
+
+      // Initialize Bid Types Bar Chart with default data before making AJAX call
+      const bidTypesBarChart = echarts.init(document.querySelector("#bidTypesBarChart"));
+
+      bidTypesBarChart.setOption({
+        title: {
+          text: "Bid Types",
+          left: "center",
+          textStyle: {
+            fontSize: 14
+          },
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow"
+          },
+        },
+        grid: {
+          left: "5%",
+          right: "5%",
+          bottom: "5%",
+          top: "15%",
+          containLabel: true,
+        },
+        xAxis: {
+          type: "value",
+          axisLabel: {
+            fontSize: 10
+          },
+        },
+        yAxis: {
+          type: "category",
+          data: ["RFQ", "Tender", "Quotation", "RFP", "RFI", "Upstream", "Strategic Proposal", "Strategic Initiative"],
+          axisLabel: {
+            fontSize: 10
+          },
+        },
+        series: [{
+          name: "Bid Types",
+          type: "bar",
+          data: [], // Start with empty data
+          color: "#4668E6",
+          barWidth: "50%",
+        }],
+      });
+
+      // Format data for Pipelines Bar Chart
+      var pipelinesData = [
+        pipelineCounts['Unknown'],
+        pipelineCounts['Loss'],
+        pipelineCounts['Close'],
+        pipelineCounts['KIV'],
+        pipelineCounts['Intro'],
+        pipelineCounts['Clarification']
+      ];
+
+      // Initialize Pipelines Bar Chart with default data
+      const pipelinesBarChart = echarts.init(document.querySelector("#pipelinesBarChart"));
+      pipelinesBarChart.setOption({
+        title: {
+          text: "Pipelines",
+          left: "center",
+          textStyle: {
+            fontSize: 14
+          },
+        },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: {
+            type: "shadow"
+          },
+        },
+        grid: {
+          left: "5%",
+          right: "5%",
+          bottom: "5%",
+          top: "15%",
+          containLabel: true,
+        },
+        xAxis: {
+          type: "value",
+          axisLabel: {
+            fontSize: 10
+          },
+        },
+        yAxis: {
+          type: "category",
+          data: ["Unknown", "Loss", "Close", "KIV", "Intro", "Clarification"],
+          axisLabel: {
+            fontSize: 10
+          },
+        },
+        series: [{
+          name: "Pipelines",
+          type: "bar",
+          data: pipelinesData,
+          color: "#4668E6",
+          barWidth: "50%",
+        }],
+      });
 
       // Bar Chart Code
-      const barChart = new Chart(document.querySelector("#barChart"), {
+      const barSumChart = new Chart(document.querySelector("#barChart"), {
         type: "bar",
         data: {
           labels: ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"], // Labels
@@ -646,24 +961,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           },
           responsive: true,
           maintainAspectRatio: false,
-          onClick: (e) => {
-            const elements = barChart.getElementsAtEventForMode(e, 'nearest', {
-              intersect: true
-            }, true);
-            if (elements.length > 0) {
-              const clickedLabel = barChart.data.labels[elements[0].index]; // Get the clicked label
-
-              if (currentSelectedLabel === clickedLabel) {
-                // If the same label is clicked again, reset the charts
-                resetCharts();
-                currentSelectedLabel = null; // Reset current selection
-              } else {
-                // Update the charts based on the clicked label
-                currentSelectedLabel = clickedLabel; // Update current selection
-                updateCharts(clickedLabel);
-              }
-            }
-          },
           plugins: {
             tooltip: {
               callbacks: {
@@ -688,77 +985,123 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       });
 
       // Stacked Bar Chart Code
-      var solutionCounts = <?php echo $solutionCountsJson; ?>;
+      var solutionBusinessUnitCounts = <?php echo $solutionCountsJson; ?>;
       var labels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"]; // Same labels as bar chart
 
+      // Create dataset for Mix Solution with breakdown information
       var datasets = [{
           label: "Channel",
           data: [
-            solutionCounts['PaduNet']['Channel'],
-            solutionCounts['SecureX']['Channel'],
-            solutionCounts['AwanHeiTech']['Channel'],
-            solutionCounts['iSentrix']['Channel'],
-            solutionCounts['MixSolution']['Channel']
+            solutionBusinessUnitCounts['PaduNet']['Channel'],
+            solutionBusinessUnitCounts['SecureX']['Channel'],
+            solutionBusinessUnitCounts['AwanHeiTech']['Channel'],
+            solutionBusinessUnitCounts['iSentrix']['Channel'],
+            solutionBusinessUnitCounts['MixSolution']['Channel']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['Channel']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#6CC3DF" // Color for Channel
         },
         {
           label: "IMG",
           data: [
-            solutionCounts['PaduNet']['IMG'],
-            solutionCounts['SecureX']['IMG'],
-            solutionCounts['AwanHeiTech']['IMG'],
-            solutionCounts['iSentrix']['IMG'],
-            solutionCounts['MixSolution']['IMG']
+            solutionBusinessUnitCounts['PaduNet']['IMG'],
+            solutionBusinessUnitCounts['SecureX']['IMG'],
+            solutionBusinessUnitCounts['AwanHeiTech']['IMG'],
+            solutionBusinessUnitCounts['iSentrix']['IMG'],
+            solutionBusinessUnitCounts['MixSolution']['IMG']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['IMG']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#FF6B6B" // Color for IMG
         },
         {
           label: "NMG",
           data: [
-            solutionCounts['PaduNet']['NMG'],
-            solutionCounts['SecureX']['NMG'],
-            solutionCounts['AwanHeiTech']['NMG'],
-            solutionCounts['iSentrix']['NMG'],
-            solutionCounts['MixSolution']['NMG']
+            solutionBusinessUnitCounts['PaduNet']['NMG'],
+            solutionBusinessUnitCounts['SecureX']['NMG'],
+            solutionBusinessUnitCounts['AwanHeiTech']['NMG'],
+            solutionBusinessUnitCounts['iSentrix']['NMG'],
+            solutionBusinessUnitCounts['MixSolution']['NMG']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['NMG']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#F9D266" // Color for NMG
         },
         {
           label: "TMG (Private Sector)",
           data: [
-            solutionCounts['PaduNet']['TMG (Private Sector)'],
-            solutionCounts['SecureX']['TMG (Private Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
-            solutionCounts['iSentrix']['TMG (Private Sector)'],
-            solutionCounts['MixSolution']['TMG (Private Sector)']
+            solutionBusinessUnitCounts['PaduNet']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['SecureX']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['AwanHeiTech']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['iSentrix']['TMG (Private Sector)'],
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Private Sector)']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#4668E6" // Color for TMG (Private Sector)
         },
         {
           label: "TMG (Public Sector)",
           data: [
-            solutionCounts['PaduNet']['TMG (Public Sector)'],
-            solutionCounts['SecureX']['TMG (Public Sector)'],
-            solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
-            solutionCounts['iSentrix']['TMG (Public Sector)'],
-            solutionCounts['MixSolution']['TMG (Public Sector)']
+            solutionBusinessUnitCounts['PaduNet']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['SecureX']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['AwanHeiTech']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['iSentrix']['TMG (Public Sector)'],
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
+            solutionBusinessUnitCounts['MixSolution']['TMG (Public Sector)']['iSentrix'] // Sum of all for MixSolution
           ],
           backgroundColor: "#7EC968" // Color for TMG (Public Sector)
         }
       ];
 
+      // Create a custom tooltip callback function to show the breakdown of "Mix Solution" when hovered
+      const customTooltips = {
+        callbacks: {
+          label: function(tooltipItem) {
+            // Check if the tooltip item corresponds to "Mix Solution"
+            if (tooltipItem.label === 'Mix Solution') {
+              const businessUnit = tooltipItem.dataset.label; // Get the business unit label (e.g., "NMG", "TMG (Public Sector)")
+              const counts = solutionBusinessUnitCounts['MixSolution'][businessUnit]; // Get breakdown for this business unit
+
+              // Format the tooltip text to display individual solution counts
+              let breakdownText = `${businessUnit}:\n`;
+              breakdownText += `AwanHeiTech: ${counts['AwanHeiTech']} | `;
+              breakdownText += `Secure-X: ${counts['SecureX']} | `;
+              breakdownText += `PaduNet: ${counts['PaduNet']} | `;
+              breakdownText += `i-Sentrix: ${counts['iSentrix']}`;
+
+              return breakdownText; // Return the formatted breakdown
+            }
+
+            // Default label for non-Mix Solution entries
+            return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+          }
+        }
+      };
+
+      // Initialize the stacked bar chart with custom tooltip logic
       const stackedBarChart = new Chart(document.querySelector("#stakedBarChart"), {
         type: "bar",
         data: {
-          labels: labels, // Same labels as bar chart
-          datasets: datasets // Data for each business sector per solution
+          labels: labels, // Solution labels for each stack
+          datasets: datasets // Data for each business unit per solution
         },
         options: {
           plugins: {
             title: {
               display: false, // Hiding the chart title to save space
             },
+            legend: {
+              onClick: (e) => e.stopPropagation() // Disable hiding behavior on label click
+            },
+            tooltip: customTooltips // Use the custom tooltip callback for detailed breakdown
           },
           responsive: true,
           scales: {
@@ -773,592 +1116,873 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         },
       });
 
-      // Function to update both charts based on the clicked label
-      // Function to update both charts based on the clicked label
-      function updateCharts(clickedLabel) {
-        const labelKeyMapping = {
-          "PaduNet": "PaduNet",
-          "Secure-X": "SecureX", // Correct mapping for Secure-X
-          "AwanHeiTech": "AwanHeiTech",
-          "i-Sentrix": "iSentrix", // Correct mapping for i-Sentrix
-          "Mix Solution": "MixSolution"
-        };
 
-        const allLabels = ["PaduNet", "Secure-X", "AwanHeiTech", "i-Sentrix", "Mix Solution"];
-        const newBarData = [];
-        const newStackedData = datasets.map(dataset => {
-          return {
-            label: dataset.label,
-            data: Array(allLabels.length).fill(0), // Initialize with zeros
-            backgroundColor: dataset.backgroundColor
-          };
+      // Define the unified function for making all fetch calls
+      function fetchDataForAllSections(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate) {
+        fetchStatus(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchMarketSectorData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchReportData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchBidPipelineData(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchSumSolution(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchInfraSolution(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+        fetchBidStatus(status, sector, bidType, pipeline, monthYear, solution, year, startDate, endDate);
+      }
+
+      // Global variables for filter values
+      let year, startDate, endDate;
+
+      // Select the filter form
+      const filterForm = document.getElementById('filterForm');
+
+      // Listen for form submission (if necessary)
+      filterForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent page reload
+
+        // Capture values from the form
+        year = document.getElementById('year').value;
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+
+        // Log captured values to the console
+        //console.log("Year:", year);
+        //console.log("Start Date:", startDate);
+        //console.log("End Date:", endDate);
+
+        // Call the unified function with the captured values
+        fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+      });
+
+      // Function for handling row click event
+      const rows = document.querySelectorAll('.table-hover tbody tr');
+      rows.forEach(row => {
+        row.addEventListener('click', () => {
+          const status = row.getAttribute('data-status');
+
+          if (selectedStatus === status) {
+            selectedStatus = '';
+            row.classList.remove('table-active');
+          } else {
+            rows.forEach(r => r.classList.remove('table-active'));
+            row.classList.add('table-active');
+            selectedStatus = status;
+          }
+
+          // Use the unified fetch function with the global filter values
+          fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+        });
+      });
+
+      // Function to handle sector selection
+      function filterSector() {
+        pieChart.on('click', function(params) {
+          if (params.seriesType === 'pie') {
+            lastSelectedSector = (lastSelectedSector === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
         });
 
-        if (clickedLabel === "All") {
-          newBarData.push(
-            <?php echo $paduNetTotal; ?>,
-            <?php echo $secureXTotal; ?>,
-            <?php echo $awanHeiTechTotal; ?>,
-            <?php echo $iSentrixTotal; ?>,
-            <?php echo $mixSolutionTotal; ?>
-          );
+        barChart.on('click', function(params) {
+          if (params.seriesType === 'bar') {
+            lastSelectedSector = (lastSelectedSector === params.name) ? null : params.name;
 
-          // Fill stacked chart data for all solutions
-          newStackedData.forEach((dataset, index) => {
-            dataset.data = [
-              solutionCounts['PaduNet'][dataset.label],
-              solutionCounts['SecureX'][dataset.label], // Ensure SecureX is used here
-              solutionCounts['AwanHeiTech'][dataset.label],
-              solutionCounts['iSentrix'][dataset.label], // Ensure iSentrix is used here
-              solutionCounts['MixSolution'][dataset.label]
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        });
+
+        stackedBarChart.options.plugins.legend = {
+          onClick: function(e, legendItem) {
+            const clickedLabel = legendItem.text;
+
+            lastSelectedSector = (lastSelectedSector === clickedLabel) ? null : clickedLabel;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          },
+        };
+        stackedBarChart.update();
+      }
+
+      // Function to handle bid type selection
+      function filterBidType() {
+        bidTypesBarChart.on('click', function(params) {
+          if (params.seriesType === 'bar') {
+            selectedBidType = (selectedBidType === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        });
+      }
+
+      // Function to handle pipeline selection
+      function filterPipeline() {
+        pipelinesBarChart.on('click', function(params) {
+          if (params.seriesType === 'bar') {
+            selectedPipeline = (selectedPipeline === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        });
+      }
+
+      // Function to handle month-year selection
+      function filterMonthYear() {
+        reportsChart.on('click', function(params) {
+          if (params.seriesType === 'line' || params.seriesType === 'bar') {
+            selectedMonthYear = (selectedMonthYear === params.name) ? null : params.name;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        });
+      }
+
+      // Function to handle solution selection
+      function filterSolution() {
+        document.querySelector("#stakedBarChart").onclick = function(evt) {
+          const activePoints = stackedBarChart.getElementsAtEventForMode(evt, 'nearest', {
+            intersect: true
+          }, true);
+          if (activePoints.length) {
+            const {
+              index
+            } = activePoints[0];
+            const label = stackedBarChart.data.labels[index];
+
+            lastSelectedSolution = (lastSelectedSolution === label) ? null : label;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        };
+
+        document.querySelector("#barChart").onclick = function(evt) {
+          const activePoints = barSumChart.getElementsAtEventForMode(evt, 'nearest', {
+            intersect: true
+          }, true);
+          if (activePoints.length) {
+            const {
+              index
+            } = activePoints[0];
+            const label = barSumChart.data.labels[index];
+
+            lastSelectedSolution = (lastSelectedSolution === label) ? null : label;
+
+            fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+          }
+        };
+      }
+
+      // Reset button event listener
+      document.getElementById('resetAllCharts').addEventListener('click', (event) => {
+        event.preventDefault(); // Prevent default link behavior
+
+        // Reset all filter variables to null or empty strings
+        selectedStatus = '';
+        lastSelectedSector = null;
+        selectedBidType = null;
+        selectedPipeline = null;
+        selectedMonthYear = null;
+        lastSelectedSolution = null;
+        year = '';
+        startDate = '';
+        endDate = '';
+
+        // Remove active highlight from all rows
+        const rows = document.querySelectorAll('.table-hover tbody tr');
+        rows.forEach(row => row.classList.remove('table-active'));
+
+        // Call the unified fetch function with null values to reset all charts
+        fetchDataForAllSections(selectedStatus, lastSelectedSector, selectedBidType, selectedPipeline, selectedMonthYear, lastSelectedSolution, year, startDate, endDate);
+      });
+
+      // Initialize all event handlers
+      filterSector();
+      filterBidType();
+      filterPipeline();
+      filterMonthYear();
+      filterSolution();
+
+      function fetchMarketSectorData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+        // Set sector to an empty string if it is null
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        //     console.log("AJAX Data being sent:", {
+        //     status: status,
+        //     sector: sector,
+        //     bidtype: bidtype,
+        //     ppline: ppline,
+        //     monthYear: monthYear,
+        //     solutionn: solutionn
+        // });
+
+        $.ajax({
+          url: 'controller/updateMarketSector.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector, // Include the sector in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline, // Include the pipeline in the request
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          dataType: 'json',
+          success: function(response) {
+            // Log the response for debugging
+            //console.log("Market Sector:", response); 
+
+            // Convert response data into the format needed for the charts
+            const pieData = Object.keys(response).map(key => ({
+              value: parseInt(response[key]), // Convert string to integer
+              name: key
+            }));
+
+            const barData = Object.keys(response).map(key => parseInt(response[key]));
+
+            // Update pie chart data
+            pieOption.series[0].data = pieData;
+            pieChart.setOption(pieOption);
+
+            // Update bar chart data
+            barOption.series[0].data = barData;
+            barChart.setOption(barOption);
+
+            // Store data in marketSectorData for PDF
+            marketSectorData = pieData; // Store pieData for table format
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+          }
+        });
+      }
+
+      function fetchReportData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+
+        // Set sector to an empty string if it is null
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        // Debug: Log the values of status and sector
+        //console.log("Status:", status);
+        //console.log("Sector:", sector);
+
+        $.ajax({
+          url: 'controller/updateReport.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector, // Include the sector in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          dataType: 'json', // Assuming your response is in JSON format
+          success: function(response) {
+            //console.log("Fetched Data:", response); // Debug
+            totalBidsData = response.totalBids;
+            totalRevenueData = response.totalRevenue;
+            monthsData = response.months;
+            // Assume the response contains totalBids and totalRevenue arrays
+            const totalBids = response.totalBids; // Update this line based on your actual response structure
+            const totalRevenue = response.totalRevenue; // Update this line based on your actual response structure
+            const months = response.months;
+
+            // Update the ECharts option with new data
+            reportsChart.setOption({
+              xAxis: {
+                data: months // Update the xAxis data with the new months
+              },
+              series: [{
+                  name: 'Number of Bids',
+                  data: totalBids.map(val => parseInt(val)), // Ensure bids are integers
+                },
+                {
+                  name: 'Total Bids Revenue',
+                  data: totalRevenue,
+                }
+              ]
+            });
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+          }
+        });
+      }
+
+      function fetchBidPipelineData(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+        // Set sector to an empty string if it is null
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+        $.ajax({
+          url: 'controller/updatebidType.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector, // Include the sector in the request
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          dataType: 'json',
+          success: function(response) {
+            // console.log("Fetched Data:", response); // Debug
+
+            bidTypesDatas = [
+              parseInt(response.bidTypesCounts['RFQ'] || 0),
+              parseInt(response.bidTypesCounts['Tender'] || 0),
+              parseInt(response.bidTypesCounts['Quotation'] || 0),
+              parseInt(response.bidTypesCounts['RFP'] || 0),
+              parseInt(response.bidTypesCounts['RFI'] || 0),
+              parseInt(response.bidTypesCounts['Upstream'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Proposal'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Initiative'] || 0)
             ];
-          });
-        } else {
-          // Get the correct key for the clicked label
-          const solutionKey = labelKeyMapping[clickedLabel];
 
-          if (!solutionKey || !solutionCounts[solutionKey]) {
-            console.error(`No data found for the selected solution: ${clickedLabel}`);
-            return; // Exit if no data is found for the clicked label
+            // Format data for Pipelines Bar Chart from the fetched response
+            pipelinesDatas = [
+              parseInt(response.pipelineCounts['Unknown'] || 0),
+              parseInt(response.pipelineCounts['Loss'] || 0),
+              parseInt(response.pipelineCounts['Close'] || 0),
+              parseInt(response.pipelineCounts['KIV'] || 0),
+              parseInt(response.pipelineCounts['Intro'] || 0),
+              parseInt(response.pipelineCounts['Clarification'] || 0)
+            ];
+
+            // Format data for Bid Types Bar Chart from the fetched response
+            const bidTypesData = [
+              parseInt(response.bidTypesCounts['RFQ'] || 0),
+              parseInt(response.bidTypesCounts['Tender'] || 0),
+              parseInt(response.bidTypesCounts['Quotation'] || 0),
+              parseInt(response.bidTypesCounts['RFP'] || 0),
+              parseInt(response.bidTypesCounts['RFI'] || 0),
+              parseInt(response.bidTypesCounts['Upstream'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Proposal'] || 0),
+              parseInt(response.bidTypesCounts['Strategic Initiative'] || 0)
+            ];
+
+            // Update Bid Types Bar Chart
+            bidTypesBarChart.setOption({
+              series: [{
+                data: bidTypesData
+              }]
+            });
+
+            // Format data for Pipelines Bar Chart from the fetched response
+            const pipelinesData = [
+              parseInt(response.pipelineCounts['Unknown'] || 0),
+              parseInt(response.pipelineCounts['Loss'] || 0),
+              parseInt(response.pipelineCounts['Close'] || 0),
+              parseInt(response.pipelineCounts['KIV'] || 0),
+              parseInt(response.pipelineCounts['Intro'] || 0),
+              parseInt(response.pipelineCounts['Clarification'] || 0)
+            ];
+
+            // Update Pipelines Bar Chart
+            pipelinesBarChart.setOption({
+              series: [{
+                data: pipelinesData
+              }]
+            });
+            //console.log("Bid Types Data:", bidTypesData);
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
           }
-
-          // Get the index of the clicked label
-          const index = allLabels.indexOf(clickedLabel);
-
-          // Update bar chart data
-          newBarData.push(
-            index === 0 ? <?php echo $paduNetTotal; ?> : 0,
-            index === 1 ? <?php echo $secureXTotal; ?> : 0,
-            index === 2 ? <?php echo $awanHeiTechTotal; ?> : 0,
-            index === 3 ? <?php echo $iSentrixTotal; ?> : 0,
-            index === 4 ? <?php echo $mixSolutionTotal; ?> : 0
-          );
-
-          // Update stacked data for the clicked label only
-          newStackedData.forEach((dataset, datasetIndex) => {
-            dataset.data[index] = solutionCounts[solutionKey][dataset.label] || 0; // Handle undefined cases
-          });
-        }
-
-        // Update the bar chart data
-        barChart.data.datasets[0].data = newBarData;
-        barChart.update();
-
-        // Update stacked chart data
-        stackedBarChart.data.datasets = newStackedData;
-        stackedBarChart.update();
+        });
       }
 
+      function fetchSumSolution(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
-      // Function to reset both charts to their original state
-      function resetCharts() {
-        // Reset bar chart data to original state
-        barChart.data.datasets[0].data = [
-          <?php echo $paduNetTotal; ?>,
-          <?php echo $secureXTotal; ?>,
-          <?php echo $awanHeiTechTotal; ?>,
-          <?php echo $iSentrixTotal; ?>,
-          <?php echo $mixSolutionTotal; ?>
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+
+        $.ajax({
+          url: 'controller/updateSumSolution.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector, // Include sector in the request
+            bidtype: bidtype,
+            ppline: ppline,
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          dataType: 'json',
+          success: function(response) {
+            // console.log("Fetched Data:", response); debug
+
+            solutionsData = {
+              PaduNet: response.PaduNet || 0, // Fallback value of 0 if response is undefined
+              SecureX: response.SecureX || 0,
+              AwanHeiTech: response.AwanHeiTech || 0,
+              iSentrix: response.iSentrix || 0,
+              MixSolution: response.MixSolution || 0
+            };
+
+            // Update the chart's data with the response values
+            barSumChart.data.datasets[0].data = [
+              response.PaduNet || 0, // Use fallback value of 0 if response is undefined
+              response.SecureX || 0,
+              response.AwanHeiTech || 0,
+              response.iSentrix || 0,
+              response.MixSolution || 0
+            ];
+
+            // Refresh the chart to reflect the new data
+            barSumChart.update();
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+          }
+        });
+      }
+      // Function to fetch InfraSolution data
+      function fetchInfraSolution(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        //console.log("Sector", solutionn); 
+
+        $.ajax({
+          url: 'controller/updateInfraSolution.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector,
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear, // Include the monthYear in the request
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          dataType: 'json',
+          success: function(response) {
+            //console.log("Infra Solution:", response);
+
+            // Extract solution counts from the response
+            // Extract solution counts from the response
+            var solutionCounts = response.solutionBusinessUnitCounts;
+
+            // Prepare datasets for the chart, with summed values for MixSolution
+            const datasets = [{
+                label: "Channel",
+                data: [
+                  solutionCounts['PaduNet']['Channel'],
+                  solutionCounts['SecureX']['Channel'],
+                  solutionCounts['AwanHeiTech']['Channel'],
+                  solutionCounts['iSentrix']['Channel'],
+                  // Sum of each sub-solution within MixSolution for "Channel"
+                  solutionCounts['MixSolution']['Channel']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['Channel']['SecureX'] +
+                  solutionCounts['MixSolution']['Channel']['PaduNet'] +
+                  solutionCounts['MixSolution']['Channel']['iSentrix']
+                ],
+                backgroundColor: "#6CC3DF"
+              },
+              {
+                label: "IMG",
+                data: [
+                  solutionCounts['PaduNet']['IMG'],
+                  solutionCounts['SecureX']['IMG'],
+                  solutionCounts['AwanHeiTech']['IMG'],
+                  solutionCounts['iSentrix']['IMG'],
+                  // Sum of each sub-solution within MixSolution for "IMG"
+                  solutionCounts['MixSolution']['IMG']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['IMG']['SecureX'] +
+                  solutionCounts['MixSolution']['IMG']['PaduNet'] +
+                  solutionCounts['MixSolution']['IMG']['iSentrix']
+                ],
+                backgroundColor: "#FF6B6B"
+              },
+              {
+                label: "NMG",
+                data: [
+                  solutionCounts['PaduNet']['NMG'],
+                  solutionCounts['SecureX']['NMG'],
+                  solutionCounts['AwanHeiTech']['NMG'],
+                  solutionCounts['iSentrix']['NMG'],
+                  // Sum of each sub-solution within MixSolution for "NMG"
+                  solutionCounts['MixSolution']['NMG']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['NMG']['SecureX'] +
+                  solutionCounts['MixSolution']['NMG']['PaduNet'] +
+                  solutionCounts['MixSolution']['NMG']['iSentrix']
+                ],
+                backgroundColor: "#F9D266"
+              },
+              {
+                label: "TMG (Private Sector)",
+                data: [
+                  solutionCounts['PaduNet']['TMG (Private Sector)'],
+                  solutionCounts['SecureX']['TMG (Private Sector)'],
+                  solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
+                  solutionCounts['iSentrix']['TMG (Private Sector)'],
+                  // Sum of each sub-solution within MixSolution for "TMG (Private Sector)"
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
+                  solutionCounts['MixSolution']['TMG (Private Sector)']['iSentrix']
+                ],
+                backgroundColor: "#4668E6"
+              },
+              {
+                label: "TMG (Public Sector)",
+                data: [
+                  solutionCounts['PaduNet']['TMG (Public Sector)'],
+                  solutionCounts['SecureX']['TMG (Public Sector)'],
+                  solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
+                  solutionCounts['iSentrix']['TMG (Public Sector)'],
+                  // Sum of each sub-solution within MixSolution for "TMG (Public Sector)"
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
+                  solutionCounts['MixSolution']['TMG (Public Sector)']['iSentrix']
+                ],
+                backgroundColor: "#7EC968"
+              }
+            ];
+
+            // Store the datasets globally for PDF usage
+            infraSolutionData = datasets;
+
+            // Update the chart with the new datasets
+            stackedBarChart.data.datasets = datasets;
+            stackedBarChart.update(); // Refresh the chart to display the new data
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX Error:', error);
+          }
+        });
+      }
+
+      function animateValue(element, start, end, duration, format = false) {
+        const range = end - start;
+        const increment = range / (duration / 10); // Calculate the increment per step
+        let current = start;
+        const stepTime = Math.abs(Math.floor(duration / range));
+
+        // Function to format the number with commas and RM symbol
+        function formatNumber(value) {
+          return format ? 'RM ' + value.toLocaleString() : value.toLocaleString(); // Format with 'RM' and thousand separator
+        }
+
+        function step() {
+          current += increment;
+          if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end; // Stop when target is reached
+          }
+          element.text(formatNumber(Math.floor(current))); // Update element with formatted value
+          if (current !== end) {
+            requestAnimationFrame(step); // Continue the animation until target is reached
+          }
+        }
+        requestAnimationFrame(step);
+      }
+
+      function fetchStatus(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+
+        if (sector === null) {
+          sector = ''; // Convert null to an empty string
+        }
+
+        // Set bidtype to an empty string if it is null
+        if (bidtype === null) {
+          bidtype = ''; // Convert null to an empty string
+        }
+
+        // Set pipeline to an empty string if it is null
+        if (ppline === null) {
+          ppline = ''; // Convert null to an empty string
+        }
+
+        // Set monthYear to an empty string if it is null
+        if (monthYear === null) {
+          monthYear = ''; // Convert null to an empty string
+        }
+
+        // Set solution to an empty string if it is null
+        if (solutionn === null) {
+          solutionn = ''; // Convert null to an empty string
+        }
+
+        $.ajax({
+          url: 'controller/updateStatus.php', // path
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector,
+            bidtype: bidtype, // Include the bidtype in the request
+            ppline: ppline,
+            monthYear: monthYear,
+            solutionn: solutionn, // Include the solution in the request
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          success: function(response) {
+            //console.log("Total Bids and Money:", response);
+            // Get new values from response
+            const newTotalBids = parseInt($(response).filter('#totalBids').text().replace(/[^0-9]/g, ''), 10);
+            const newTotalRevenue = parseInt($(response).filter('#totalRevenue').text().replace(/[^0-9]/g, ''), 10);
+
+            // Get current values (ensure they're formatted correctly)
+            const currentTotalBids = parseInt($('#totalBids').text().replace(/[^0-9]/g, ''), 10);
+            const currentTotalRevenue = parseInt($('#totalRevenue').text().replace(/[^0-9]/g, ''), 10);
+
+            // Animate Total Bids with a simple animation (no currency format)
+            animateValue($('#totalBids'), currentTotalBids, newTotalBids, 1000); // 1000ms duration
+
+            // Animate Total Bids Revenue with the formatted value
+            animateValue($('#totalRevenue'), currentTotalRevenue, newTotalRevenue, 1000, true); // 1000ms duration with formatting
+          },
+          error: function(xhr, status, error) {
+            console.error('Error fetching filtered data:', error);
+          }
+        });
+      }
+
+      function fetchBidStatus(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
+        if (sector === null) sector = '';
+        if (bidtype === null) bidtype = '';
+        if (ppline === null) ppline = '';
+        if (monthYear === null) monthYear = '';
+        if (solutionn === null) solutionn = '';
+
+        $.ajax({
+          url: 'controller/updateBidStatus.php',
+          method: 'GET',
+          data: {
+            status: status,
+            sector: sector,
+            bidtype: bidtype,
+            ppline: ppline,
+            monthYear: monthYear,
+            solutionn: solutionn,
+            year: year,
+            startDate: startDate,
+            endDate: endDate
+          },
+          success: function(response) {
+            //console.log("Status:", response); // This will be a JSON object
+
+            const newWIP = parseInt(response.WIP, 10);
+            const newSubmitted = parseInt(response.Submitted, 10);
+            const newDropped = parseInt(response.Dropped, 10);
+
+            // Get current values (ensure they're formatted correctly)
+            const currentWIP = parseInt($('#totalWIP').text().replace(/[^0-9]/g, ''), 10);
+            const currentSubmitted = parseInt($('#totalSubmitted').text().replace(/[^0-9]/g, ''), 10);
+            const currentDropped = parseInt($('#totalDropped').text().replace(/[^0-9]/g, ''), 10);
+
+            // Animate WIP
+            animateValue($('#totalWIP'), currentWIP, newWIP, 1000); // 1000ms duration
+
+            // Animate Submitted
+            animateValue($('#totalSubmitted'), currentSubmitted, newSubmitted, 1000); // 1000ms duration
+
+            // Animate Dropped
+            animateValue($('#totalDropped'), currentDropped, newDropped, 1000); // 1000ms duration
+          },
+          error: function(xhr, status, error) {
+            console.error('Error fetching filtered data:', error);
+          }
+        });
+      }
+
+      document.getElementById("exportToPDF").addEventListener("click", function() {
+        const formData = new FormData(document.getElementById("filterForm"));
+
+        // Helper function to format numbers as K or M
+        function formatSum(value) {
+          if (value >= 1000000) {
+            return (value / 1000000).toFixed(2) + ' M';
+          } else if (value >= 1000) {
+            return (value / 1000).toFixed(2) + ' K';
+          } else {
+            return value.toString();
+          }
+        }
+
+        // Format solutionsData
+        const formattedSolutionsData = {};
+        for (const [key, value] of Object.entries(solutionsData)) {
+          formattedSolutionsData[key] = formatSum(value);
+        }
+
+        formData.append('totalBids', document.getElementById('totalBids').innerText);
+        formData.append('totalRevenue', document.getElementById('totalRevenue').innerText);
+        formData.append('totalWIP', document.getElementById('totalWIP').innerText);
+        formData.append('totalSubmitted', document.getElementById('totalSubmitted').innerText);
+        formData.append('totalDropped', document.getElementById('totalDropped').innerText);
+        formData.append('marketSectorData', JSON.stringify(marketSectorData));
+        formData.append('totalBidsData', JSON.stringify(totalBidsData));
+        formData.append('totalRevenueData', JSON.stringify(totalRevenueData));
+        formData.append('monthsData', JSON.stringify(monthsData));
+        formData.append('bidTypesDatas', JSON.stringify(bidTypesDatas));
+        formData.append('pipelinesDatas', JSON.stringify(pipelinesDatas));
+
+        // Add formatted solutionsData to form data
+        formData.append('solutionsData', JSON.stringify(formattedSolutionsData));
+
+        const chartIDs = [
+          "reportsChart",
+          "stakedBarChart",
+          "sectorChart",
+          "horizontalBarChart",
+          "barChart",
+          "bidTypesBarChart",
+          "pipelinesBarChart"
         ];
-        barChart.update();
 
-        // Reset stacked bar chart data to original state
-        stackedBarChart.data.datasets.forEach((dataset, datasetIndex) => {
-          dataset.data = [
-            solutionCounts['PaduNet'][dataset.label],
-            solutionCounts['SecureX'][dataset.label],
-            solutionCounts['AwanHeiTech'][dataset.label],
-            solutionCounts['iSentrix'][dataset.label],
-            solutionCounts['MixSolution'][dataset.label]
-          ];
-        });
-        stackedBarChart.update();
-      }
-    });
-  </script>
+        chartIDs.forEach((chartID) => {
+          const chartElement = document.getElementById(chartID);
 
-
-  <!-- PieChart and VerticalBarChart -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Parse the PHP variable directly into a JavaScript variable
-      const bidCounts = <?php echo $bidCountsJson; ?>;
-
-      // Initialize pie chart
-      var pieChart = echarts.init(document.querySelector("#sectorChart"));
-
-      var pieOption = {
-        tooltip: {
-          trigger: "item",
-        },
-        legend: {
-          top: "5%",
-          left: "center",
-          itemGap: 5,
-          textStyle: {
-            fontSize: 10,
-          },
-        },
-        series: [{
-          name: "Bids",
-          type: "pie",
-          radius: ["30%", "60%"],
-          avoidLabelOverlap: false,
-          label: {
-            show: false,
-            position: "center",
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: "rgba(0, 0, 0, 0.5)",
-            },
-            label: {
-              show: true,
-              fontSize: "14",
-              fontWeight: "bold",
-            },
-          },
-          labelLine: {
-            show: false,
-          },
-          data: [{
-              value: bidCounts["TMG (Private Sector)"],
-              name: "TMG (Private Sector)"
-            },
-            {
-              value: bidCounts["TMG (Public Sector)"],
-              name: "TMG (Public Sector)"
-            },
-            {
-              value: bidCounts["NMG"],
-              name: "NMG"
-            },
-            {
-              value: bidCounts["IMG"],
-              name: "IMG"
-            },
-            {
-              value: bidCounts["Channel"],
-              name: "Channel"
-            },
-          ],
-        }],
-      };
-
-      // Initialize horizontal bar chart
-      var barChart = echarts.init(document.querySelector("#horizontalBarChart"));
-
-      var barOption = {
-        tooltip: {
-          trigger: "axis",
-          axisPointer: {
-            type: "shadow"
-          }
-        },
-        grid: {
-          left: "5%",
-          right: "5%",
-          bottom: "5%",
-          top: "10%",
-          containLabel: true
-        },
-        xAxis: {
-          type: "value",
-          boundaryGap: [0, 0.01],
-          axisLabel: {
-            fontSize: 10
-          },
-        },
-        yAxis: {
-          type: "category",
-          data: [
-            "TMG (Private Sector)",
-            "TMG (Public Sector)",
-            "NMG",
-            "IMG",
-            "Channel"
-          ],
-          axisLabel: {
-            fontSize: 10
-          },
-        },
-        series: [{
-          name: "Bids",
-          type: "bar",
-          data: [
-            bidCounts["TMG (Private Sector)"],
-            bidCounts["TMG (Public Sector)"],
-            bidCounts["NMG"],
-            bidCounts["IMG"],
-            bidCounts["Channel"]
-          ],
-          barWidth: "40%",
-          itemStyle: {
-            color: "#3398DB"
-          },
-          label: {
-            show: false, // Initially hide the labels
-            position: "insideRight",
-            fontSize: 12,
-            fontWeight: "bold",
-          },
-        }],
-      };
-
-      // Set initial options for both charts
-      pieChart.setOption(pieOption);
-      barChart.setOption(barOption);
-
-      // Track the last clicked sector
-      let lastClickedSector = null;
-
-      // Add click event to pie chart
-      pieChart.on("click", function(params) {
-        var sectorName = params.name; // Get the clicked sector's name
-
-        // Toggle between highlighting the sector and resetting
-        if (lastClickedSector === sectorName) {
-          resetAllCharts(); // Reset all charts
-          lastClickedSector = null; // Clear the last clicked sector
-        } else {
-          updateAllCharts(sectorName); // Highlight only the clicked sector in all charts
-          lastClickedSector = sectorName; // Set the last clicked sector
-        }
-      });
-
-      // Add click event listener to the bar chart
-      barChart.on('click', function(params) {
-        var sectorName = params.name; // Get the clicked sector's name
-
-        // Toggle between highlighting the sector and resetting
-        if (lastClickedSector === sectorName) {
-          resetAllCharts(); // Reset all charts
-          lastClickedSector = null; // Clear the last clicked sector
-        } else {
-          updateAllCharts(sectorName); // Highlight only the clicked sector in all charts
-          lastClickedSector = sectorName; // Set the last clicked sector
-        }
-      });
-
-      // Function to update all charts when a sector is clicked
-      function updateAllCharts(sectorName) {
-        // Update horizontal bar chart
-        updateHorizontalBarChart(sectorName);
-        // Update pie chart
-        updatePieChart(sectorName);
-        // Update stacked bar chart
-        updateStackedBarChart(sectorName);
-      }
-
-      // Function to highlight only the clicked sector in the horizontal bar chart
-      function updateHorizontalBarChart(sectorName) {
-        barOption.series[0].itemStyle = {
-          color: function(param) {
-            return param.name === sectorName ? "#FF0000" : "#A9A9A9"; // Red for the highlighted sector, gray for others
-          },
-        };
-
-        // Update the series label to show the value for the clicked sector
-        barOption.series[0].label = {
-          show: true,
-          formatter: function(param) {
-            return param.name === sectorName ? param.value : ""; // Show value only for the clicked sector
-          },
-        };
-
-        // Refresh the horizontal bar chart
-        barChart.setOption(barOption);
-      }
-
-      // Function to reset the bar chart to its default state
-      function resetHorizontalBarChart() {
-        barOption.series[0].itemStyle = {
-          color: "#3398DB", // Reset color to blue for all bars
-        };
-
-        barOption.series[0].label = {
-          show: false, // Hide labels for all sectors
-        };
-
-        // Refresh the horizontal bar chart
-        barChart.setOption(barOption);
-      }
-
-      // Function to update pie chart based on sector clicked
-      function updatePieChart(sectorName) {
-        pieOption.series[0].data.forEach(function(item) {
-          item.itemStyle = {
-            opacity: item.name === sectorName ? 1 : 0.2, // Highlight clicked sector, fade others
-          };
-        });
-
-        // Refresh the pie chart to reflect changes
-        pieChart.setOption(pieOption);
-      }
-
-      // Function to reset the pie chart to default state
-      function resetPieChart() {
-        pieOption.series[0].data.forEach(function(item) {
-          item.itemStyle = {
-            opacity: 1, // Reset opacity for all sectors
-          };
-        });
-
-        pieChart.setOption(pieOption);
-      }
-
-      // Update Stacked Bar Chart
-      function updateStackedBarChart(sectorName) {
-        const chart = Chart.getChart("stakedBarChart");
-
-        chart.data.datasets.forEach(function(dataset) {
-          dataset.hidden = dataset.label !== sectorName; // Show only clicked sector
-        });
-
-        chart.update();
-      }
-
-      // Function to reset the stacked bar chart to default state
-      function resetStackedBarChart() {
-        const chart = Chart.getChart("stakedBarChart");
-
-        chart.data.datasets.forEach(function(dataset) {
-          dataset.hidden = false; // Show all datasets
-        });
-
-        chart.update();
-      }
-
-      // Reset all charts to default state
-      function resetAllCharts() {
-        resetHorizontalBarChart();
-        resetPieChart();
-        resetStackedBarChart();
-      }
-
-      // Set initial chart options
-      pieChart.setOption(pieOption);
-      barChart.setOption(barOption);
-    });
-  </script>
-  <!-- BidTypesandPipeline Chart -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Get the JSON-encoded data from PHP
-      var bidTypesCounts = <?php echo $bidTypesJson; ?>;
-      var pipelineCounts = <?php echo $pipelineCountsJson; ?>;
-
-      // Data for Bid Types Chart
-      var bidTypesData = [
-        bidTypesCounts['RFQ'],
-        bidTypesCounts['Tender'],
-        bidTypesCounts['Quotation'],
-        bidTypesCounts['RFP'],
-        bidTypesCounts['RFI'],
-        bidTypesCounts['Upstream']
-      ];
-
-      // Bid Types Bar Chart
-      echarts
-        .init(document.querySelector("#bidTypesBarChart"))
-        .setOption({
-          title: {
-            text: "Bid Types",
-            left: "center",
-            textStyle: {
-              fontSize: 14
-            },
-          },
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "shadow"
-            },
-          },
-          grid: {
-            left: "5%",
-            right: "5%",
-            bottom: "5%",
-            top: "15%",
-            containLabel: true,
-          },
-          xAxis: {
-            type: "value",
-            axisLabel: {
-              fontSize: 10
+          if (chartElement) {
+            let chartImage;
+            if (chartElement.tagName === "CANVAS") {
+              chartImage = chartElement.toDataURL("image/png");
+            } else if (chartElement.classList.contains("echart")) {
+              const echartInstance = echarts.getInstanceByDom(chartElement);
+              chartImage = echartInstance ? echartInstance.getDataURL() : null;
             }
-          },
-          yAxis: {
-            type: "category",
-            data: ["RFQ", "Tender", "Quotation", "RFP", "RFI", "Upstream"],
-            axisLabel: {
-              fontSize: 10
-            },
-          },
-          series: [{
-            name: "Bid Types",
-            type: "bar",
-            data: bidTypesData,
-            color: "#4668E6",
-            barWidth: "50%",
-          }],
-        });
 
-      // Data for Pipelines Chart
-      var pipelinesData = [
-        pipelineCounts['Unknown'],
-        pipelineCounts['Loss'],
-        pipelineCounts['Close'],
-        pipelineCounts['KIV'],
-        pipelineCounts['Intro'],
-        pipelineCounts['Clarification']
-      ];
-
-      // Pipelines Bar Chart
-      echarts
-        .init(document.querySelector("#pipelinesBarChart"))
-        .setOption({
-          title: {
-            text: "Pipelines",
-            left: "center",
-            textStyle: {
-              fontSize: 14
-            },
-          },
-          tooltip: {
-            trigger: "axis",
-            axisPointer: {
-              type: "shadow"
-            },
-          },
-          grid: {
-            left: "5%",
-            right: "5%",
-            bottom: "5%",
-            top: "15%",
-            containLabel: true,
-          },
-          xAxis: {
-            type: "value",
-            axisLabel: {
-              fontSize: 10
-            }
-          },
-          yAxis: {
-            type: "category",
-            data: ["Unknown", "Loss", "Close", "KIV", "Intro", "Clarification"],
-            axisLabel: {
-              fontSize: 10
-            },
-          },
-          series: [{
-            name: "Pipelines",
-            type: "bar",
-            data: pipelinesData,
-            color: "#4668E6",
-            barWidth: "50%",
-          }],
-        });
-    });
-  </script>
-
-  <!-- Bids by Month Charts -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Get the JSON-encoded data from PHP
-      var months = <?php echo $monthsJson; ?>;
-      var totalBids = <?php echo $totalBidsJson; ?>;
-      var totalRevenue = <?php echo $totalRevenueJson; ?>;
-
-      // Line chart using ApexCharts
-      new ApexCharts(document.querySelector("#reportsChart"), {
-        series: [{
-            name: "Number of Bids",
-            data: totalBids.map(function(val) {
-              return parseInt(val);
-            }), // Ensure bids are integers
-            type: "area",
-          },
-          {
-            name: "Total Revenue of Bids",
-            data: totalRevenue,
-            type: "line",
-          },
-        ],
-        chart: {
-          height: 250,
-          type: "line",
-          toolbar: {
-            show: false,
-          },
-        },
-        markers: {
-          size: 4, // Smaller markers
-        },
-        stroke: {
-          curve: "smooth",
-          width: 2, // Thinner lines
-          dashArray: [0, 5], // Solid line for bids, dashed for revenue
-        },
-        colors: ["#4154f1", "#ff771d"], // Blue for bids, orange for revenue
-        xaxis: {
-          categories: months, // Month names
-        },
-        yaxis: [{
-            title: {
-              text: "Number of Bids",
-            },
-            min: 0,
-            tickAmount: 5, // Adjusted for better visualization
-            labels: {
-              formatter: function(val) {
-                return parseInt(val); // Convert to integer
-              }
-            }
-          },
-          {
-            opposite: true, // Show revenue axis on the right
-            title: {
-              text: "Total Revenue (Mil)",
-            },
-            min: 0,
-            tickAmount: 5, // Adjusted to suit the revenue scale
-            labels: {
-              formatter: function(val) {
-                if (val >= 1) {
-                  return val + "M"; // If 1 million or more, append 'M'
-                } else {
-                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
-                }
-              }
-            }
-          },
-        ],
-        tooltip: {
-          x: {
-            format: "MMMM", // Format the month
-          },
-          y: {
-            formatter: function(val, opts) {
-              if (opts.seriesIndex === 1) { // For the revenue series
-                if (val >= 1) {
-                  return val + "M"; // If 1 million or more, append 'M'
-                } else {
-                  return (val * 1000) + "K"; // If less than 1 million, show in 'K'
-                }
-              } else {
-                return val; // Return number of bids as is
-              }
+            if (chartImage) {
+              formData.append(chartID + "Image", chartImage);
             }
           }
-        },
-        fill: {
-          type: "solid",
-          opacity: [0.3, 1], // Reduced opacity for area
-        },
-      }).render();
+        });
+
+        fetch("controller/generatePDF.php", {
+            method: "POST",
+            body: formData
+          })
+          .then(response => response.blob())
+          .then(blob => {
+            const url = URL.createObjectURL(blob);
+            window.open(url);
+          })
+          .catch(error => console.error("Error generating PDF:", error));
+      });
+
+
+
     });
   </script>
 
