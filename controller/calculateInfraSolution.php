@@ -59,6 +59,13 @@ $solutionBusinessUnitCounts = [
             "AwanHeiTech" => 0, "SecureX" => 0, "PaduNet" => 0, "iSentrix" => 0
         ]
     ],
+    'MixSolutionRowTotal' => [
+        "TMG (Private Sector)" => 0,
+        "TMG (Public Sector)" => 0,
+        "NMG" => 0,
+        "IMG" => 0,
+        "Channel" => 0,
+    ],
 ];
 
 // Ensure that the keys exist in solutionBusinessUnitCounts before using them
@@ -94,24 +101,27 @@ if ($result->num_rows > 0) {
             }
         }
 
-        // Only proceed if $businessUnit is valid
-        if (!empty($businessUnit) && isset($solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit])) {
-            if ($solutionCount > 1) {
-                // Count as MixSolution
-                foreach ($solutions as $solution) {
-                    if (!empty($solution) && isset($solutionBusinessUnitCounts['MixSolution'][$businessUnit][$solution])) {
-                        $solutionBusinessUnitCounts['MixSolution'][$businessUnit][$solution]++;
-                    }
+       // Only proceed if $businessUnit is valid
+       if (!empty($businessUnit) && isset($solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit])) {
+        if ($solutionCount > 1) {
+            // Count as MixSolution (row-level total)
+            $solutionBusinessUnitCounts['MixSolutionRowTotal'][$businessUnit]++;
+
+            // Count individual solutions in MixSolution
+            foreach ($solutions as $solution) {
+                if (!empty($solution) && isset($solutionBusinessUnitCounts['MixSolution'][$businessUnit][$solution])) {
+                    $solutionBusinessUnitCounts['MixSolution'][$businessUnit][$solution]++;
                 }
-            } else {
-                // Count individual solutions
-                if ($solutions[0] === 'AwanHeiTech') $solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit]++;
-                if ($solutions[1] === 'PaduNet') $solutionBusinessUnitCounts['PaduNet'][$businessUnit]++;
-                if ($solutions[2] === 'SecureX') $solutionBusinessUnitCounts['SecureX'][$businessUnit]++;
-                if ($solutions[3] === 'iSentrix') $solutionBusinessUnitCounts['iSentrix'][$businessUnit]++;
             }
+        } else {
+            // Count individual solutions
+            if ($solutions[0] === 'AwanHeiTech') $solutionBusinessUnitCounts['AwanHeiTech'][$businessUnit]++;
+            if ($solutions[1] === 'PaduNet') $solutionBusinessUnitCounts['PaduNet'][$businessUnit]++;
+            if ($solutions[2] === 'SecureX') $solutionBusinessUnitCounts['SecureX'][$businessUnit]++;
+            if ($solutions[3] === 'iSentrix') $solutionBusinessUnitCounts['iSentrix'][$businessUnit]++;
         }
     }
+}
 }
 
 // Output the counts (optional, if you want to inspect the results)

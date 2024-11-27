@@ -149,6 +149,55 @@ foreach ($solutionsData as $solution => $value) {
 }
 $solutionsDataTable .= '</table>';
 
+$infraSolutionData = json_decode($_POST['infraSolutionData'] ?? '[]', true);
+
+// Generate infraSolutionData table
+$infraSolutionTable = '<table class="stats-table">
+    <tr>
+        <th style="font-size: 10px;">Solution/Sector</th>
+        <th style="font-size: 10px;">PaduNet</th>
+        <th style="font-size: 10px;">Secure-X</th>
+        <th style="font-size: 10px;">AwanHeiTech</th>
+        <th style="font-size: 10px;">i-Sentrix</th>
+    </tr>';
+foreach ($infraSolutionData as $entry) {
+    $infraSolutionTable .= '
+    <tr>
+        <td>' . htmlspecialchars($entry['label']) . '</td>';
+    foreach ($entry['data'] as $dataPoint) {
+        $infraSolutionTable .= '<td>' . htmlspecialchars($dataPoint) . '</td>';
+    }
+    $infraSolutionTable .= '</tr>';
+}
+$infraSolutionTable .= '</table>';
+
+$mixSolutionDetails = json_decode($_POST['mixSolutionDetails'] ?? '[]', true);
+
+// Build a Mix Solution table
+$mixSolutionTable .= '<table class="stats-table">
+    <tr>
+        <th style="font-size: 10px;">Business Unit</th>
+        <th style="font-size: 10px;">Total Bids</th>
+        <th style="font-size: 10px;">AwanHeiTech</th>
+        <th style="font-size: 10px;">Secure-X</th>
+        <th style="font-size: 10px;">PaduNet</th>
+        <th style="font-size: 10px;">i-Sentrix</th>
+    </tr>';
+
+foreach ($mixSolutionDetails as $detail) {
+    $mixSolutionTable .= '
+    <tr>
+        <td>' . htmlspecialchars($detail['businessUnit']) . '</td>
+        <td>' . htmlspecialchars($detail['rowTotal']) . '</td>
+        <td>' . htmlspecialchars($detail['breakdown']['AwanHeiTech'] ?? 0) . '</td>
+        <td>' . htmlspecialchars($detail['breakdown']['SecureX'] ?? 0) . '</td>
+        <td>' . htmlspecialchars($detail['breakdown']['PaduNet'] ?? 0) . '</td>
+        <td>' . htmlspecialchars($detail['breakdown']['iSentrix'] ?? 0) . '</td>
+    </tr>';
+}
+
+$mixSolutionTable .= '</table>';
+
 // Generate HTML for the report
 $html = '
 <!DOCTYPE html>
@@ -170,10 +219,18 @@ $html = '
     }
     h1 {
       text-align: center;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: bold;
       color: #2c3e50;
       margin: 0 0 20px;
+    }
+    h2 {
+      font-size: 24px;
+      color: #2c3e50;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #2c3e50;
+      padding-bottom: 5px;
     }
     .header, .footer {
       text-align: center;
@@ -253,6 +310,11 @@ $html = '
       display: block;
       border-radius: 5px;
     }
+
+    .page-break {
+  page-break-before: always; /* Forces a new page before this element */
+  break-before: page;       /* For modern browsers supporting the standard */
+}
   </style>
 </head>
 <body>
@@ -292,13 +354,17 @@ $html = '
   <h2>Market Sector Data</h2>
   ' . $marketSectorTable . '
 
-  <!-- Market Sector Table Section -->
+  <div class="page-break"></div> <!-- Page break after two tables -->
+
+  <!-- Month Revenue Data Section -->
   <h2>Month Revenue Data</h2>
   ' . $monthsRevenueTable . '
 
   <!-- Bid Types Table Section -->
   <h2>Bid Types Data</h2>
   ' . $bidTypesTable . '
+
+   <div class="page-break"></div> <!-- Page break after two tables -->
 
   <!-- Pipelines Table Section -->
   <h2>Pipelines Data</h2>
@@ -308,35 +374,37 @@ $html = '
   <h2>Each Solution Sum Data</h2>
   ' . $solutionsDataTable . '
 
+   <div class="page-break"></div> <!-- Page break after two tables -->
 
- <!-- Charts Section -->
-<table class="chart-table">
+  <h2>Infrastructure Solution Data</h2>
+  ' . $infraSolutionTable . '
 
-    <!-- Second row with two images -->
-      <tr>
-        <td>' . (isset($charts[3]) ? '<img src="' . htmlspecialchars($charts[3]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-        <td>' . (isset($charts[2]) ? '<img src="' . htmlspecialchars($charts[2]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-        <td>' . (isset($charts[4]) ? '<img src="' . htmlspecialchars($charts[4]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-      </tr>
+  <h2>Mix Solution Breakdown</h2>
+  ' . $mixSolutionTable . '
 
-  <!-- First row with one image spanning three columns -->
-  <tr>
-    <td colspan="3">' . (isset($charts[0]) ? '<img src="' . htmlspecialchars($charts[0]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-  </tr>
+   <div class="page-break"></div> <!-- Page break after two tables -->
 
-  <tr>
-    <td colspan="3">' . (isset($charts[1]) ? '<img src="' . htmlspecialchars($charts[1]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-  </tr>
-  
-  <!-- Third row with three images -->
-  <tr>
-    <td colspan="3">' . (isset($charts[5]) ? '<img src="' . htmlspecialchars($charts[5]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-  </tr>
-
-  <tr>
-    <td colspan="3">' . (isset($charts[6]) ? '<img src="' . htmlspecialchars($charts[6]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
-  </tr>
-</table>
+  <!-- Charts Section -->
+  <h2>Chart Section</h2>
+  <table class="chart-table">
+    <tr>
+      <td>' . (isset($charts[3]) ? '<img src="' . htmlspecialchars($charts[3]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+      <td>' . (isset($charts[2]) ? '<img src="' . htmlspecialchars($charts[2]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+      <td>' . (isset($charts[4]) ? '<img src="' . htmlspecialchars($charts[4]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+    </tr>
+    <tr>
+      <td colspan="3">' . (isset($charts[0]) ? '<img src="' . htmlspecialchars($charts[0]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+    </tr>
+    <tr>
+      <td colspan="3">' . (isset($charts[1]) ? '<img src="' . htmlspecialchars($charts[1]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+    </tr>
+    <tr>
+      <td colspan="3">' . (isset($charts[5]) ? '<img src="' . htmlspecialchars($charts[5]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+    </tr>
+    <tr>
+      <td colspan="3">' . (isset($charts[6]) ? '<img src="' . htmlspecialchars($charts[6]) . '" alt="Chart" class="chart-img"/>' : '') . '</td>
+    </tr>
+  </table>
 
   <div class="footer">Generated on ' . date('F d, Y') . '</div>
 </body>
@@ -347,7 +415,10 @@ $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
+// Get today's date in the desired format (e.g., YYYY-MM-DD)
+$todayDate = date('Y-m-d');
+
 // Output PDF to the browser
 header("Content-Type: application/pdf");
-header("Content-Disposition: attachment; filename=Corporate_Report.pdf");
+header("Content-Disposition: attachment; filename=BidsReport_{$todayDate}.pdf");
 echo $dompdf->output();
