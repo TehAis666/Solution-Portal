@@ -39,7 +39,6 @@ if (isset($_SESSION['user_id'])) {
         'role' => $role,
         'sector' => $sector,
         'phonenum' => $phonenum,
-        'sector' => $sector,
         'managername' => $managername, // Add manager name to the array
         'profile_picture' => $profile_picture,
     ];
