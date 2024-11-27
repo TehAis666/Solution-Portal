@@ -10,23 +10,26 @@
     <style>
         @import url("https://fonts.googleapis.com/css?family=Fira+Sans");
 
-        
+
         body {
             position: relative;
             min-height: 105vh;
-            background-color: #E1E8EE;
+            /* background-color: #E1E8EE; */
+            background-image: url('images/menara.jpg');
+            background-size: 100%;
             width: 100%;
             align-items: center;
             justify-content: center;
             font-family: "Fira Sans", Helvetica, Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-color: #2C3E50;
+            /* background-color: #2C3E50; */
             overflow-y: hidden;
             overflow-x: hidden;
-            background: linear-gradient(135deg, #243B55, #141E30);
+            /* background: linear-gradient(135deg, #243B55, #141E30); */
             /* Hides any horizontal overflow */
         }
+
 
         .form-structor {
             background-color: #222;
@@ -60,11 +63,7 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background-repeat: no-repeat;
-            background-position: left bottom;
-            background-size: 755px;
-            /* background-image: url('https://apicms.thestar.com.my/uploads/images/2023/12/06/2425813.jpg'); */
-            background-image: url('images/menara.jpg');
+            background-color: whitesmoke;
         }
 
         .login {
@@ -422,18 +421,16 @@
             top: 20px;
             left: 20px;
             width: 150px;
-            /* Adjusted for circular dimensions */
             height: 150px;
-            /* Width and height should be equal for a circle */
             border-radius: 50%;
-            /* Makes it circular */
-            border: 2px solid black;
-            /* Add a white circular border */
+            border: 3px solid #333;
+            /* Dark border for contrast */
             object-fit: cover;
-            /* Ensures the image scales well inside the circle */
             z-index: 10;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            /* Optional: Add shadow for better visibility */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            /* Stronger shadow for better visibility */
+            background-color: rgba(0, 0, 0, 0.2);
+            /* Optional: Adds a semi-transparent dark background to highlight the logo */
         }
     </style>
 </head>

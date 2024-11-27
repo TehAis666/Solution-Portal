@@ -512,9 +512,18 @@ try {
                                                     ?>
                                                 </td>
                                                 <td>
-                                                    <!-- View Button with Data Attributes for Each Bid -->
-                                                    <button type="button" class="btn btn-primary rejectbtn">Reject</button>
-                                                    <button type="button" class="btn btn-primary approvebtn">Approve</button>
+                                                    <div style="display: flex; justify-content: center; gap: 10px;">                                                   
+                                                        <button type="button" class="btn btn-primary approvebtn"
+                                                            data-staff-id="<?php echo htmlspecialchars($user['staffID']); ?>"
+                                                            style="<?php echo ($user['status'] === 'Approved') ? 'display:none;' : ''; ?>">
+                                                            Approve
+                                                        </button>                                                                                                          
+                                                        <button type="button" class="btn btn-danger rejectbtn"
+                                                            data-staff-id="<?php echo htmlspecialchars($user['staffID']); ?>"
+                                                            style="<?php echo ($user['status'] === 'Rejected') ? 'display:none;' : ''; ?>">
+                                                            Reject
+                                                        </button>                                                        
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -745,11 +754,15 @@ try {
                     success: function(response) {
                         console.log(response);
                         // On success, update the status badge in the table
-                        const statusCell = row.querySelector('td:nth-child(6)'); // Find the status cell
+                        const statusCell = row.querySelector('td:nth-child(7)'); // Find the status cell
                         if (status === 'Approved') {
                             statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
+                            row.querySelector('.approvebtn').style.display = 'none';
+                            row.querySelector('.rejectbtn').style.display = 'inline-block';
                         } else if (status === 'Rejected') {
                             statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
+                            row.querySelector('.rejectbtn').style.display = 'none';
+                            row.querySelector('.approvebtn').style.display = 'inline-block';
                         }
                         calculateDashboard(); // Update dashboard counts after status change
 
@@ -801,7 +814,7 @@ try {
         });
     </script>
 
-    
+
 </body>
 
 </html>

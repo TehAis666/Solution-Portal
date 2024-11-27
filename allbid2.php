@@ -50,16 +50,28 @@ try {
             WHEN rb.status = 'requested' THEN 'requested'
             WHEN rb.status = 'Rejected' THEN 'rejected'
             ELSE 'others'
-        END AS role
+        END AS role,
+        al.staffname AS LastEditedBy,
+        al.timestamp AS LastEditTimestamp
     FROM bids b
     JOIN tender t ON b.BidID = t.BidID
     LEFT JOIN user u ON b.staffID = u.staffID
     LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? 
+    LEFT JOIN (
+        SELECT 
+            refID, 
+            staffname, 
+            MAX(timestamp) AS timestamp 
+        FROM activitylog 
+        WHERE type = 'bids' 
+        GROUP BY refID, staffname
+    ) al ON b.BidID = al.refID
     WHERE 
         ($solutionConditions)
         OR 
         (b.staffID IN (SELECT staffID FROM user WHERE sector = ?))
     ";
+    
 
     // Prepare and execute the statement
     $stmt = $conn->prepare($query);
@@ -67,8 +79,8 @@ try {
     $stmt->execute();
     $bids = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-    // Fetching staff names along with their sectors
-    $staffQuery = "SELECT staffID, name, sector FROM user WHERE role = 'presales'";
+    // Fetching staff names along with their sectors and roles
+    $staffQuery = "SELECT staffID, name, sector, role FROM user WHERE role IN ('presales', 'head')";
     $staffStmt = $conn->query($staffQuery);
     $staffNames = [];
 
@@ -100,9 +112,6 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -619,6 +628,8 @@ try {
                                                     <button type="button" class="btn btn-primary viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-role="<?php echo htmlspecialchars($bid['role']); ?>"
+                                                        data-lastupdatedby="<?php echo htmlspecialchars($bid['LastEditedBy'] ?? 'null'); ?>"
+                                                        data-lastupdatedate="<?php echo htmlspecialchars($bid['LastEditTimestamp'] ?? 'null'); ?>"
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
                                                         data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"
                                                         data-staffid="<?php echo htmlspecialchars($bid['staffID']); ?>"
@@ -789,6 +800,12 @@ try {
                                 <div class="col-sm-4"><strong>Remarks:</strong></div>
                                 <div class="col-sm-8" id="modalRemarks">-</div>
                             </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Last updated by:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedby">-</div>
+                                <div class="col-sm-4"><strong>Time:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedate">-</div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -818,13 +835,19 @@ try {
                                 <div id="firstSlide">
                                     <div class="row mb-3 sub-presales-field">
                                         <div class="col-md-12">
-                                            <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
+                                        <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
                                             <select id="updateStaffName" class="form-select" name="StaffID">
                                                 <?php foreach ($groupedStaffBySector as $sectorName => $staffList): ?>
                                                     <optgroup label="<?php echo htmlspecialchars($sectorName); ?>">
                                                         <?php foreach ($staffList as $staff): ?>
                                                             <option value="<?php echo htmlspecialchars($staff['staffID']); ?>">
-                                                                <?php echo htmlspecialchars($staff['name']); ?>
+                                                                <?php
+                                                                // Append role to name if the staff is a head
+                                                                echo htmlspecialchars($staff['name']);
+                                                                if ($staff['role'] === 'head') {
+                                                                    echo " (head)";
+                                                                }
+                                                                ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </optgroup>
@@ -1371,7 +1394,10 @@ try {
 
                 var staffName = $(this).data('staffname');
                 var staffID = $(this).data('staffid');
-
+                
+                var lastupdatedby = $(this).data('lastupdatedby');
+                var lastupdatedate = $(this).data('lastupdatedate');
+                
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
                 var value1 = $(this).data('value1');
@@ -1413,7 +1439,8 @@ try {
                 $('#modalBidID').text(bidID);
                 $('#modalstaffID').text(staffID);
 
-
+                $('#modallastupdatedby').text(lastupdatedby);
+                $('#modallastupdatedate').text(lastupdatedate);
 
                 $('#modalRequestDate').text(requestDate);
                 $('#modalSubmissionDate').text(submissionDate);

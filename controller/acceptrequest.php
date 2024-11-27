@@ -4,13 +4,14 @@
 include_once '../db/db.php';
 
 // Check if the request method is POST and necessary data is provided
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requestID'], $_POST['userID'], $_POST['action'])) {
+    $requestID = intval($_POST['requestID']);
     $userID = intval($_POST['userID']);
     $action = $_POST['action'];
 
     // Validate the action is either 'accept' or 'reject'
     if (!in_array($action, ['accept', 'reject'])) {
-        echo "Invalid action.";
+        echo json_encode(['success' => false, 'message' => 'Invalid action.']);
         exit;
     }
 
@@ -18,21 +19,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['userID'], $_POST['act
     $newStatus = ($action === 'accept') ? 'Accepted' : 'Rejected';
 
     try {
-        // Prepare the SQL statement to update the status
-        $stmt = $conn->prepare("UPDATE requestbids SET status = ? WHERE staffID = ?");
-        $stmt->bind_param("si", $newStatus, $userID);
+        // Prepare the SQL statement to update the status using requestID
+        $stmt = $conn->prepare("UPDATE requestbids SET status = ? WHERE requestID = ? AND staffID = ?");
+        $stmt->bind_param("sii", $newStatus, $requestID, $userID);
 
         if ($stmt->execute()) {
-            echo "Request successfully $newStatus.";
+            echo json_encode(['success' => true, 'newStatus' => $newStatus]);
         } else {
-            echo "Error updating request status.";
+            echo json_encode(['success' => false, 'message' => 'Error updating request status.']);
         }
 
         $stmt->close();
     } catch (Exception $e) {
-        echo "Error: " . $e->getMessage();
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 } else {
-    echo "Invalid request.";
+    echo json_encode(['success' => false, 'message' => 'Invalid request.']);
 }
 ?>
