@@ -260,6 +260,69 @@
             text-decoration: none;
             /* Remove underline on hover */
         }
+
+        /* Transparent modal overlay */
+        #dropzoneModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            /* Semi-transparent black overlay */
+            backdrop-filter: blur(10px);
+            /* Blurs the background */
+            z-index: 1050;
+        }
+
+        /* Modal content styling */
+        #dropzoneModal .modal-content {
+            background: rgba(255, 255, 255, 0.85);
+            /* Semi-transparent white */
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Button styling */
+        #dropzoneModal button {
+            margin-top: 20px;
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Dropzone styling overrides */
+        #myDropzone {
+            border: 2px dashed #888;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.7);
+            /* Light transparent background */
+            padding: 30px;
+            color: #333;
+        }
+
+        #myDropzone .dz-message {
+            font-size: 1.2em;
+            color: #888;
+        }
     </style>
 </head>
 
@@ -281,25 +344,35 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
-                            <!-- Flex container for breadcrumb and button -->
-                            <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 20px;">
+                            <!-- Flex container for breadcrumb and buttons -->
+                            <div class="d-flex align-items-center" style="margin-bottom: 20px;">
                                 <!-- Breadcrumb with margin -->
-                                <div class="folderpath" style="margin-top: 10px; margin-bottom: 10px;">
+                                <div class="folderpath flex-grow-1" style="margin-top: 10px; margin-bottom: 10px;">
                                     <nav>
                                         <ol class="breadcrumb" style="margin-top: 0;">
                                             <li class="breadcrumb-item"><a href="#" onclick="goHome()">Home</a></li>
-                                            <!-- Folder name(s) will be inserted here dynamically -->
+                                            <!-- Folder name(s) dynamically inserted here -->
                                         </ol>
                                     </nav>
                                 </div>
-                                <!-- Button at the top-right corner -->
+
+                                <!-- Buttons Container with custom spacing -->
                                 <button
-                                    class="btn btn-success btn-sm rounded-pill"
+                                    class="btn btn-success btn-sm rounded-pill me-2"
                                     style="margin-top: 10px;"
                                     title="Create a new folder"
                                     data-bs-target="#folderModal"
                                     data-bs-toggle="modal">
                                     <i class="ri-folder-add-fill"></i>
+                                </button>
+
+                                <button
+                                    id="addFileBtn"
+                                    class="btn btn-primary btn-sm rounded-pill"
+                                    style="margin-top: 10px; display: none;"
+                                    title="Add new file"
+                                    onclick="showDropzoneModal()">
+                                    <i class="ri-file-add-fill"></i> Add New File
                                 </button>
                             </div>
 
@@ -362,6 +435,18 @@
                         <button type="submit" form="folderForm" class="btn btn-primary rounded-pill">Create Folder</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="dropzoneModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Upload Files</h3>
+                <form id="myDropzone" class="dropzone" action="controller/uploadFile.php">
+                    <div class="dz-message">Drag files here or click to upload</div>
+                </form>
+                <button onclick="hideDropzoneModal()" class="btn btn-secondary rounded">Cancel</button>
+                <!-- Upload button to trigger AJAX upload -->
+                <button id="uploadButton" class="btn btn-primary rounded">Upload</button>
             </div>
         </div>
 
@@ -550,11 +635,127 @@
             fetchFolders(); // Fetch folder data when the page loads
         });
 
-        // Function to open the folder and display its contents (files)
+        // Function to show Dropzone modal and initialize Dropzone if needed
+        function showDropzoneModal() {
+            const dropzoneModal = document.getElementById('dropzoneModal');
+            dropzoneModal.style.display = 'flex';
+
+            if (!Dropzone.instances.length) { // Prevent duplicate initialization
+                const myDropzone = new Dropzone("#myDropzone", {
+                    paramName: "files[]", // Name of file parameter
+                    maxFilesize: 5, // Max file size in MB
+                    addRemoveLinks: true, // Allow file removal
+                    dictDefaultMessage: "Drag files here or click to upload",
+                    autoProcessQueue: false, // Disable automatic submission to allow AJAX upload
+
+                    // Event listener for successful file add
+                    success: function(file, response) {
+                        // You can handle the success here, but we'll do it via AJAX
+                    },
+
+                    // Error handling for failed uploads
+                    error: function(file, errorMessage) {
+                        alert('Error uploading file: ' + errorMessage);
+                    }
+                });
+
+                // You can manually handle the file upload here with AJAX
+                document.getElementById('uploadButton').addEventListener('click', function() {
+                    uploadFilesWithAjax();
+                });
+            }
+        }
+
+        // Function to hide Dropzone modal
+        function hideDropzoneModal() {
+            const dropzoneModal = document.getElementById('dropzoneModal');
+            dropzoneModal.style.display = 'none';
+        }
+
+        // Function to control Add File button visibility
+        function toggleAddFileButton(show) {
+            const addFileBtn = document.getElementById('addFileBtn');
+            addFileBtn.style.display = show ? 'inline-block' : 'none';
+        }
+
+        // Function to upload files using AJAX
+        function uploadFilesWithAjax() {
+            const myDropzone = Dropzone.forElement("#myDropzone"); // Get Dropzone instance
+
+            // Create FormData object for AJAX submission
+            const formData = new FormData();
+            const files = myDropzone.files; // Get all files in the Dropzone instance
+
+            // Append each file to the FormData object
+            files.forEach(function(file) {
+                formData.append('files[]', file);
+            });
+
+            // Append the folderID to the FormData
+            formData.append('folderID', currentFolderID); // currentFolderID should be defined elsewhere in your code
+
+            // Send the files using AJAX
+            $.ajax({
+                url: 'controller/uploadFile.php', // Your backend controller that handles the upload
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    const data = JSON.parse(response); // Assuming the response is JSON
+                    if (data.success) {
+                        alert("Files uploaded successfully!");
+                        hideDropzoneModal(); // Close the modal
+                        openFolder(currentFolderID); // Refresh the folder view
+                    } else {
+                        alert(data.message || "File upload failed.");
+                    }
+                },
+                error: function() {
+                    alert("Error occurred during file upload.");
+                }
+            });
+        }
+
+        // Upload file function
+        function uploadFile(folderID) {
+            const dropzoneModal = document.getElementById('dropzoneModal');
+            const files = document.getElementById('fileInput').files;
+            const formData = new FormData();
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+
+            formData.append('folderID', folderID); // Pass folderID with the request
+
+            $.ajax({
+                url: 'controller/uploadFile.php', // Update with your controller's path
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        alert('File(s) uploaded successfully!');
+                        hideDropzoneModal(); // Hide the modal
+                        openFolder(folderID); // Refresh the folder
+                    } else {
+                        alert(response.message || 'File upload failed.');
+                    }
+                },
+                error: function() {
+                    alert('Error occurred during file upload.');
+                }
+            });
+        }
+
+        // Example usage in openFolder() function
         function openFolder(folderID, folderName) {
             console.log('Opening folder with ID:', folderID);
+
             $.ajax({
-                url: 'controller/fetchFolderContents.php', // PHP to fetch files inside the folder
+                url: 'controller/fetchFolderContents.php',
                 method: 'GET',
                 data: {
                     folderID: folderID
@@ -562,25 +763,19 @@
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        // If there are files in the folder, populate them
-                        if (response.data.length > 0) {
-                            populateFolderContents(response.data);
-                        } else {
-                            // If no files in the folder, display a message in the table
-                            displayNoFilesMessage();
-                        }
+                        populateFolderContents(response.data);
+                        toggleAddFileButton(true); // Show Add File button
                     } else {
-                        alert(response.message || 'Failed to load folder contents');
+                        alert(response.message || 'Failed to load folder contents.');
                     }
                 },
                 error: function() {
-                    alert('Error fetching folder contents');
+                    alert('Error fetching folder contents.');
                 }
             });
 
-            // Update breadcrumb
-            breadcrumb.push(folderName); // Add the folder name to the breadcrumb
-            updateBreadcrumb(); // Call the function to update the breadcrumb
+            breadcrumb.push(folderName);
+            updateBreadcrumb();
         }
 
         // Function to populate the files inside the folder
