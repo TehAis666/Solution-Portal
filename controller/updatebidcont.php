@@ -1,11 +1,14 @@
 <?php
 // Include the database connection file
 include '../db/db.php';
+include_once 'handler/updateactivitylog.php';
+session_start();
 
-$loggedInStaffID = intval($_SESSION['user_id']);  // Retrieve the staff ID from session
-
+// Retrieve the staff ID from session
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $debugMessages = []; // Array to collect debug messages
+
+    $loggedInStaffID = intval($_SESSION['user_id']);
 
     // Check for required fields
     if (empty($_POST['BidID']) || empty($_POST['TenderID'])) {
@@ -50,13 +53,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $debugMessages[] = "CustName: $custName";
     $debugMessages[] = "HMS_Scope: $hmsScope";
     $debugMessages[] = "StaffID (from POST): " . var_export($staffID, true);
-    // Add other variables to debug messages here as needed
 
     // Begin transaction
     $conn->begin_transaction();
 
     try {
-        // Update bids table
+        // Fetch current bid data
+        $currentBidData = $conn->query("SELECT * FROM bids WHERE BidID = $bidID")->fetch_assoc();
+        // Fetch current tender data
+        $currentTenderData = $conn->query("SELECT * FROM tender WHERE TenderID = $tenderID")->fetch_assoc();
+
+        // Combine current bid and tender data
+        $combinedCurrentData = array_merge($currentBidData, $currentTenderData);
+
+        // Prepare the update for bids table
         $updateBid = "UPDATE bids SET 
                         StaffID = '$staffID',
                         CustName = '$custName',
@@ -71,13 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         UpdateDate = NOW()
                       WHERE BidID = $bidID";
 
-        $debugMessages[] = "Executing Query for Bids: $updateBid";
-
         if (!$conn->query($updateBid)) {
             throw new Exception("Error updating bids table: " . $conn->error);
         }
 
-        // Update tender table
+        // Prepare the update for tender table
         $updateTender = "UPDATE tender SET 
                         Solution1 = '$solution1',
                         Solution2 = '$solution2',
@@ -97,11 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Remarks = '$remarks'
                       WHERE TenderID = $tenderID";
 
-        $debugMessages[] = "Executing Query for Tender: $updateTender";
-
         if (!$conn->query($updateTender)) {
             throw new Exception("Error updating tender table: " . $conn->error);
         }
+
+        // Log activity for both bid and tender updates
+        logActivity($loggedInStaffID, $_SESSION['user_name'], "Updated Bid and Tender: $custName ", "bids", $bidID, $conn, $combinedCurrentData, $_POST);
 
         // Commit transaction
         $conn->commit();
@@ -111,7 +120,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->rollback();
         $debugMessages[] = "Error: " . $e->getMessage();
     }
-
-    // Output the debug messages as a JavaScript alert
-    echo "<script>alert('" . implode("\\n", $debugMessages) . "');</script>";
 }

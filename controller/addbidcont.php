@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                  VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt_bids = $conn->prepare($sql_bids);
-    $stmt_bids->bind_param("ssssssssss",$staffID, $requestDate, $status, $customerName, $scope, $tender, $type, $businessUnit, $accountSector, $accountManager);
+    $stmt_bids->bind_param("ssssssssss", $staffID, $requestDate, $status, $customerName, $scope, $tender, $type, $businessUnit, $accountSector, $accountManager);
 
     // Execute bids insertion and check for errors
     if ($stmt_bids->execute()) {
@@ -48,21 +48,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt_tender = $conn->prepare($sql_tender);
 
     $solution1 = in_array("AwanHeiTech", $solutions) ? "AwanHeiTech" : "";
-$solution2 = in_array("PaduNet", $solutions) ? "PaduNet" : "";
-$solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : "";
-$solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
+    $solution2 = in_array("PaduNet", $solutions) ? "PaduNet" : "";
+    $solution3 = in_array("Secure-X", $solutions) ? "Secure-X" : "";
+    $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
 
     // Bind parameters
-    $stmt_tender->bind_param("issssss", $bidID, $solution1, $solution2, $solution3, $solution4, $submissionDate,$remarks);
+    $stmt_tender->bind_param("issssss", $bidID, $solution1, $solution2, $solution3, $solution4, $submissionDate, $remarks);
 
     // Execute tender insertion and check for errors
     if ($stmt_tender->execute()) {
         // On successful insertion, redirect with an alert
-        logActivity($_SESSION['user_id'], $_SESSION['user_name'] , "Added New Bid: " . $customerName, "bids", $bidID, $conn);
-        
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Added New Bid: " . $customerName, "bids", $bidID, $conn);
+
         echo "<script>
                 alert('Bids successfully created.');
-                window.location.href = '../userbid';
+                window.location.href = '../userbid4';
               </script>";
     } else {
         die("Error inserting tender: " . $stmt_tender->error);
@@ -75,4 +75,3 @@ $solution4 = in_array("i-Sentrix", $solutions) ? "i-Sentrix" : "";
 } else {
     echo "No POST data received.";
 }
-?>

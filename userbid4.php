@@ -11,6 +11,7 @@ include_once 'db/db.php';
 try {
     $staffID = $_SESSION['user_id'];
     $name = $_SESSION['user_name'];
+    $sector = $_SESSION['user_sector'];
 
     // Query to fetch bids along with staff and affiliate names
     $stmt = $conn->query("
@@ -471,7 +472,7 @@ try {
                                 <thead>
                                     <tr>
                                         <th>Last Update</th>
-                                        <th>Owner</th> <!-- New column for Staff Name -->
+                                        <th>Presales</th> <!-- New column for Staff Name -->
                                         <th>Sub-Presales</th> <!-- New column for Staff Name -->
                                         <th>Company/Agency Name</th>
                                         <th>Tender Proposal Title</th>

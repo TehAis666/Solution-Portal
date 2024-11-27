@@ -45,10 +45,21 @@ SELECT
       CASE WHEN t.Solution2 IS NOT NULL AND t.Solution2 != '' THEN 'PaduNet' ELSE NULL END,
       CASE WHEN t.Solution3 IS NOT NULL AND t.Solution3 != '' THEN 'Secure-X' ELSE NULL END,
       CASE WHEN t.Solution4 IS NOT NULL AND t.Solution4 != '' THEN 'i-Sentrix' ELSE NULL END
-    ) AS Solutions
+    ) AS Solutions,
+     al.staffname AS LastEditedBy,
+        al.timestamp AS LastEditTimestamp
 FROM bids b
 LEFT JOIN tender t ON b.BidID = t.BidID
 LEFT JOIN user u ON b.staffID = u.staffID
+LEFT JOIN (
+        SELECT 
+            refID, 
+            staffname, 
+            MAX(timestamp) AS timestamp 
+        FROM activitylog 
+        WHERE type = 'bids' 
+        GROUP BY refID, staffname
+    ) al ON b.BidID = al.refID
 ";
 
     // Add solution filtering if solutions are selected
@@ -62,12 +73,19 @@ LEFT JOIN user u ON b.staffID = u.staffID
     $stmt = $conn->query($query);
     $bids = $stmt->fetch_all(MYSQLI_ASSOC);
 
-    $staffNames = [];
-    $staffQuery = "SELECT staffID, name FROM user WHERE role = 'presales'";
+    // Fetching staff names along with their sectors and roles
+    $staffQuery = "SELECT staffID, name, sector, role FROM user WHERE role IN ('presales', 'head')";
     $staffStmt = $conn->query($staffQuery);
+    $staffNames = [];
 
     if ($staffStmt) {
         $staffNames = $staffStmt->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Group staff by sector
+    $groupedStaffBySector = [];
+    foreach ($staffNames as $staff) {
+        $groupedStaffBySector[$staff['sector']][] = $staff;
     }
 
 
@@ -591,6 +609,8 @@ LEFT JOIN user u ON b.staffID = u.staffID
                                                     <!-- View Button with Data Attributes for Each Bid -->
                                                     <button type="button" class="btn btn-primary viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
+                                                        data-lastupdatedby="<?php echo htmlspecialchars($bid['LastEditedBy'] ?? 'null'); ?>"
+                                                        data-lastupdatedate="<?php echo htmlspecialchars($bid['LastEditTimestamp'] ?? 'null'); ?>"
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
                                                         data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"
                                                         data-staffid="<?php echo htmlspecialchars($bid['staffID']); ?>"
@@ -759,6 +779,12 @@ LEFT JOIN user u ON b.staffID = u.staffID
                                 <div class="col-sm-4"><strong>Remarks:</strong></div>
                                 <div class="col-sm-8" id="modalRemarks">-</div>
                             </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Last updated by:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedby">-</div>
+                                <div class="col-sm-4"><strong>Time:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedate">-</div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -789,21 +815,31 @@ LEFT JOIN user u ON b.staffID = u.staffID
                                         <div class="col-md-12">
                                             <label for="updateStaffName" class="form-label"><strong>Presales:</strong></label>
                                             <select id="updateStaffName" class="form-select" name="StaffID">
-                                                <?php foreach ($staffNames as $staff): ?>
-                                                    <option value="<?php echo htmlspecialchars($staff['staffID']); ?>">
-                                                        <?php echo htmlspecialchars($staff['name']); ?>
-                                                    </option>
+                                                <?php foreach ($groupedStaffBySector as $sectorName => $staffList): ?>
+                                                    <optgroup label="<?php echo htmlspecialchars($sectorName); ?>">
+                                                        <?php foreach ($staffList as $staff): ?>
+                                                            <option value="<?php echo htmlspecialchars($staff['staffID']); ?>">
+                                                                <?php
+                                                                // Append role to name if the staff is a head
+                                                                echo htmlspecialchars($staff['name']);
+                                                                if ($staff['role'] === 'head') {
+                                                                    echo " (head)";
+                                                                }
+                                                                ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </optgroup>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="row mb-3 align-items-center sub-presales-field">
                                         <div class="col-md-4">
-                                            <label  class="form-label"><strong>Sub-Presales:</strong></label>
+                                            <label class="form-label"><strong>Sub-Presales:</strong></label>
                                         </div>
                                         <div class="col-md-8">
                                             <a id="updateAffiliateName" class="form-control-plaintext text-primary">Edit Permission</a>
-                                        </div> 
+                                        </div>
                                     </div>
 
                                     <!-- Existing fields -->
@@ -1345,6 +1381,8 @@ LEFT JOIN user u ON b.staffID = u.staffID
 
                 var staffName = $(this).data('staffname');
                 var staffID = $(this).data('staffid');
+                var lastupdatedby = $(this).data('lastupdatedby');
+                var lastupdatedate = $(this).data('lastupdatedate');
 
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
@@ -1380,6 +1418,9 @@ LEFT JOIN user u ON b.staffID = u.staffID
                 $('#modalPresales4').text(presales4);
 
                 $('#modalStaffName').text(staffName);
+
+                $('#modallastupdatedby').text(lastupdatedby);
+                $('#modallastupdatedate').text(lastupdatedate);
 
                 $('#modalRequestDate').text(requestDate);
                 $('#modalSubmissionDate').text(submissionDate);

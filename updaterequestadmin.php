@@ -36,7 +36,6 @@ try {
     if (empty($users)) {
         echo "<script>console.log('No requests found for BidID: $bidID');</script>";
     }
-
 } catch (Exception $e) {
     // Handle any errors
     echo "Error: " . $e->getMessage();
@@ -428,9 +427,19 @@ try {
                                             <td style="text-align:center"><?php echo htmlspecialchars($user['Tender_Proposal']); ?></td>
                                             <td style="text-align:center"><?php echo htmlspecialchars($user['status']); ?></td>
                                             <td style="text-align:center">
-                                                <!-- Accept and Reject buttons -->
-                                                <button type="button" class="btn btn-success acceptbtn" data-user-id="<?php echo $user['staffID']; ?>">Accept</button>
-                                                <button type="button" class="btn btn-danger rejectbtn" data-user-id="<?php echo $user['staffID']; ?>">Reject</button>
+                                                <div style="display: flex; justify-content: center; gap: 10px;">
+                                                    <button type="button" class="btn btn-success acceptbtn"
+                                                        data-user-id="<?php echo $user['staffID']; ?>"
+                                                        data-request-id="<?php echo $user['requestID']; ?>"
+                                                        style="<?php echo ($user['status'] === 'Accepted') ? 'display:none;' : ''; ?>">
+                                                        Accept
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger rejectbtn"
+                                                        data-user-id="<?php echo $user['staffID']; ?>"
+                                                        data-request-id="<?php echo $user['requestID']; ?>"
+                                                        style="<?php echo ($user['status'] === 'Rejected') ? 'display:none;' : ''; ?>">
+                                                        Reject
+                                                    </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -487,54 +496,89 @@ try {
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Accept button logic
-            document.querySelectorAll('.acceptbtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userID = this.getAttribute('data-user-id');
+        function updateRowButtons(row, status) {
+            if (!row) {
+                console.error("Row is null or undefined.");
+                return;
+            }
 
-                    // Send an AJAX POST request to accept the request
-                    fetch('controller/acceptrequest.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `userID=${userID}&action=accept`,
-                        })
-                        .then(response => response.text())
-                        .then(data => {
-                            // Handle successful acceptance
-                            console.log(data);
-                            this.closest('tr').querySelector('td:nth-child(6)').textContent = 'Accepted';
-                        })
-                        .catch(error => console.error('Error:', error));
-                });
-            });
+            console.log("Row HTML:", row.innerHTML); // Log the full row HTML for inspection
 
-            // Reject button logic
-            document.querySelectorAll('.rejectbtn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userID = this.getAttribute('data-user-id');
+            const acceptButton = row.querySelector('.acceptbtn');
+            const rejectButton = row.querySelector('.rejectbtn');
 
-                    // Send an AJAX POST request to reject the request
-                    fetch('controller/acceptrequest.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `userID=${userID}&action=reject`,
-                        })
-                        .then(response => response.text())
-                        .then(data => {
-                            console.log(data); // Optional: Check response from the server
-                            // Optionally, update the UI to reflect the change
-                            this.closest('tr').querySelector('td:nth-child(6)').textContent = 'Rejected';
-                        })
-                        .catch(error => console.error('Error:', error));
-                });
-            });
+            if (!acceptButton || !rejectButton) {
+                console.error("Accept or Reject button is missing from the row.");
+                return;
+            }
+
+            const statusCell = row.querySelector('td:nth-child(6)');
+            if (statusCell) {
+                statusCell.textContent = status;
+            }
+
+            if (status === 'Accepted') {
+                acceptButton.style.display = 'none';
+                rejectButton.style.display = 'inline-block';
+            } else if (status === 'Rejected') {
+                rejectButton.style.display = 'none';
+                acceptButton.style.display = 'inline-block';
+            }
+        }
+
+
+        // Generic function to handle button actions
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('acceptbtn')) {
+                const row = event.target.closest('tr');
+                const userID = event.target.getAttribute('data-user-id');
+                const requestID = event.target.getAttribute('data-request-id');
+
+                // AJAX logic to handle Accept action
+                fetch('controller/acceptrequest.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `userID=${userID}&requestID=${requestID}&action=accept`,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateRowButtons(row, data.newStatus);
+                        } else {
+                            console.error('Error:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            if (event.target.classList.contains('rejectbtn')) {
+                const row = event.target.closest('tr');
+                const userID = event.target.getAttribute('data-user-id');
+                const requestID = event.target.getAttribute('data-request-id');
+
+                // AJAX logic to handle Reject action
+                fetch('controller/acceptrequest.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `userID=${userID}&requestID=${requestID}&action=reject`,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateRowButtons(row, data.newStatus);
+                        } else {
+                            console.error('Error:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
         });
     </script>
+
 
 
 

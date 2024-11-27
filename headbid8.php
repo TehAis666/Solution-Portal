@@ -40,10 +40,21 @@ try {
                 ) > 1 
                 AND b.staffID NOT IN (SELECT staffID FROM user WHERE sector = '$sector') THEN 1
                 ELSE 0
-            END AS showtag
+            END AS showtag,
+            al.staffname AS LastEditedBy,
+            al.timestamp AS LastEditTimestamp
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
         LEFT JOIN user u ON b.staffID = u.staffID
+        LEFT JOIN (
+        SELECT 
+            refID, 
+            staffname, 
+            MAX(timestamp) AS timestamp 
+        FROM activitylog 
+        WHERE type = 'bids' 
+        GROUP BY refID, staffname
+    ) al ON b.BidID = al.refID
         WHERE 
             -- Show bids that have at least one solution matching the user's sector
             (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL)
@@ -57,13 +68,12 @@ try {
 
         // Fetch the bid data as an associative array
         $bids = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        
     } else {
         echo "<pre>Invalid sector for the user.</pre>";
     }
 
-    // Fetching staff names along with their sectors
-    $staffQuery = "SELECT staffID, name, sector FROM user WHERE role = 'presales'";
+    // Fetching staff names along with their sectors and roles
+    $staffQuery = "SELECT staffID, name, sector, role FROM user WHERE role IN ('presales', 'head')";
     $staffStmt = $conn->query($staffQuery);
     $staffNames = [];
 
@@ -553,6 +563,8 @@ try {
                                                     <!-- View Button with Data Attributes for Each Bid -->
                                                     <button type="button" class="btn btn-primary viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
+                                                        data-lastupdatedby="<?php echo htmlspecialchars($bid['LastEditedBy'] ?? 'null'); ?>"
+                                                        data-lastupdatedate="<?php echo htmlspecialchars($bid['LastEditTimestamp'] ?? 'null'); ?>"                                                    
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
                                                         data-showtag="<?php echo htmlspecialchars($bid['showtag']); ?>"
                                                         data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
@@ -724,6 +736,13 @@ try {
                                 <div class="col-sm-4"><strong>Remarks:</strong></div>
                                 <div class="col-sm-8" id="modalRemarks">-</div>
                             </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4"><strong>Last updated by:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedby">-</div>
+
+                                <div class="col-sm-4"><strong>Time:</strong></div>
+                                <div class="col-sm-8" id="modallastupdatedate">-</div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -763,7 +782,13 @@ try {
                                                     <optgroup label="<?php echo htmlspecialchars($sectorName); ?>">
                                                         <?php foreach ($staffList as $staff): ?>
                                                             <option value="<?php echo htmlspecialchars($staff['staffID']); ?>">
-                                                                <?php echo htmlspecialchars($staff['name']); ?>
+                                                                <?php
+                                                                // Append role to name if the staff is a head
+                                                                echo htmlspecialchars($staff['name']);
+                                                                if ($staff['role'] === 'head') {
+                                                                    echo " (head)";
+                                                                }
+                                                                ?>
                                                             </option>
                                                         <?php endforeach; ?>
                                                     </optgroup>
@@ -1271,6 +1296,9 @@ try {
                 // Fetch user role
                 var showtag = $(this).data('showtag'); // Get user role from data attribute
 
+                var lastupdatedby = $(this).data('lastupdatedby');
+                var lastupdatedate = $(this).data('lastupdatedate');
+
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
                 var value1 = $(this).data('value1');
@@ -1324,6 +1352,10 @@ try {
                 $('#modalStaff').text(staffID); // Set hidden field for staff ID
                 $('#modalStaffName').text(staffName); // Set the staff name for display in the dropdown
 
+                $('#modallastupdatedby').text(lastupdatedby);
+                $('#modallastupdatedate').text(lastupdatedate);
+                
+
                 // Populate the Update Form in Edit Modal
                 $('#updateCustName').val(custName);
                 $('#updateHMSScope').val(hmsScope);
@@ -1361,7 +1393,7 @@ try {
                 $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
                 console.log("showtag num", showtag);
 
-                
+
                 // if (showtag == '0') {
                 //     $('.edit-btn').show(); // Show Edit button
                 // } else {
@@ -1370,7 +1402,7 @@ try {
 
                 // Show the View Modal
                 $('#viewbids').modal('show');
-                
+
             });
 
             // Function to return HTML for status badges

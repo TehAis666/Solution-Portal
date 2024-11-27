@@ -1,7 +1,8 @@
 <?php
 // Include the database connection file
 include '../db/db.php';
-
+include_once 'handler/updateactivitylog.php';
+session_start();
 $loggedInStaffID = intval($_SESSION['user_id']);  // Retrieve the staff ID from session
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -54,7 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->begin_transaction();
 
     try {
-        // Update bids table
+        // Fetch current bid data
+        $currentBidData = $conn->query("SELECT * FROM bids WHERE BidID = $bidID")->fetch_assoc();
+        // Fetch current tender data
+        $currentTenderData = $conn->query("SELECT * FROM tender WHERE TenderID = $tenderID")->fetch_assoc();
+
+        // Combine current bid and tender data
+        $combinedCurrentData = array_merge($currentBidData, $currentTenderData);
+        
         $updateBid = "UPDATE bids SET 
                         CustName = '$custName',
                         HMS_Scope = '$hmsScope',
@@ -99,6 +107,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$conn->query($updateTender)) {
             throw new Exception("Error updating tender table: " . $conn->error);
         }
+
+       // Log activity for both bid and tender updates
+       logActivity($loggedInStaffID, $_SESSION['user_name'], "Updated Bid and Tender: $custName ", "bids", $bidID, $conn, $combinedCurrentData, $_POST);
 
         // Commit transaction
         $conn->commit();
