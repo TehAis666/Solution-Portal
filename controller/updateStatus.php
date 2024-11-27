@@ -52,6 +52,11 @@ function buildWhereClause($filters, $conn) {
                 t.Solution2 = '$solution' OR 
                 t.Solution3 = '$solution' OR 
                 t.Solution4 = '$solution'
+            ) AND (
+                (t.Solution1 IS NOT NULL AND t.Solution1 != '') + 
+                (t.Solution2 IS NOT NULL AND t.Solution2 != '') + 
+                (t.Solution3 IS NOT NULL AND t.Solution3 != '') + 
+                (t.Solution4 IS NOT NULL AND t.Solution4 != '') = 1
             )";
         }
     }

@@ -116,7 +116,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
     .col-md-2.d-flex {
       padding-left: 0;
       /* Remove left padding */
-      gap: 4px;
+      gap: 2px;
       /* Reduce space between buttons */
       white-space: nowrap;
       /* Prevent wrapping */
@@ -251,24 +251,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
     <section class="section dashboard">
       <!-- Responsive Filter Card -->
       <div class="card filtering shadow-sm">
-        <div class="filter">
-          <a
-            class="icon"
-            href="#"
-            data-bs-toggle="dropdown"
-            style="font-size: 18px">
-            <i class="bi bi-three-dots"></i>
-          </a>
-          <ul
-            class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-            <li class="dropdown-header text-start">
-              <h6 style="font-size: 12px">Action</h6>
-            </li>
-            <li>
-              <a class="dropdown-item" href="#" style="font-size: 12px" id="resetAllCharts">Reset</a>
-            </li>
-          </ul>
-        </div>
         <div class="card-body pb-0">
           <form id="filterForm">
             <div class="row g-2">
@@ -309,10 +291,18 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                 </div>
               </div>
 
-              <!-- Filter Button -->
-              <div class="col-md-2 d-flex align-items-center justify-content">
-                <button type="submit" class="btn btn-primary">Filter</button>
-                <button id="exportToPDF" type="button" class="btn btn-primary">Export to PDF</button>
+              <!-- Filter Buttons with Boxicons -->
+              <!-- Compact Rounded Buttons with Tooltips -->
+              <div class="col-auto d-flex align-items-center gap-2">
+                <button type="submit" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Filter">
+                  <i class="bx bx-filter"></i>
+                </button>
+                <button id="exportToPDF" type="button" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Export to PDF">
+                  <i class="bx bxs-file-pdf"></i>
+                </button>
+                <button id="resetAllCharts" type="button" class="btn btn-light btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset All Charts">
+                  <i class="bx bx-reset"></i>
+                </button>
               </div>
             </div>
           </form>
@@ -511,20 +501,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         </div>
       </div>
       <!-- End Responsive Bid Types and Pipelines -->
-
-      <!-- Modal HTML for Greeting -->
-      <div class="modal fade" id="greetingModal" tabindex="-1" aria-labelledby="greetingModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-body">
-              <!-- SVG Icon will change based on greeting -->
-              <div id="greetingIcon"></div>
-              <p id="greetingMessage" class="fade-in"></p>
-              <p class="slide-in"><?php echo $userData['name']; ?></p> <!-- Display the user's name -->
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
   </main>
   <!-- End #main -->
@@ -598,7 +574,15 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       // Define a global variable to store InfraSolution data
       var infraSolutionData = null;
 
-      // Check if marketSectorData is empty and fetch data if true
+      let MixSolutionCounts = {};
+      let MixSolutionRowTotal = {};
+
+      // Check if infrasolutionData is empty and fetch data if true
+      if (infraSolutionData === null) {
+        fetchInfraSolution(null, null, null, null, null, null, null, null, null);
+      }
+
+      // Check if solutionsData is empty and fetch data if true
       if (solutionsData.length === 0) {
         fetchSumSolution(null, null, null, null, null, null, null, null, null);
       }
@@ -608,7 +592,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         fetchMarketSectorData(null, null, null, null, null, null, null, null, null);
       }
 
-      // Check if marketSectorData is empty and fetch data if true
+      // Check if monthsData is empty and fetch data if true
       if (monthsData.length === 0 || totalRevenueData.length === 0 || totalBidsData.length === 0) {
         fetchReportData(null, null, null, null, null, null, null, null, null);
       }
@@ -1069,13 +1053,14 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             if (tooltipItem.label === 'Mix Solution') {
               const businessUnit = tooltipItem.dataset.label; // Get the business unit label (e.g., "NMG", "TMG (Public Sector)")
               const counts = solutionBusinessUnitCounts['MixSolution'][businessUnit]; // Get breakdown for this business unit
+              const rowTotal = solutionBusinessUnitCounts["MixSolutionRowTotal"][businessUnit];
 
               // Format the tooltip text to display individual solution counts
-              let breakdownText = `${businessUnit}:\n`;
-              breakdownText += `AwanHeiTech: ${counts['AwanHeiTech']} | `;
+              let breakdownText = `${businessUnit} Mix Solution: ${rowTotal}\n`;
+              breakdownText += `(AwanHeiTech: ${counts['AwanHeiTech']} | `;
               breakdownText += `Secure-X: ${counts['SecureX']} | `;
               breakdownText += `PaduNet: ${counts['PaduNet']} | `;
-              breakdownText += `i-Sentrix: ${counts['iSentrix']}`;
+              breakdownText += `i-Sentrix: ${counts['iSentrix']})`;
 
               return breakdownText; // Return the formatted breakdown
             }
@@ -1633,31 +1618,12 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
       // Function to fetch InfraSolution data
       function fetchInfraSolution(status, sector, bidtype, ppline, monthYear, solutionn, year, startDate, endDate) {
 
-        if (sector === null) {
-          sector = ''; // Convert null to an empty string
-        }
-
-        // Set bidtype to an empty string if it is null
-        if (bidtype === null) {
-          bidtype = ''; // Convert null to an empty string
-        }
-
-        // Set pipeline to an empty string if it is null
-        if (ppline === null) {
-          ppline = ''; // Convert null to an empty string
-        }
-
-        // Set monthYear to an empty string if it is null
-        if (monthYear === null) {
-          monthYear = ''; // Convert null to an empty string
-        }
-
-        // Set solution to an empty string if it is null
-        if (solutionn === null) {
-          solutionn = ''; // Convert null to an empty string
-        }
-
-        //console.log("Sector", solutionn); 
+        // Convert null values to empty strings for all parameters
+        if (sector === null) sector = '';
+        if (bidtype === null) bidtype = '';
+        if (ppline === null) ppline = '';
+        if (monthYear === null) monthYear = '';
+        if (solutionn === null) solutionn = '';
 
         $.ajax({
           url: 'controller/updateInfraSolution.php',
@@ -1665,21 +1631,21 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           data: {
             status: status,
             sector: sector,
-            bidtype: bidtype, // Include the bidtype in the request
+            bidtype: bidtype,
             ppline: ppline,
-            monthYear: monthYear, // Include the monthYear in the request
-            solutionn: solutionn, // Include the solution in the request
+            monthYear: monthYear,
+            solutionn: solutionn,
             year: year,
             startDate: startDate,
             endDate: endDate
           },
           dataType: 'json',
           success: function(response) {
-            //console.log("Infra Solution:", response);
-
-            // Extract solution counts from the response
             // Extract solution counts from the response
             var solutionCounts = response.solutionBusinessUnitCounts;
+            // Update global variables
+            MixSolutionCounts = solutionCounts['MixSolution'] || {};
+            MixSolutionRowTotal = solutionCounts['MixSolutionRowTotal'] || {};
 
             // Prepare datasets for the chart, with summed values for MixSolution
             const datasets = [{
@@ -1689,7 +1655,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   solutionCounts['SecureX']['Channel'],
                   solutionCounts['AwanHeiTech']['Channel'],
                   solutionCounts['iSentrix']['Channel'],
-                  // Sum of each sub-solution within MixSolution for "Channel"
                   solutionCounts['MixSolution']['Channel']['AwanHeiTech'] +
                   solutionCounts['MixSolution']['Channel']['SecureX'] +
                   solutionCounts['MixSolution']['Channel']['PaduNet'] +
@@ -1704,7 +1669,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   solutionCounts['SecureX']['IMG'],
                   solutionCounts['AwanHeiTech']['IMG'],
                   solutionCounts['iSentrix']['IMG'],
-                  // Sum of each sub-solution within MixSolution for "IMG"
                   solutionCounts['MixSolution']['IMG']['AwanHeiTech'] +
                   solutionCounts['MixSolution']['IMG']['SecureX'] +
                   solutionCounts['MixSolution']['IMG']['PaduNet'] +
@@ -1719,7 +1683,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   solutionCounts['SecureX']['NMG'],
                   solutionCounts['AwanHeiTech']['NMG'],
                   solutionCounts['iSentrix']['NMG'],
-                  // Sum of each sub-solution within MixSolution for "NMG"
                   solutionCounts['MixSolution']['NMG']['AwanHeiTech'] +
                   solutionCounts['MixSolution']['NMG']['SecureX'] +
                   solutionCounts['MixSolution']['NMG']['PaduNet'] +
@@ -1734,7 +1697,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   solutionCounts['SecureX']['TMG (Private Sector)'],
                   solutionCounts['AwanHeiTech']['TMG (Private Sector)'],
                   solutionCounts['iSentrix']['TMG (Private Sector)'],
-                  // Sum of each sub-solution within MixSolution for "TMG (Private Sector)"
                   solutionCounts['MixSolution']['TMG (Private Sector)']['AwanHeiTech'] +
                   solutionCounts['MixSolution']['TMG (Private Sector)']['SecureX'] +
                   solutionCounts['MixSolution']['TMG (Private Sector)']['PaduNet'] +
@@ -1749,7 +1711,6 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   solutionCounts['SecureX']['TMG (Public Sector)'],
                   solutionCounts['AwanHeiTech']['TMG (Public Sector)'],
                   solutionCounts['iSentrix']['TMG (Public Sector)'],
-                  // Sum of each sub-solution within MixSolution for "TMG (Public Sector)"
                   solutionCounts['MixSolution']['TMG (Public Sector)']['AwanHeiTech'] +
                   solutionCounts['MixSolution']['TMG (Public Sector)']['SecureX'] +
                   solutionCounts['MixSolution']['TMG (Public Sector)']['PaduNet'] +
@@ -1759,11 +1720,38 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               }
             ];
 
+            // Custom tooltip callback for breakdown of Mix Solution
+            const customTooltips = {
+              callbacks: {
+                label: function(tooltipItem) {
+                  // Check if the tooltip item corresponds to "Mix Solution"
+                  if (tooltipItem.label === 'Mix Solution') {
+                    const businessUnit = tooltipItem.dataset.label; // Get the business unit label
+                    const counts = solutionCounts['MixSolution'][businessUnit]; // Get breakdown for this business unit
+                    const rowTotal = solutionCounts["MixSolutionRowTotal"] ? solutionCounts["MixSolutionRowTotal"][businessUnit] : 0; // Get row total
+
+                    // Format the tooltip text to display individual solution counts
+                    let breakdownText = `${businessUnit}: ${rowTotal}\n`;
+                    breakdownText += `(AwanHeiTech: ${counts['AwanHeiTech']} | `;
+                    breakdownText += `Secure-X: ${counts['SecureX']} | `;
+                    breakdownText += `PaduNet: ${counts['PaduNet']} | `;
+                    breakdownText += `i-Sentrix: ${counts['iSentrix']})`;
+
+                    return breakdownText; // Return the formatted breakdown
+                  }
+
+                  // Default label for non-Mix Solution entries
+                  return tooltipItem.dataset.label + ': ' + tooltipItem.raw;
+                }
+              }
+            };
+
             // Store the datasets globally for PDF usage
             infraSolutionData = datasets;
 
-            // Update the chart with the new datasets
+            // Update the chart with the new datasets and tooltip settings
             stackedBarChart.data.datasets = datasets;
+            stackedBarChart.options.plugins.tooltip = customTooltips; // Include the custom tooltip
             stackedBarChart.update(); // Refresh the chart to display the new data
           },
           error: function(xhr, status, error) {
@@ -1910,37 +1898,97 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
         const formData = new FormData(document.getElementById("filterForm"));
 
         // Helper function to format numbers as K or M
-        function formatSum(value) {
-          if (value >= 1000000) {
-            return (value / 1000000).toFixed(2) + ' M';
-          } else if (value >= 1000) {
-            return (value / 1000).toFixed(2) + ' K';
-          } else {
-            return value.toString();
-          }
-        }
+        const formatSum = (value) => {
+          if (value >= 1000000) return (value / 1000000).toFixed(2) + " M";
+          if (value >= 1000) return (value / 1000).toFixed(2) + " K";
+          return value.toString();
+        };
+
+        // Extract and format MixSolution details
+        const getMixSolutionDetails = () => {
+          const businessUnits = [
+            "Channel",
+            "IMG",
+            "NMG",
+            "TMG (Private Sector)",
+            "TMG (Public Sector)",
+          ];
+
+          return businessUnits.map((businessUnit) => {
+            const rowTotal = MixSolutionRowTotal?.[businessUnit] || 0;
+            const counts = MixSolutionCounts?.[businessUnit] || {
+              AwanHeiTech: 0,
+              SecureX: 0,
+              PaduNet: 0,
+              iSentrix: 0,
+            };
+
+            return {
+              businessUnit,
+              rowTotal: formatSum(rowTotal),
+              breakdown: {
+                AwanHeiTech: formatSum(counts.AwanHeiTech),
+                SecureX: formatSum(counts.SecureX),
+                PaduNet: formatSum(counts.PaduNet),
+                iSentrix: formatSum(counts.iSentrix),
+              },
+            };
+          });
+        };
+
+        // Preprocess infraSolutionData to ensure arrays have fixed length (4 elements)
+        const preprocessInfraSolutionData = (data) =>
+          data.map((item) => ({
+            label: item.label,
+            data: [
+              ...item.data.slice(0, 4),
+              ...Array(Math.max(0, 4 - item.data.length)).fill(0),
+            ],
+          }));
+
+        // Append MixSolution details
+        formData.append("mixSolutionDetails", JSON.stringify(getMixSolutionDetails()));
 
         // Format solutionsData
-        const formattedSolutionsData = {};
-        for (const [key, value] of Object.entries(solutionsData)) {
-          formattedSolutionsData[key] = formatSum(value);
+        const formattedSolutionsData = Object.fromEntries(
+          Object.entries(solutionsData).map(([key, value]) => [key, formatSum(value)])
+        );
+
+        // Preprocess infraSolutionData
+        const processedInfraSolutionData = preprocessInfraSolutionData(
+          infraSolutionData
+        );
+
+        // Append form data
+        const appendFormData = (key, value) => formData.append(key, value);
+
+        const idsToExtract = [
+          "totalBids",
+          "totalRevenue",
+          "totalWIP",
+          "totalSubmitted",
+          "totalDropped",
+        ];
+        idsToExtract.forEach((id) =>
+          appendFormData(id, document.getElementById(id).innerText)
+        );
+
+        const jsonDataToAppend = {
+          marketSectorData,
+          totalBidsData,
+          totalRevenueData,
+          monthsData,
+          bidTypesDatas,
+          pipelinesDatas,
+          solutionsData: formattedSolutionsData,
+          infraSolutionData: processedInfraSolutionData,
+        };
+
+        for (const [key, value] of Object.entries(jsonDataToAppend)) {
+          appendFormData(key, JSON.stringify(value));
         }
 
-        formData.append('totalBids', document.getElementById('totalBids').innerText);
-        formData.append('totalRevenue', document.getElementById('totalRevenue').innerText);
-        formData.append('totalWIP', document.getElementById('totalWIP').innerText);
-        formData.append('totalSubmitted', document.getElementById('totalSubmitted').innerText);
-        formData.append('totalDropped', document.getElementById('totalDropped').innerText);
-        formData.append('marketSectorData', JSON.stringify(marketSectorData));
-        formData.append('totalBidsData', JSON.stringify(totalBidsData));
-        formData.append('totalRevenueData', JSON.stringify(totalRevenueData));
-        formData.append('monthsData', JSON.stringify(monthsData));
-        formData.append('bidTypesDatas', JSON.stringify(bidTypesDatas));
-        formData.append('pipelinesDatas', JSON.stringify(pipelinesDatas));
-
-        // Add formatted solutionsData to form data
-        formData.append('solutionsData', JSON.stringify(formattedSolutionsData));
-
+        // Append chart images
         const chartIDs = [
           "reportsChart",
           "stakedBarChart",
@@ -1948,14 +1996,15 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
           "horizontalBarChart",
           "barChart",
           "bidTypesBarChart",
-          "pipelinesBarChart"
+          "pipelinesBarChart",
         ];
 
         chartIDs.forEach((chartID) => {
           const chartElement = document.getElementById(chartID);
 
           if (chartElement) {
-            let chartImage;
+            let chartImage = null;
+
             if (chartElement.tagName === "CANVAS") {
               chartImage = chartElement.toDataURL("image/png");
             } else if (chartElement.classList.contains("echart")) {
@@ -1964,80 +2013,44 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
             }
 
             if (chartImage) {
-              formData.append(chartID + "Image", chartImage);
+              appendFormData(`${chartID}Image`, chartImage);
             }
           }
         });
 
+        // Fetch and handle the PDF generation
         fetch("controller/generatePDF.php", {
             method: "POST",
-            body: formData
+            body: formData,
           })
-          .then(response => response.blob())
-          .then(blob => {
+          .then((response) => response.blob())
+          .then((blob) => {
             const url = URL.createObjectURL(blob);
             window.open(url);
           })
-          .catch(error => console.error("Error generating PDF:", error));
+          .catch((error) => console.error("Error generating PDF:", error));
       });
-
-
-
     });
   </script>
 
-  <script>
-    window.onload = function() {
-      // Check for success login session
-      <?php if (isset($_SESSION['login_success'])): ?>
-        const greetingModal = new bootstrap.Modal(document.getElementById('greetingModal'));
+  <!-- Initialize Tooltips and Handle Click -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Initialize all tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipInstances = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
 
-        // Get the current time
-        let currentHour = new Date().getHours();
-        let greetingMessage = '';
-        let svgIcon = '';
-
-        // Determine the greeting based on the time
-        if (currentHour < 12) {
-          greetingMessage = 'Good Morning';
-          svgIcon = `<svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <circle cx="12" cy="12" r="5" fill="#FFD700"/>
-                              <g stroke="#FFD700" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="4"/>
-                                <line x1="12" y1="20" x2="12" y2="23"/>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                                <line x1="1" y1="12" x2="4" y2="12"/>
-                                <line x1="20" y1="12" x2="23" y2="12"/>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                              </g>
-                            </svg>`;
-        } else if (currentHour >= 12 && currentHour < 17) {
-          greetingMessage = 'Good Afternoon';
-          svgIcon = `<svg class="cloud-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <circle cx="6" cy="6" r="4" fill="#FFD700"/>
-                              <path d="M17 16a5 5 0 1 0-8 4H4a4 4 0 1 1 0-8c0-.3.02-.59.07-.88A6 6 0 1 1 17 16z" fill="#B0C4DE"/>
-                            </svg>`;
-        } else {
-          greetingMessage = 'Good Evening';
-          svgIcon = `<svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z" fill="#B0C4DE"/>
-                            </svg>`;
-        }
-
-        // Display the greeting message and SVG icon
-        document.getElementById('greetingMessage').textContent = greetingMessage;
-        document.getElementById('greetingIcon').innerHTML = svgIcon;
-
-        // Show the modal
-        greetingModal.show();
-
-        <?php unset($_SESSION['login_success']); // Clear the session variable to prevent the modal from showing again 
-        ?>
-      <?php endif; ?>
-    };
-  </script>
+    // Add click event to hide tooltip
+    tooltipTriggerList.forEach(function (button, index) {
+      button.addEventListener('click', function () {
+        // Hide the tooltip on click
+        tooltipInstances[index].hide();
+      });
+    });
+  });
+</script>
 
 </body>
 
