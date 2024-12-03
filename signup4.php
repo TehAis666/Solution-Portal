@@ -10,36 +10,29 @@
     <style>
         @import url("https://fonts.googleapis.com/css?family=Fira+Sans");
 
-
-        body {
-            position: relative;
-            min-height: 100vh;
-            background-color: #2C3E50;
-            /* Fallback color */
-            width: 100%;
-            align-items: center;
-            justify-content: center;
-            font-family: "Fira Sans", Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            overflow-y: hidden;
-            overflow-x: hidden;
-
-            /* Gradient Background with a darker focus */
-            background: linear-gradient(to bottom,
-                    rgba(13, 22, 75, 0.95),
-                    /* Deep dark blue */
-                    rgba(26, 35, 126, 0.9),
-                    /* Stronger dark blue */
-                    rgba(33, 64, 154, 0.85),
-                    /* Mid-tone blue */
-                    rgba(52, 152, 219, 0.7)
-                    /* Lighter blue near the bottom */
-                ),
-                url('https://media.macphun.com/img/uploads/macphun/blog/2414/1_IlluminatingtheUrbanJungleAnIntrotoCityscapePhotographyISkylum.jpeg') no-repeat center center fixed;
-            background-size: cover;
+        
+                /* Base Styles */
+                * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
         }
 
+        body {
+            background: linear-gradient(to bottom, rgba(26, 35, 126, 0.9), rgba(100, 181, 246, 0.8)), 
+                        url('https://media.macphun.com/img/uploads/macphun/blog/2414/1_IlluminatingtheUrbanJungleAnIntrotoCityscapePhotographyISkylum.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        /* Subtle texture overlay */
         body::after {
             content: '';
             position: absolute;
@@ -47,18 +40,29 @@
             left: 0;
             width: 100%;
             height: 100%;
-
-            /* Subtle diagonal pattern overlay */
-            background: repeating-linear-gradient(45deg,
-                    rgba(255, 255, 255, 0.08) 10px,
-                    rgba(0, 0, 0, 0) 10px,
-                    rgba(0, 0, 0, 0) 20px);
-            opacity: 0.15;
-            /* Slightly reduced opacity for a subtler effect */
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.1) 10px,
+                rgba(0, 0, 0, 0) 10px,
+                rgba(0, 0, 0, 0) 20px
+            );
+            opacity: 0.2;
             pointer-events: none;
         }
 
+        /* Wave Design */
+        .wave-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
 
+        .wave-container svg {
+            width: 100%;
+            height: auto;
+        }
         .form-structor {
             background-color: #222;
             /* Dark gray background for the form */
@@ -95,8 +99,7 @@
             background-position: left bottom;
             background-size: 755px;
             /* background-image: url('https://apicms.thestar.com.my/uploads/images/2023/12/06/2425813.jpg'); */
-            /* background-image: url('images/menara.jpg'); */
-            background-color: whitesmoke;
+            background-image: url('images/menara.jpg');
         }
 
         .login {
@@ -122,11 +125,10 @@
         }
 
         .login .form-title {
-            color: black; 
+            color: #fff;
             font-size: 1.8em;
             /* Initial font size (smaller) */
             text-align: center;
-            margin-right: 30px;
             cursor: pointer;
             transition: all 0.5s ease;
             /* Smooth transition */
@@ -171,7 +173,6 @@
         /* Optional styling for hover effect */
         .login .form-title:hover {
             opacity: 0.8;
-            
         }
 
 
@@ -208,8 +209,8 @@
         }
 
         .login .submit-btn {
-            background-color: #0096FF;
-            color: white;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: rgba(256, 256, 256, 0.7);
             border: 0;
             border-radius: 15px;
             display: block;
@@ -274,7 +275,6 @@
             color: #000;
             font-size: 1.7em;
             text-align: center;
-            margin-right: 30px;
             /* Center text */
         }
 
@@ -318,7 +318,7 @@
         }
 
         .singup .submit-btn {
-            background-color: #0096FF;
+            background-color: #6B92A4;
             color: white;
             border: 0;
             border-radius: 15px;
@@ -391,12 +391,11 @@
         }
 
         .logo-text {
-            font-size: 2.5em;
+            font-size: 2.3em;
             /* Adjust text size */
             color: hsl(233deg 36% 38%);
             font-weight: 600;
             transition: all 0.5s ease;
-            text-align: center;
             /* Smooth transition */
         }
 
@@ -453,30 +452,18 @@
             cursor: pointer;
         }
 
-        .picture {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            width: 150px;
-            /* Adjusted for circular dimensions */
-            height: 150px;
-            /* Add a white circular border */
-            object-fit: cover;
-            /* Ensures the image scales well inside the circle */
-            z-index: 10;
-
-        }
+        
     </style>
 </head>
 
 <body>
-    <img src="images/logo4.png" alt="HeiTech" class="picture">
+    <img src="images/logo6.png" alt="HeiTech" class="picture">
 
 
     <div class="form-structor">
         <div class="login">
             <div class="logo-container">
-                <!-- <img src="images/logo3.png" alt="Logo 2" class="logo" /> -->
+                <img src="images/logo3.png" alt="Logo 2" class="logo" />
                 <span class="logo-text"> Solution Portal</span>
             </div>
             <h2 class="form-title" id="login"><span>or</span>Log In</h2>
