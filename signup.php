@@ -254,8 +254,6 @@
             transition: all .3s ease;
         }
 
-
-
         .singup .center {
             position: absolute;
             top: calc(60% - 10%);
