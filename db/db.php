@@ -1,6 +1,6 @@
 <?php
 define('db_user','root');
-define('db_password','system');
+define('db_password','12345678');
 define('db_host','localhost');
 define('db_name','solutiondb');
 
