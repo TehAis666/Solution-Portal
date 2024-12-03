@@ -46,6 +46,14 @@
 
     <!--New Css Added-->
     <style>
+        /* Make the body scrollable */
+        body {
+            overflow-y: auto;
+            /* Enables vertical scrolling if content overflows */
+            height: 100vh;
+            /* Ensures the body takes up full height */
+        }
+
         /* Table Styles */
         table.foldertable {
             width: 100%;
@@ -323,6 +331,11 @@
             font-size: 1.2em;
             color: #888;
         }
+
+        .table-dropzone.dragover {
+            background-color: #f0f8ff;
+            border: 2px dashed #007bff;
+        }
     </style>
 </head>
 
@@ -350,7 +363,6 @@
                                 <div class="folderpath flex-grow-1" style="margin-top: 10px; margin-bottom: 10px;">
                                     <nav>
                                         <ol class="breadcrumb" style="margin-top: 0;">
-                                            <li class="breadcrumb-item"><a href="#" onclick="goHome()">Home</a></li>
                                             <!-- Folder name(s) dynamically inserted here -->
                                         </ol>
                                     </nav>
@@ -360,7 +372,7 @@
                                 <button
                                     class="btn btn-success btn-sm rounded-pill me-2"
                                     style="margin-top: 10px;"
-                                    title="Create a new folder"
+                                    title="Create new folder"
                                     data-bs-target="#folderModal"
                                     data-bs-toggle="modal">
                                     <i class="ri-folder-add-fill"></i>
@@ -370,26 +382,26 @@
                                     id="addFileBtn"
                                     class="btn btn-primary btn-sm rounded-pill"
                                     style="margin-top: 10px; display: none;"
-                                    title="Add new file"
+                                    title="Create New File"
                                     onclick="showDropzoneModal()">
-                                    <i class="ri-file-add-fill"></i> Add New File
+                                    <i class="ri-file-add-fill"></i>
                                 </button>
                             </div>
 
-                            <!-- Main Table -->
-                            <table id="folderTable" class="foldertable table table-striped table-hover" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>No. of files</th>
-                                        <th>Created By</th>
-                                        <th>Date Uploaded</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
+                            <div id="tableDropzone" class="table-dropzone">
+                                <table id="folderTable" class="foldertable table table-striped table-hover" style="width:100%">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>No. of files</th>
+                                            <th>Created By</th>
+                                            <th>Date Uploaded</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -438,17 +450,25 @@
             </div>
         </div>
 
-        <div id="dropzoneModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>Upload Files</h3>
-                <form id="myDropzone" class="dropzone" action="controller/uploadFile.php">
-                    <div class="dz-message">Drag files here or click to upload</div>
-                </form>
-                <button onclick="hideDropzoneModal()" class="btn btn-secondary rounded">Cancel</button>
-                <!-- Upload button to trigger AJAX upload -->
-                <button id="uploadButton" class="btn btn-primary rounded">Upload</button>
+        <!-- Modal for PDF Preview -->
+        <div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filePreviewModalLabel">File Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Container for PDF preview -->
+                        <div id="pdf-viewer" style="text-align: center;">
+                            <canvas id="pdf-canvas" style="width: 100%; height: auto;"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+
 
 
     </main>
@@ -487,6 +507,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 
 
     <!-- Template Main JS File -->
@@ -497,7 +518,12 @@
         // Global variable to track if we are in "folder view" or "file view"
         let isFolderView = true;
         let currentFolderID = null; // Store the currently selected folder ID
+        let currentfolderName = '';
         let breadcrumb = ['Home']; // Start breadcrumb with Home
+
+        // Specify the worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+
 
         // Define fetchFolders function in the global scope, outside of $(document).ready()
         function fetchFolders() {
@@ -515,55 +541,58 @@
             });
         }
 
-        // Define populateTable function in the global scope, outside of $(document).ready()
         function populateTable(folders) {
-            const table = $('#folderTable').DataTable(); // Get reference to the table
-
+            const table = $('#folderTable').DataTable();
             table.clear(); // Clear existing data
 
-            if (isFolderView) {
-                // Render folder view (default)
-                folders.forEach(function(folder) {
-                    const rowNode = table.row.add([
-                        `
-                <button class="btn btn-primary btn-sm toggle-breakdown pill-btn">
-                    <i class="ri-add-fill"></i>
-                </button>
-                <i class="ri-folder-open-fill folder-icon"></i> ${folder.folderName}
-            `, 'N/A', // Placeholder for number of files
-                        folder.CreatedBy || 'N/A',
-                        folder.DateCreated || 'N/A'
-                    ]).node();
+            folders.forEach(function(folder) {
+                const rowNode = table.row.add([
+                    `<button class="btn btn-primary btn-sm toggle-breakdown pill-btn">
+                <i class="ri-add-fill"></i>
+            </button>
+            <i class="ri-folder-open-fill folder-icon"></i> ${folder.folderName}`,
+                    'N/A', // Placeholder for number of files
+                    folder.CreatedBy || 'N/A',
+                    folder.DateCreated || 'N/A',
+                    `<button class="btn btn-link btn-sm text-secondary view-files" onclick="openFolder('${folder.folderID}', '${folder.folderName}')">
+                <i class="ri-eye-line" style="font-size: 1.2rem;"></i>
+            </button>`
+                ]).node();
 
-                    $(rowNode).data('folderDetails', folder); // Store folder details in the row
-                    $(rowNode).data('folderID', folder.folderID); // Store folderID in the row
+                $(rowNode).data('folderDetails', folder); // Store folder details in the row
+                $(rowNode).data('folderID', folder.folderID); // Store folderID in the row
+
+                // Attach double-click event to open folder content
+                $(rowNode).dblclick(function() {
+                    const folderID = $(this).data('folderID');
+                    const folderName = folder.folderName;
+
+                    // Add the folder name to the breadcrumb before opening the folder
+                    breadcrumb.push(folderName);
+
+                    // Open the folder
+                    openFolder(folderID, folderName);
                 });
-            } else {
-                // If we are in file view, we would populate with files data
-                folders.forEach(function(file) {
-                    table.row.add([
-                        file.fileName, // File name
-                        file.uploadedBy || 'N/A', // Uploaded By
-                        file.dateUploaded || 'N/A' // Date uploaded
-                    ]).node();
-                });
-            }
+            });
 
             table.draw(); // Redraw the table after adding new rows
             updateBreadcrumb(); // Update breadcrumb
         }
 
-        // Update breadcrumb display
         function updateBreadcrumb() {
-            const breadcrumbContainer = $('.breadcrumb'); // Select the breadcrumb container
+            const breadcrumbContainer = $('.breadcrumb');
             breadcrumbContainer.empty(); // Clear current breadcrumb
 
-            // Add Home as the first item
+            // Log breadcrumb to console to ensure the correct data
+            console.log("Breadcrumb array:", breadcrumb);
+
+            let uniqueBreadcrumb = Array.from(new Set(breadcrumb));
+            uniqueBreadcrumb = uniqueBreadcrumb.filter(item => item.toLowerCase() !== 'home' && item.toLowerCase() !== 'files'); // Remove "Home" and "Files"
+
             breadcrumbContainer.append('<li class="breadcrumb-item"><a href="#" onclick="goHome()">Home</a></li>');
 
-            // Loop through the breadcrumb array and add each item as a breadcrumb
-            breadcrumb.slice(1).forEach((item, index) => {
-                breadcrumbContainer.append(`<li class="breadcrumb-item ${index === breadcrumb.length - 1 ? 'active' : ''}">${item}</li>`);
+            uniqueBreadcrumb.forEach((item, index) => {
+                breadcrumbContainer.append(`<li class="breadcrumb-item ${index === uniqueBreadcrumb.length - 1 ? 'active' : ''}">${item}</li>`);
             });
         }
 
@@ -600,77 +629,84 @@
                 }
             });
 
-            // Format the breakdown details
             function formatBreakdown(data) {
+                let breakdownDetails;
+
+                if (!data.BidID) {
+                    breakdownDetails = `<p class="text-muted" style="font-size: 0.75rem;">Standalone Folder</p>`;
+                } else {
+                    breakdownDetails = `
+        <p class="text-muted" style="font-size: 0.75rem;">Agency Name: ${data.CustName || 'N/A'}</p>
+        <p class="text-muted" style="font-size: 0.75rem;">Scope: ${data.HMS_Scope || 'N/A'}</p>
+        <p class="text-muted" style="font-size: 0.75rem;">Tender Proposal: ${data.Tender_Proposal || 'N/A'}</p>
+        `;
+                }
+
                 return `
-        <div>
-            <p class="text-muted" style="font-size: 0.75rem;">
-                Agency Name: ${data.CustName || 'N/A'}
-            </p>
-            <p class="text-muted" style="font-size: 0.75rem;">
-                Scope: ${data.HMS_Scope || 'N/A'}
-            </p>
-            <p class="text-muted" style="font-size: 0.75rem;">
-                Tender Proposal: ${data.Tender_Proposal || 'N/A'}
-            </p>
-
-            <!-- Eye icon to switch to file view -->
-            <button class="btn btn-link btn-sm text-secondary view-files" onclick="viewFiles('${data.folderID}', '${data.folderName}')">
-                <i class="ri-eye-line" style="font-size: 1.2rem;"></i>
-            </button>
-
-            <!-- Edit Button -->
-            <button class="btn btn-link btn-sm text-secondary edit-folder" onclick="editFolder('${data.folderName}')">
-                <i class="ri-edit-fill" style="font-size: 1.2rem;"></i>
-            </button>
-
-            <!-- Delete Button -->
-            <button class="btn btn-link btn-sm text-secondary delete-folder" onclick="deleteFolder('${data.folderName}')">
-                <i class="ri-delete-bin-fill" style="font-size: 1.2rem;"></i>
-            </button>
-        </div>
+    <div>
+        ${breakdownDetails}
+        <button class="btn btn-link btn-sm text-secondary edit-folder" onclick="editFolder('${data.folderName}')">
+            <i class="ri-edit-fill" style="font-size: 1.2rem;"></i>
+        </button>
+        <button class="btn btn-link btn-sm text-secondary delete-folder" onclick="deleteFolder('${data.folderName}')">
+            <i class="ri-delete-bin-fill" style="font-size: 1.2rem;"></i>
+        </button>
+    </div>
     `;
             }
 
+
             fetchFolders(); // Fetch folder data when the page loads
+
+            // Dropzone initialization
+            Dropzone.autoDiscover = false;
+
+            const tableDropzone = new Dropzone("#tableDropzone", {
+                url: 'controller/uploadFile.php',
+                paramName: "file", // Update: should match your PHP $_FILES key
+                maxFilesize: 5, // 5 MB max file size
+                clickable: false,
+                addRemoveLinks: true,
+                previewsContainer: false, // No preview needed
+                acceptedFiles: ".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx",
+                autoProcessQueue: true,
+                init: function() {
+                    const myDropzone = this;
+
+                    this.on("sending", function(file, xhr, formData) {
+                        // Append the folderID to the form data
+                        const folderID = currentFolderID || 0; // Replace with a dynamic value if necessary
+                        formData.append("folderID", folderID);
+                    });
+
+                    this.on("dragenter", function() {
+                        $("#tableDropzone").addClass("dragover");
+                    });
+
+                    this.on("dragleave drop", function() {
+                        $("#tableDropzone").removeClass("dragover");
+                    });
+
+                    this.on("success", function(file, response) {
+                        response = JSON.parse(response); // Ensure response is parsed
+                        if (response.success) {
+                            alert('File uploaded successfully!');
+                            myDropzone.removeFile(file); // Remove file from Dropzone
+                            openFolder(currentFolderID, currentfolderName); // Refresh folder contents
+                        } else {
+                            alert('Upload failed: ' + response.message);
+                            myDropzone.removeFile(file);
+                        }
+                    });
+
+                    this.on("error", function(file, errorMessage) {
+                        alert('Upload error: ' + errorMessage);
+                        this.removeFile(file);
+                    });
+                }
+            });
+
         });
-
-        // Function to show Dropzone modal and initialize Dropzone if needed
-        function showDropzoneModal() {
-            const dropzoneModal = document.getElementById('dropzoneModal');
-            dropzoneModal.style.display = 'flex';
-
-            if (!Dropzone.instances.length) { // Prevent duplicate initialization
-                const myDropzone = new Dropzone("#myDropzone", {
-                    paramName: "files[]", // Name of file parameter
-                    maxFilesize: 5, // Max file size in MB
-                    addRemoveLinks: true, // Allow file removal
-                    dictDefaultMessage: "Drag files here or click to upload",
-                    autoProcessQueue: false, // Disable automatic submission to allow AJAX upload
-
-                    // Event listener for successful file add
-                    success: function(file, response) {
-                        // You can handle the success here, but we'll do it via AJAX
-                    },
-
-                    // Error handling for failed uploads
-                    error: function(file, errorMessage) {
-                        alert('Error uploading file: ' + errorMessage);
-                    }
-                });
-
-                // You can manually handle the file upload here with AJAX
-                document.getElementById('uploadButton').addEventListener('click', function() {
-                    uploadFilesWithAjax();
-                });
-            }
-        }
-
-        // Function to hide Dropzone modal
-        function hideDropzoneModal() {
-            const dropzoneModal = document.getElementById('dropzoneModal');
-            dropzoneModal.style.display = 'none';
-        }
 
         // Function to control Add File button visibility
         function toggleAddFileButton(show) {
@@ -678,82 +714,12 @@
             addFileBtn.style.display = show ? 'inline-block' : 'none';
         }
 
-        // Function to upload files using AJAX
-        function uploadFilesWithAjax() {
-            const myDropzone = Dropzone.forElement("#myDropzone"); // Get Dropzone instance
-
-            // Create FormData object for AJAX submission
-            const formData = new FormData();
-            const files = myDropzone.files; // Get all files in the Dropzone instance
-
-            // Append each file to the FormData object
-            files.forEach(function(file) {
-                formData.append('files[]', file);
-            });
-
-            // Append the folderID to the FormData
-            formData.append('folderID', currentFolderID); // currentFolderID should be defined elsewhere in your code
-
-            // Send the files using AJAX
-            $.ajax({
-                url: 'controller/uploadFile.php', // Your backend controller that handles the upload
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    const data = JSON.parse(response); // Assuming the response is JSON
-                    if (data.success) {
-                        alert("Files uploaded successfully!");
-                        hideDropzoneModal(); // Close the modal
-                        openFolder(currentFolderID); // Refresh the folder view
-                    } else {
-                        alert(data.message || "File upload failed.");
-                    }
-                },
-                error: function() {
-                    alert("Error occurred during file upload.");
-                }
-            });
-        }
-
-        // Upload file function
-        function uploadFile(folderID) {
-            const dropzoneModal = document.getElementById('dropzoneModal');
-            const files = document.getElementById('fileInput').files;
-            const formData = new FormData();
-
-            for (let i = 0; i < files.length; i++) {
-                formData.append('files[]', files[i]);
-            }
-
-            formData.append('folderID', folderID); // Pass folderID with the request
-
-            $.ajax({
-                url: 'controller/uploadFile.php', // Update with your controller's path
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        alert('File(s) uploaded successfully!');
-                        hideDropzoneModal(); // Hide the modal
-                        openFolder(folderID); // Refresh the folder
-                    } else {
-                        alert(response.message || 'File upload failed.');
-                    }
-                },
-                error: function() {
-                    alert('Error occurred during file upload.');
-                }
-            });
-        }
-
-        // Example usage in openFolder() function
         function openFolder(folderID, folderName) {
-            console.log('Opening folder with ID:', folderID);
-
+            currentFolderID = folderID; // Update current folder ID
+            currentfolderName = folderName;
+            if (folderName && folderName.trim() !== '') { // Check if folderName is non-empty
+                breadcrumb.push(folderName);
+            }
             $.ajax({
                 url: 'controller/fetchFolderContents.php',
                 method: 'GET',
@@ -763,10 +729,11 @@
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        populateFolderContents(response.data);
-                        toggleAddFileButton(true); // Show Add File button
+                        populateFolderContents(response.data.folders, response.data.files); // Pass both folders and files
+                        toggleAddFileButton(true);
                     } else {
                         alert(response.message || 'Failed to load folder contents.');
+                        displayNoFilesMessage(); // Show "No files" message
                     }
                 },
                 error: function() {
@@ -774,27 +741,134 @@
                 }
             });
 
-            breadcrumb.push(folderName);
-            updateBreadcrumb();
+            updateBreadcrumb(); // Ensure breadcrumb is updated after navigating
         }
 
-        // Function to populate the files inside the folder
-        function populateFolderContents(files) {
+        function populateFolderContents(folders, files) {
             const table = $('#folderTable').DataTable();
-            table.clear(); // Clear the folder table
+            table.clear(); // Clear the table
 
-            // Add the files to the table
-            files.forEach(function(file) {
-                table.row.add([
-                    file.fileName, // File name
-                    file.uploadedBy || 'N/A', // Uploaded By
-                    file.dateUploaded || 'N/A' // Date uploaded
+            // Add subfolders to the table
+            folders.forEach(function(folder) {
+                const rowNode = table.row.add([
+                    `<button class="btn btn-primary btn-sm toggle-breakdown pill-btn">
+                <i class="ri-add-fill"></i>
+            </button>
+            <i class="ri-folder-open-fill folder-icon"></i> ${folder.folderName}`,
+                    'N/A', // Placeholder for number of files
+                    folder.CreatedBy || 'N/A',
+                    folder.DateCreated || 'N/A',
+                    `<button class="btn btn-link btn-sm text-secondary view-files" onclick="openFolder('${folder.folderID}', '${folder.folderName}')">
+                <i class="ri-eye-line" style="font-size: 1.2rem;"></i>
+            </button>`
                 ]).node();
+
+                $(rowNode).data('folderDetails', folder); // Store folder details in the row
+                $(rowNode).data('folderID', folder.folderID); // Store folderID in the row
+
+                // Double-click to view folder contents
+                $(rowNode).dblclick(function() {
+                    const folderID = $(this).data('folderID');
+                    const folderName = folder.folderName;
+                    openFolder(folderID, folderName);
+                });
+            });
+
+            files.forEach(function(file) {
+                const rowNode = table.row.add([
+                    `<a href="#" class="file-link">${file.fileName}</a>`, // File name as a link
+                    '', // Placeholder for the file count
+                    file.uploadedBy || 'N/A',
+                    file.dateUploaded || 'N/A',
+                    '' // No action for files yet
+                ]).node();
+
+                // Store fileID in the row
+                $(rowNode).data('FileID', file.FileID);
+
+                // Add click or double-click event to trigger preview
+                $(rowNode).dblclick(function() {
+                    const fileID = $(this).data('FileID'); // Retrieve fileID from the row
+                    console.log(fileID); // Check if fileID is correctly retrieved
+                    previewPDF(fileID); // Pass fileID to previewFile function
+                });
             });
 
             table.draw(); // Redraw the table after adding new rows
-            breadcrumb.push('Files'); // Add 'Files' to the breadcrumb trail when viewing files
             updateBreadcrumb(); // Update breadcrumb display
+        }
+
+        function previewPDF(fileID) {
+            $.ajax({
+                url: 'controller/filepreview.php', // Server-side script to handle file preview
+                method: 'POST',
+                data: {
+                    fileID: fileID
+                },
+                success: function(response) {
+                    const data = JSON.parse(response);
+                    if (data.success) {
+                        const fileUrl = data.fileUrl;
+
+                        // Use pdf.js to load and display the PDF
+                        pdfjsLib.getDocument(fileUrl).promise.then(function(pdf) {
+                            console.log("PDF loaded");
+
+                            // Get the first page
+                            pdf.getPage(1).then(function(page) {
+                                const scale = 1.5;
+                                const viewport = page.getViewport({
+                                    scale: scale
+                                });
+
+                                // Prepare the canvas for rendering
+                                const canvas = document.getElementById('pdf-canvas');
+                                const context = canvas.getContext('2d');
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                // Render the page
+                                page.render({
+                                    canvasContext: context,
+                                    viewport: viewport
+                                });
+                            });
+                        }).catch(function(error) {
+                            console.error('Error loading PDF: ', error);
+                        });
+
+                        // Show the preview in a modal (Bootstrap modal)
+                        $('#filePreviewModal').modal('show');
+                    } else {
+                        alert('Error loading file preview.');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while loading the preview.');
+                }
+            });
+        }
+
+
+        // Function to render a page of the PDF
+        function renderPage(pdfDoc, pageNum) {
+            pdfDoc.getPage(pageNum).then(function(page) {
+                const canvas = document.getElementById('pdf-canvas');
+                const context = canvas.getContext('2d');
+
+                const viewport = page.getViewport({
+                    scale: 1.5
+                }); // Set scale to control zoom level
+
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render the page onto the canvas
+                page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                });
+            });
         }
 
         // Function to display a "No files in this folder" message in the table
@@ -812,12 +886,11 @@
             table.draw(); // Redraw the table after adding the message
         }
 
-        // View files for the selected folder
         function viewFiles(folderID, folderName) {
-            currentFolderID = folderID; // Store the selected folder ID
+            currentFolderID = folderID; // Set current folder ID
             isFolderView = false; // Switch to file view
-            openFolder(folderID, folderName); // Open folder and fetch its files
-            breadcrumb.push(folderName); // Add the folder to breadcrumb when viewing its files
+            openFolder(folderID, folderName);
+            breadcrumb.push(folderName); // Update breadcrumb
         }
 
         // Go back to Home (reset breadcrumb)
@@ -826,6 +899,9 @@
             isFolderView = true; // Ensure we are in folder view
             fetchFolders(); // Fetch the top-level folders
             updateBreadcrumb(); // Update breadcrumb
+
+            // Hide the "Add New File" button when going to Home
+            toggleAddFileButton(false); // This will hide the button
         }
 
         // Toggle view between folder and file view
@@ -960,7 +1036,17 @@
             folderForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(folderForm);
-                formData.append('relatedProposalId', selectedBidID); // Add the selected BidID to the form data
+
+                // Ensure that if no BidID is selected, we don't append it
+                if (!selectedBidID) {
+                    formData.append('relatedProposalId', ''); // No BidID for standalone folder
+                } else {
+                    formData.append('relatedProposalId', selectedBidID); // Add selected proposal ID
+                }
+
+                if (currentFolderID) {
+                    formData.append('parentID', currentFolderID); // Add parent folder ID
+                }
 
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'controller/createfolder.php', true);
@@ -969,25 +1055,29 @@
                         const response = JSON.parse(xhr.responseText);
                         if (xhr.status === 200 && response.success) {
                             alert(response.message);
-                            // Hide modal
                             const modal = bootstrap.Modal.getInstance(document.getElementById('folderModal'));
                             modal.hide();
-                            // Reset the form
                             folderForm.reset();
 
-                            // Ensure the backdrop is removed (in case modal doesn't do it automatically)
+                            // Reset selectedBidID if the form was submitted without it
+                            selectedBidID = '';
+
                             const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) {
-                                backdrop.remove();
-                            }
-                            // Refresh the table by fetching new data
-                            fetchFolders(); // This will fetch and repopulate the table with new data
+                            if (backdrop) backdrop.remove();
+                            fetchFolders(); // Refresh the folder table
                         } else {
-                            alert(response.message); // Show detailed error message
+                            alert(response.message);
                         }
                     }
                 };
                 xhr.send(formData);
+            });
+
+            // Reset selectedBidID if the input is cleared manually
+            searchInput.addEventListener('input', function() {
+                if (searchInput.value.trim() === '') {
+                    selectedBidID = ''; // Clear selectedBidID if the search is cleared
+                }
             });
         });
     </script>
