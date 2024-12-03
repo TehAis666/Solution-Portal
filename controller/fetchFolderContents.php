@@ -2,16 +2,42 @@
 require_once '../db/db.php';  // Include the database connection
 
 // Initializing response array
-$response = ['success' => false, 'data' => []];
+$response = ['success' => false, 'data' => ['folders' => [], 'files' => []]];
 
 // Get the folder ID from the request
 $folderID = isset($_GET['folderID']) ? (int)$_GET['folderID'] : 0;
 
 // Validate the folderID
-if ($folderID > 0) {
-    // Prepare SQL query to fetch files inside the folder
-    $query = "
+if ($folderID >= 0) {  // Allow root folder (ID 0)
+    // Fetch subfolders within the folder
+    $folderQuery = "
         SELECT 
+            folderID, 
+            folderName, 
+            CreatedBy, 
+            DateCreated
+        FROM folders
+        WHERE parentID = ?
+        ORDER BY DateCreated DESC;
+    ";
+
+    if ($folderStmt = mysqli_prepare($conn, $folderQuery)) {
+        mysqli_stmt_bind_param($folderStmt, "i", $folderID);
+        if (mysqli_stmt_execute($folderStmt)) {
+            $folderResult = mysqli_stmt_get_result($folderStmt);
+            while ($folderRow = mysqli_fetch_assoc($folderResult)) {
+                $response['data']['folders'][] = $folderRow;
+            }
+        } else {
+            $response['message'] = 'Error fetching subfolders: ' . mysqli_error($conn);
+        }
+        mysqli_stmt_close($folderStmt);
+    }
+
+    // Fetch files inside the folder
+    $fileQuery = "
+        SELECT 
+            FileID,
             fileName, 
             uploadedBy, 
             dateUploaded
@@ -20,47 +46,24 @@ if ($folderID > 0) {
         ORDER BY dateUploaded DESC;
     ";
 
-    // Prepare the query to prevent SQL injection
-    if ($stmt = mysqli_prepare($conn, $query)) {
-        // Bind the folderID parameter to the SQL query
-        mysqli_stmt_bind_param($stmt, "i", $folderID);
-
-        // Execute the query
-        if (mysqli_stmt_execute($stmt)) {
-            // Get the result of the query
-            $result = mysqli_stmt_get_result($stmt);
-            
-            // Check if any files are found
-            if (mysqli_num_rows($result) > 0) {
-                // Fetch all files inside the folder and add to the response data
-                while ($row = mysqli_fetch_assoc($result)) {
-                    $response['data'][] = $row;
-                }
-                $response['success'] = true;  // Set success flag
-            } else {
-                // If no files are found, still success but empty data
-                $response['success'] = true;
-                $response['data'] = [];  // Empty data
+    if ($fileStmt = mysqli_prepare($conn, $fileQuery)) {
+        mysqli_stmt_bind_param($fileStmt, "i", $folderID);
+        if (mysqli_stmt_execute($fileStmt)) {
+            $fileResult = mysqli_stmt_get_result($fileStmt);
+            while ($fileRow = mysqli_fetch_assoc($fileResult)) {
+                $response['data']['files'][] = $fileRow;
             }
+            $response['success'] = true;  // Indicate success
         } else {
-            // Error executing the prepared statement
-            $response['message'] = 'Error fetching folder contents: ' . mysqli_error($conn);
+            $response['message'] = 'Error fetching files: ' . mysqli_error($conn);
         }
-
-        // Close the prepared statement
-        mysqli_stmt_close($stmt);
-    } else {
-        // Error preparing the query
-        $response['message'] = 'Error preparing the SQL query.';
+        mysqli_stmt_close($fileStmt);
     }
 } else {
-    // Invalid folder ID
     $response['message'] = 'Invalid folder ID.';
 }
 
 // Set the header to return JSON response
 header('Content-Type: application/json');
-
-// Return the response as JSON
 echo json_encode($response);
 ?>

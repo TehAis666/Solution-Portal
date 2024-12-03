@@ -2,6 +2,8 @@
 // Include the database connection
 require_once '../db/db.php';  // Adjust this path as needed
 
+session_start();
+
 // Define the upload directory (absolute path to your 'resources/documents' folder)
 $uploadDir = realpath(__DIR__ . '/../resources/documents/') . '/'; // Absolute path to 'resources/documents'
 
@@ -12,72 +14,68 @@ if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
 }
 
 // Check if files are uploaded
-if (!isset($_FILES['files']) || empty($_FILES['files']['name'][0])) {
-    echo json_encode(['success' => false, 'message' => 'No files uploaded.']);
-    exit;
-}
+if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {  // Updated from 'files' to 'file'
+    $folderID = $_POST['folderID'] ?? null; // Get the folder ID from the request (e.g., passed via AJAX)
+    
+    if (!$folderID) {
+        echo json_encode(['success' => false, 'message' => 'Folder ID is missing.']);
+        exit;
+    }
 
-$folderID = $_POST['folderID'] ?? null; // Get the folder ID from the request (e.g., passed via AJAX)
+    // Initialize array to store file details for database
+    $fileDetails = [];
 
-if (!$folderID) {
-    echo json_encode(['success' => false, 'message' => 'Folder ID is missing.']);
-    exit;
-}
-
-// Initialize array to store file details for database
-$fileDetails = [];
-
-foreach ($_FILES['files']['name'] as $index => $fileName) {
-    // Get file details
-    $tmpName = $_FILES['files']['tmp_name'][$index];
-    $fileType = $_FILES['files']['type'][$index];
-    $fileSize = $_FILES['files']['size'][$index];
+    // Handle the uploaded file
+    $fileName = $_FILES['file']['name'];
+    $tmpName = $_FILES['file']['tmp_name'];
+    $fileType = $_FILES['file']['type'];
+    $fileSize = $_FILES['file']['size'];
 
     // Generate a unique file name to avoid name conflicts
     $uniqueFileName = uniqid() . '_' . basename($fileName);
-    $filePath = $uploadDir . $uniqueFileName;
+    $filePath = $uploadDir . $uniqueFileName;  // This is the absolute path to the file
 
     // Move the uploaded file to the specified directory
     if (move_uploaded_file($tmpName, $filePath)) {
+        // Save the relative file path (relative to the 'resources/documents' folder)
+        $relativeFilePath = 'resources/documents/' . $uniqueFileName;
+
         // Store file details (for example, file name, folder ID, path, etc.)
         $fileDetails[] = [
             'fileName' => $fileName,
             'folderID' => $folderID,
-            'path' => $filePath,
+            'path' => $relativeFilePath,  // Save relative path in the database
             'type' => $fileType,
-            'size' => $fileSize
+            'size' => $fileSize,
+            'uploadedBy' => $_SESSION['user_name'],
+            'staffID' => $_SESSION['user_id']
         ];
     } else {
         echo json_encode(['success' => false, 'message' => 'Error uploading file: ' . $fileName]);
         exit;
     }
-}
 
-// Assuming you are storing file details in the database, use your DB logic here
-// Example: insert into the 'files' table using MySQLi
-foreach ($fileDetails as $file) {
-    // Prepare an SQL query to insert file details
-    $stmt = $conn->prepare("INSERT INTO files (fileName, FolderID, path, type, size) VALUES (?, ?, ?, ?, ?)");
-    if ($stmt === false) {
-        echo json_encode(['success' => false, 'message' => 'Database query preparation failed.']);
-        exit;
-    }
-    
-    // Bind the parameters (fileName, FolderID, path, type, size)
-    $stmt->bind_param("sissi", $file['fileName'], $file['folderID'], $file['path'], $file['type'], $file['size']);
+    // Insert file details into the database
+    foreach ($fileDetails as $file) {
+        $stmt = $conn->prepare("INSERT INTO files (fileName, FolderID, path, type, size, uploadedBy, staffID) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt === false) {
+            echo json_encode(['success' => false, 'message' => 'Database query preparation failed.']);
+            exit;
+        }
 
-    // Execute the query
-    if ($stmt->execute()) {
-        // If successful, continue
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error inserting file details into the database.']);
-        exit;
+        $stmt->bind_param("sississ", $file['fileName'], $file['folderID'], $file['path'], $file['type'], $file['size'], $file['uploadedBy'], $file['staffID']);
+
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'message' => 'Error inserting file details into the database.']);
+            exit;
+        }
+
+        $stmt->close();
     }
 
-    // Close the statement
-    $stmt->close();
+    // Return success response
+    echo json_encode(['success' => true, 'message' => 'Files uploaded successfully.']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'No files uploaded.']);
 }
-
-// Return success response
-echo json_encode(['success' => true, 'message' => 'Files uploaded successfully.']);
 ?>
