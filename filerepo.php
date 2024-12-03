@@ -808,37 +808,9 @@
                 success: function(response) {
                     const data = JSON.parse(response);
                     if (data.success) {
-                        const fileUrl = data.fileUrl;
-
-                        // Use pdf.js to load and display the PDF
-                        pdfjsLib.getDocument(fileUrl).promise.then(function(pdf) {
-                            console.log("PDF loaded");
-
-                            // Get the first page
-                            pdf.getPage(1).then(function(page) {
-                                const scale = 1.5;
-                                const viewport = page.getViewport({
-                                    scale: scale
-                                });
-
-                                // Prepare the canvas for rendering
-                                const canvas = document.getElementById('pdf-canvas');
-                                const context = canvas.getContext('2d');
-                                canvas.height = viewport.height;
-                                canvas.width = viewport.width;
-
-                                // Render the page
-                                page.render({
-                                    canvasContext: context,
-                                    viewport: viewport
-                                });
-                            });
-                        }).catch(function(error) {
-                            console.error('Error loading PDF: ', error);
-                        });
-
-                        // Show the preview in a modal (Bootstrap modal)
-                        $('#filePreviewModal').modal('show');
+                        const fileUrl = encodeURIComponent(data.fileUrl); // Encode the file URL
+                        const viewerUrl = `pdfviewer/web/viewer.html?file=${fileUrl}`;
+                        window.open(viewerUrl, '_blank'); // Open the viewer in a new tab
                     } else {
                         alert('Error loading file preview.');
                     }
@@ -849,27 +821,6 @@
             });
         }
 
-
-        // Function to render a page of the PDF
-        function renderPage(pdfDoc, pageNum) {
-            pdfDoc.getPage(pageNum).then(function(page) {
-                const canvas = document.getElementById('pdf-canvas');
-                const context = canvas.getContext('2d');
-
-                const viewport = page.getViewport({
-                    scale: 1.5
-                }); // Set scale to control zoom level
-
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                // Render the page onto the canvas
-                page.render({
-                    canvasContext: context,
-                    viewport: viewport
-                });
-            });
-        }
 
         // Function to display a "No files in this folder" message in the table
         function displayNoFilesMessage() {
