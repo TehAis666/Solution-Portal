@@ -195,6 +195,29 @@ $role = $_SESSION['user_role']; // Get the role from the session
       </ul>
     </li>
 
+    <!-- ======= First nav List ======= -->
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        data-bs-target="#File-nav"
+        data-bs-toggle="collapse"
+        href="#">
+        <i class="bi bi-stack"></i><span>File Repository</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul
+        id="File-nav"
+        class="nav-content collapse"
+        data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="manageFile">
+            <i class="bi bi-plus-circle fs-6"></i><span>Manage</span>
+          </a>
+        </li>
+        
+      </ul>
+    </li>
+
     <!-- End First Nav -->
     <!-- ======= First nav List ======= -->
     <?php if ($role != 'admin'): // Only Admin
