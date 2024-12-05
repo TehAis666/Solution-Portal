@@ -921,6 +921,7 @@
 
             // Hide the "Add New File" button when going to Home
             toggleAddFileButton(false); // This will hide the button
+            currentFolderID = '';
         }
 
         // Toggle view between folder and file view
@@ -930,6 +931,53 @@
             } else {
                 openFolder(currentFolderID, breadcrumb[breadcrumb.length - 1]); // Open the current folder's files again
             }
+        }
+
+        // Reference to the hidden file input and the button
+        const fileInput = document.getElementById('fileInput');
+        const addFileBtn = document.getElementById('addFileBtn');
+
+        // Show or hide the "Add File" button based on folder state
+        function toggleAddFileButton(show) {
+            addFileBtn.style.display = show ? 'inline-block' : 'none';
+        }
+
+        // Trigger file input dialog when the "Add File" button is clicked
+        function triggerFileInput() {
+            fileInput.click(); // This simulates clicking on the hidden file input
+        }
+
+        // Listen for file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0]; // Get the selected file
+            if (file) {
+                uploadFile(file); // Proceed with the file upload
+            }
+        });
+
+        // Function to upload the selected file with currentFolderID
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file); // Append the file
+            formData.append('folderID', currentFolderID); // Append the current folder ID
+
+            // Perform the AJAX request to upload the file
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'controller/uploadFile.php', true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert('File uploaded successfully!');
+                        openFolder(currentFolderID, currentfolderName);
+                    } else {
+                        alert('Error uploading file: ' + response.message);
+                    }
+                }
+            };
+
+            xhr.send(formData); // Send the FormData containing the file and folder ID
         }
 
 
@@ -943,6 +991,26 @@
             // Initialize tooltips for all elements with the `title` attribute
             document.querySelectorAll('[title]').forEach(function(el) {
                 new bootstrap.Tooltip(el);
+            });
+
+            folderModal.addEventListener('show.bs.modal', function() {
+                if (currentFolderID && currentFolderID !== '') {
+                    searchInput.setAttribute('disabled', 'disabled'); // Disable the input
+                    searchInput.placeholder = 'Search disabled due to folder selection'; // Optional placeholder text
+                    previewSection.classList.add('d-none'); // Hide the preview
+                    dropdown.classList.remove('show'); // Hide dropdown if visible
+                } else {
+                    searchInput.removeAttribute('disabled'); // Enable the input
+                    searchInput.placeholder = 'Search proposals...'; // Reset placeholder text
+                }
+            });
+
+            // Clear the input when the modal is closed
+            folderModal.addEventListener('hide.bs.modal', function() {
+                searchInput.value = ''; // Clear the input value
+                dropdown.innerHTML = ''; // Clear dropdown list
+                dropdown.classList.remove('show'); // Hide dropdown
+                previewSection.classList.add('d-none'); // Hide preview section
             });
 
             let currentIndex = -1; // Keeps track of the currently selected (focused) option
@@ -1068,54 +1136,6 @@
                 }
             });
         });
-
-        // Reference to the hidden file input and the button
-        const fileInput = document.getElementById('fileInput');
-        const addFileBtn = document.getElementById('addFileBtn');
-
-        // Show or hide the "Add File" button based on folder state
-        function toggleAddFileButton(show) {
-            addFileBtn.style.display = show ? 'inline-block' : 'none';
-        }
-
-        // Trigger file input dialog when the "Add File" button is clicked
-        function triggerFileInput() {
-            fileInput.click(); // This simulates clicking on the hidden file input
-        }
-
-        // Listen for file selection
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0]; // Get the selected file
-            if (file) {
-                uploadFile(file); // Proceed with the file upload
-            }
-        });
-
-        // Function to upload the selected file with currentFolderID
-        function uploadFile(file) {
-            const formData = new FormData();
-            formData.append('file', file); // Append the file
-            formData.append('folderID', currentFolderID); // Append the current folder ID
-
-            // Perform the AJAX request to upload the file
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'controller/uploadFile.php', true);
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        alert('File uploaded successfully!');
-                        openFolder(currentFolderID, currentfolderName);
-                    } else {
-                        alert('Error uploading file: ' + response.message);
-                    }
-                }
-            };
-
-            xhr.send(formData); // Send the FormData containing the file and folder ID
-        }
-
     </script>
 
 
