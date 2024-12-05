@@ -155,6 +155,13 @@ try {
 
     <!--New Css Added-->
     <style>
+        
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            /* border: 1px solid #e3e6f0; */
+            border-radius: 15px;
+            color: #333;
+        }
         /*--Dark Mode Style--*/
         .dark-mode {
             background-color: #121212;
@@ -327,6 +334,7 @@ try {
         }
 
         /* Badge Styles */
+        
 
         .text-center {
             text-align: center;
@@ -383,11 +391,20 @@ try {
             font-weight: bold;
             /* Bold labels */
         }
+        
+        .rounded-btn {
+            border-radius: 50px; /* Adjust the value to increase or decrease roundness */
+            padding: 10px 20px; /* Optional: Adjust padding for better button appearance */
+        }
+        .badge {
+            border-radius: 50px; /* Makes badges fully rounded */
+            padding: 0.5rem 1rem; /* Adjust padding for a better rounded appearance */
+        }
 
         .btn-primary.edit-btn {
             background-color: #28a745;
             /* Green color for edit button */
-            border: none;
+            border-radius: 50px;
             /* No border */
         }
 
@@ -472,6 +489,7 @@ try {
             display: inline-block;
             margin-right: 10px;
         }
+        
     </style>
 </head>
 
@@ -522,38 +540,38 @@ try {
         <section class="section dashboard">
             <div class="row text-center">
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="background-color: #E3F2FD;">
                         <div class="card-body">
                             <h1 class="card-title total-bids clickable" style="color: #1e73be; font-size: 48px;">0</h1>
                             <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                            <h5 class="card-subtitle text-muted">Total Bids</h5>
+                            <h5 class="card-subtitle text-muted"><strong>Total Bids</h5></strong>
                         </div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="background-color: #E0F2F1;">
                         <div class="card-body">
                             <h1 class="card-title total-new-request clickable" style="color: #26a69a; font-size: 48px;">0</h1>
                             <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                            <h5 class="card-subtitle text-muted">Total New Request</h5>
+                            <h5 class="card-subtitle text-muted"><strong>Total New Request</h5></strong>
                         </div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="background-color: #E1F5FE;">
                         <div class="card-body">
                             <h1 class="card-title total-submitted clickable" style="color: #039be5; font-size: 48px;">0</h1>
                             <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                            <h5 class="card-subtitle text-muted">Total Submitted</h5>
+                            <h5 class="card-subtitle text-muted"><strong>Total Submitted</h5></strong>
                         </div>
                     </div>
                 </div>
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="background-color: #FFEBEE;">
                         <div class="card-body">
                             <h1 class="card-title total-dropped clickable" style="color: #e53935; font-size: 48px;">0</h1>
                             <hr style="width: 50px; border: 2px solid #f1a400; margin: 10px auto;">
-                            <h5 class="card-subtitle text-muted">Total Dropped</h5>
+                            <h5 class="card-subtitle text-muted"><strong>Total Dropped</h5></strong>
                         </div>
                     </div>
                 </div>
@@ -588,23 +606,26 @@ try {
                                                 <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
                                                 <td><?php echo $bid['StaffName'] ? htmlspecialchars($bid['StaffName']) : 'null'; ?></td>
                                                 <td>
-                                                    <?php echo htmlspecialchars($bid['CustName']); ?>
-                                                    <?php
-                                                    if ($bid['role'] == 'creator'): ?>
-                                                        <span class="badge bg-primary">Creator</span>
-                                                    <?php elseif ($bid['role'] == 'partner'): ?>
-                                                        <span class="badge bg-success">Partner</span>
-                                                    <?php elseif ($bid['role'] == 'affiliate'): ?>
-                                                        <span class="badge bg-warning">Sub-Presales</span>
-                                                    <?php elseif ($bid['role'] == 'requested'): ?>
-                                                        <span class="badge bg-info">Requested</span>
-                                                    <?php elseif ($bid['role'] == 'rejected'): ?>
-                                                        <span class="badge bg-danger">Rejected</span>
-                                                    <?php else: ?>
-                                                        <span class="badge bg-secondary">Others</span>
-                                                    <?php endif; ?>
-
+                                                    <div>
+                                                        <?php echo htmlspecialchars($bid['CustName']); ?>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        <?php if ($bid['role'] == 'creator'): ?>
+                                                            <span class="badge bg-primary rounded-pill">Creator</span>
+                                                        <?php elseif ($bid['role'] == 'partner'): ?>
+                                                            <span class="badge bg-success rounded-pill">Partner</span>
+                                                        <?php elseif ($bid['role'] == 'affiliate'): ?>
+                                                            <span class="badge bg-warning rounded-pill">Sub-Presales</span>
+                                                        <?php elseif ($bid['role'] == 'requested'): ?>
+                                                            <span class="badge bg-info rounded-pill">Requested</span>
+                                                        <?php elseif ($bid['role'] == 'rejected'): ?>
+                                                            <span class="badge bg-danger rounded-pill">Rejected</span>
+                                                        <?php else: ?>
+                                                            <span class="badge bg-secondary rounded-pill">Others</span>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </td>
+
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                                                 <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
                                                 <td><?php echo htmlspecialchars(number_format($bid['RMValue'], 2, '.', ',')); ?></td>
@@ -613,19 +634,18 @@ try {
                                                     <?php
                                                     $status = htmlspecialchars($bid['Status']);
                                                     if ($status == 'Submitted') {
-                                                        echo '<span class="badge bg-success">Submitted</span>';
+                                                        echo '<span class="badge bg-success rounded-pill">Submitted</span>';
                                                     } elseif ($status == 'Dropped') {
-                                                        echo '<span class="badge bg-danger">Dropped</span>';
+                                                        echo '<span class="badge bg-danger rounded-pill">Dropped</span>';
                                                     } elseif ($status == 'WIP') {
-                                                        echo '<span class="badge bg-warning text-dark">WIP</span>';
+                                                        echo '<span class="badge bg-warning text-dark rounded-pill">WIP</span>';
                                                     } else {
-                                                        echo '<span class="badge bg-secondary">Unknown</span>';
+                                                        echo '<span class="badge bg-secondary rounded-pill">Unknown</span>';
                                                     }
                                                     ?>
                                                 </td>
-                                                <td>
-                                                    <!-- View Button with Data Attributes for Each Bid -->
-                                                    <button type="button" class="btn btn-primary viewbtn"
+                                                <td class="text-center align-middle">
+                                                    <button type="button" class="btn btn-primary btn-sm rounded-pill viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-role="<?php echo htmlspecialchars($bid['role']); ?>"
                                                         data-lastupdatedby="<?php echo htmlspecialchars($bid['LastEditedBy'] ?? 'null'); ?>"
@@ -664,6 +684,7 @@ try {
                                                         View
                                                     </button>
                                                 </td>
+
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
@@ -692,55 +713,70 @@ try {
                         <div class="container">
                             <input type="hidden" name="BidID" id="modalBidID">
                             <input type="hidden" name="StaffID" id="modalstaffID"> <!-- Hidden StaffID -->
-                            <div class="row mb-3">
+
+                            <!-- Section: General Details -->
+                            <h6 class="text-primary mb-3">General Details</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Presales:</strong></div>
                                 <div class="col-sm-8" id="modalStaffName">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Company/Agency Name:</strong></div>
                                 <div class="col-sm-8" id="modalCustName">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>HMS Scope:</strong></div>
                                 <div class="col-sm-8" id="modalHMSScope">-</div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Tender Proposal Title:</strong></div>
-                                <div class="col-sm-8" id="modalTenderProposal">-</div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Type:</strong></div>
-                                <div class="col-sm-8" id="modalType">-</div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Business Unit:</strong></div>
-                                <div class="col-sm-8" id="modalBusinessUnit">-</div>
-                            </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Account Details -->
+                            <h6 class="text-primary mb-3 mt-4">Account Details</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Account Sector:</strong></div>
                                 <div class="col-sm-8" id="modalAccountSector">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Account Manager:</strong></div>
                                 <div class="col-sm-8" id="modalAccountManager">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Proposal Details -->
+                            <h6 class="text-primary mb-3 mt-4">Proposal Details</h6>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Tender Proposal Title:</strong></div>
+                                <div class="col-sm-8" id="modalTenderProposal">-</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Type:</strong></div>
+                                <div class="col-sm-8" id="modalType">-</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Business Unit:</strong></div>
+                                <div class="col-sm-8" id="modalBusinessUnit">-</div>
+                            </div>
+                            
+                            <!-- Section: Solutions -->
+                            <h6 class="text-primary mb-3 mt-4">Solutions</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Solution1:</strong></div>
                                 <div class="col-sm-8" id="modalSolution1">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Solution2:</strong></div>
                                 <div class="col-sm-8" id="modalSolution2">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Solution3:</strong></div>
                                 <div class="col-sm-8" id="modalSolution3">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Solution4:</strong></div>
                                 <div class="col-sm-8" id="modalSolution4">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Presales Team -->
+                            <h6 class="text-primary mb-3 mt-4">Presales Team</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Presales1:</strong></div>
                                 <div class="col-sm-8" id="modalPresales1">-</div>
                             </div>
@@ -748,59 +784,71 @@ try {
                                 <div class="col-sm-4"><strong>Presales2:</strong></div>
                                 <div class="col-sm-8" id="modalPresales2">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Presales3:</strong></div>
                                 <div class="col-sm-8" id="modalPresales3">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Presales4:</strong></div>
                                 <div class="col-sm-8" id="modalPresales4">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Dates -->
+                            <h6 class="text-primary mb-3 mt-4">Dates</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Request Date:</strong></div>
                                 <div class="col-sm-8" id="modalRequestDate">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Submission Date:</strong></div>
                                 <div class="col-sm-8" id="modalSubmissionDate">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Values -->
+                            <h6 class="text-primary mb-3 mt-4">Values (RM)</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Value1 (RM):</strong></div>
                                 <div class="col-sm-8" id="modalValue1">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Value2 (RM):</strong></div>
                                 <div class="col-sm-8" id="modalValue2">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Value3 (RM):</strong></div>
                                 <div class="col-sm-8" id="modalValue3">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Value4 (RM):</strong></div>
                                 <div class="col-sm-8" id="modalValue4">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Total Value (RM):</strong></div>
                                 <div class="col-sm-8" id="modalTotalValue">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>RM Value (Final):</strong></div>
                                 <div class="col-sm-8" id="modalRMValue">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Tender Details -->
+                            <h6 class="text-primary mb-3 mt-4">Tender Status</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Status:</strong></div>
                                 <div class="col-sm-8" id="modalStatus">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Tender Status:</strong></div>
                                 <div class="col-sm-8" id="modalTenderStatus">-</div>
                             </div>
-                            <div class="row mb-3">
+
+                            <!-- Section: Additional Info -->
+                            <h6 class="text-primary mb-3 mt-4">Additional Info</h6>
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Remarks:</strong></div>
                                 <div class="col-sm-8" id="modalRemarks">-</div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-2">
                                 <div class="col-sm-4"><strong>Last updated by:</strong></div>
                                 <div class="col-sm-8" id="modallastupdatedby">-</div>
                                 <div class="col-sm-4"><strong>Time:</strong></div>
@@ -809,9 +857,9 @@ try {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
-                        <button type="button" class="btn btn-primary" id="requestBtn">Request Access</button>
+                        <button type="button" class="btn btn-secondary rounded-btn" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary edit-btn rounded-btn" data-toggle="modal" data-target="#editModal">Edit</button>
+                        <button type="button" class="btn btn-primary rounded-btn" id="requestBtn">Request Access</button>
                     </div>
                 </div>
             </div>

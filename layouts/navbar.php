@@ -107,7 +107,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
         <li>
           <a href="addbid">
-            <i class="bi bi-circle"></i><span>Add Bid</span>
+            <i class="bi bi-plus-circle fs-6"></i><span>Add Bid</span>
           </a>
         </li>
         <?php endif; ?>
@@ -116,7 +116,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="adminbid3">
-              <i class="bi bi-circle"></i><span>ManageBid</span>
+              <i class="bi bi-gear fs-6"></i><span>ManageBid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -125,7 +125,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="userbid3">
-              <i class="bi bi-circle"></i><span>My Bid</span>
+              <i class="bi bi-person-circle fs-6"></i><span>My Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -134,7 +134,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="adminbidaccess">
-              <i class="bi bi-circle"></i><span>Bid Access Control</span>
+              <i class="bi bi-lock fs-6"></i><span>Bid Access Control</span>
             </a>
           </li>
         <?php endif; ?>
@@ -143,7 +143,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="allbid2">
-              <i class="bi bi-circle"></i><span>HeiTech Bid</span>
+              <i class="bi bi-briefcase fs-6"></i><span>HeiTech Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -152,7 +152,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="headbid8">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
+              <i class="bi bi-building fs-6"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -161,7 +161,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="sectorbid2">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
+              <i class="bi bi-folder"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -170,7 +170,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="userbid4">
-              <i class="bi bi-circle"></i><span>Manage Bid</span>
+              <i class="bi bi-pencil-square fs-6"></i><span>Manage Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -179,7 +179,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="acceptrequest">
-              <i class="bi bi-circle"></i><span>Manage Bid Access</span>
+              <i class="bi bi-person-check fs-6"></i><span>Manage Bid Access</span>
             </a>
           </li>
         <?php endif; ?>
@@ -188,7 +188,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="viewbid">
-              <i class="bi bi-circle"></i><span>CTO/SO/SA Bid</span>
+              <i class="bi bi-eye fs-6"></i><span>CTO/SO/SA Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -221,7 +221,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="userteam">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Members</span>
+              <i class="bi bi-people-fill fs-6"></i><span><?php echo $sector; ?> Members</span>
             </a>
           </li>
         <?php endif; ?>

@@ -113,6 +113,10 @@ try {
 
     <!--New Css Added-->
     <style>
+
+        .card {
+            border-radius: 15px; /* Adjust the number to increase or decrease roundness */
+            }
         /*--Dark Mode Style--*/
         .dark-mode {
             background-color: #121212;
@@ -341,7 +345,14 @@ try {
             font-weight: bold;
             /* Bold labels */
         }
-
+        .rounded-btn {
+            border-radius: 50px; /* Adjust the value to increase or decrease roundness */
+            padding: 10px 20px; /* Optional: Adjust padding for better button appearance */
+        }
+        .badge {
+            border-radius: 50px; /* Makes badges fully rounded */
+            padding: 0.5rem 1rem; /* Adjust padding for a better rounded appearance */
+        }
         .btn-primary.edit-btn {
             background-color: #28a745;
             /* Green color for edit button */
@@ -524,8 +535,8 @@ try {
                                                     }
                                                     ?>
                                                 </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-primary viewbtn"
+                                                <td class="text-center align-middle">
+                                                    <button type="button" class="btn btn-primary btn-sm rounded-pill viewbtn"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-role="<?php echo htmlspecialchars($bid['role']); ?>"
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
@@ -590,6 +601,8 @@ try {
                     </div>
                     <div class="modal-body">
                         <div class="container">
+                            <!-- Section: General Details -->
+                            <h6 class="text-primary mb-3">General Details</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Owner:</strong></div>
                                 <div class="col-sm-8" id="modalStaffName">-</div>
@@ -606,6 +619,8 @@ try {
                                 <div class="col-sm-4"><strong>HMS Scope:</strong></div>
                                 <div class="col-sm-8" id="modalHMSScope">-</div>
                             </div>
+                            <!-- Section: Proposal Details -->
+                            <h6 class="text-primary mb-3 mt-4">Proposal Details</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Tender Proposal Title:</strong></div>
                                 <div class="col-sm-8" id="modalTenderProposal">-</div>
@@ -618,6 +633,8 @@ try {
                                 <div class="col-sm-4"><strong>Business Unit:</strong></div>
                                 <div class="col-sm-8" id="modalBusinessUnit">-</div>
                             </div>
+                            <!-- Section: Account Details -->
+                            <h6 class="text-primary mb-3 mt-4">Account Details</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Account Sector:</strong></div>
                                 <div class="col-sm-8" id="modalAccountSector">-</div>
@@ -626,6 +643,8 @@ try {
                                 <div class="col-sm-4"><strong>Account Manager:</strong></div>
                                 <div class="col-sm-8" id="modalAccountManager">-</div>
                             </div>
+                            <!-- Section: Solutions -->
+                            <h6 class="text-primary mb-3 mt-4">Solutions</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Solution1:</strong></div>
                                 <div class="col-sm-8" id="modalSolution1">-</div>
@@ -642,6 +661,8 @@ try {
                                 <div class="col-sm-4"><strong>Solution4:</strong></div>
                                 <div class="col-sm-8" id="modalSolution4">-</div>
                             </div>
+                            <!-- Section: Presales Team -->
+                            <h6 class="text-primary mb-3 mt-4">Presales Team</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Presales1:</strong></div>
                                 <div class="col-sm-8" id="modalPresales1">-</div>
@@ -658,6 +679,8 @@ try {
                                 <div class="col-sm-4"><strong>Presales4:</strong></div>
                                 <div class="col-sm-8" id="modalPresales4">-</div>
                             </div>
+                            <!-- Section: Dates -->
+                            <h6 class="text-primary mb-3 mt-4">Dates</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Request Date:</strong></div>
                                 <div class="col-sm-8" id="modalRequestDate">-</div>
@@ -666,6 +689,8 @@ try {
                                 <div class="col-sm-4"><strong>Submission Date:</strong></div>
                                 <div class="col-sm-8" id="modalSubmissionDate">-</div>
                             </div>
+                            <!-- Section: Values -->
+                            <h6 class="text-primary mb-3 mt-4">Values (RM)</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Value1 (RM):</strong></div>
                                 <div class="col-sm-8" id="modalValue1">-</div>
@@ -694,6 +719,8 @@ try {
                                 <div class="col-sm-4"><strong>Status:</strong></div>
                                 <div class="col-sm-8" id="modalStatus">-</div>
                             </div>
+                            <!-- Section: Tender Details -->
+                            <h6 class="text-primary mb-3 mt-4">Tender Status</h6>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Tender Status:</strong></div>
                                 <div class="col-sm-8" id="modalTenderStatus">-</div>

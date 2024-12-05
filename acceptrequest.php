@@ -91,6 +91,9 @@ try {
 
     <!--New Css Added-->
     <style>
+        .card {
+        border-radius: 15px; /* Adjust the number to increase or decrease roundness */
+        }
         /*--Dark Mode Style--*/
         .dark-mode {
             background-color: #121212;
