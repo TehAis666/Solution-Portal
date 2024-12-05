@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>Dashboard</title>
+    <title>File Repository</title>
     <meta content="" name="description" />
     <meta content="" name="keywords" />
 
@@ -317,24 +317,80 @@
             }
         }
 
-        /* Dropzone styling overrides */
-        #myDropzone {
-            border: 2px dashed #888;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.7);
-            /* Light transparent background */
-            padding: 30px;
-            color: #333;
-        }
-
-        #myDropzone .dz-message {
-            font-size: 1.2em;
-            color: #888;
+        .table-dropzone {
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+            border: 2px dashed transparent;
+            /* Dashed border, initially invisible */
         }
 
         .table-dropzone.dragover {
-            background-color: #f0f8ff;
-            border: 2px dashed #007bff;
+            border-color: #007bff;
+            /* Show dashed border when dragging files */
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .table-dropzone::before,
+        .table-dropzone::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: #007bff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .table-dropzone::before {
+            top: 40%;
+        }
+
+        .table-dropzone::after {
+            top: 60%;
+        }
+
+        .table-dropzone.dragover::before,
+        .table-dropzone.dragover::after {
+            opacity: 1;
+        }
+
+        .table-dropzone.dragover::after {
+            content: "Drop the files here";
+            /* Display the message */
+            font-size: 1.5rem;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .table-dropzone-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.6);
+            z-index: 10;
+        }
+
+        .table-dropzone.dragover .table-dropzone-overlay {
+            display: block;
+        }
+
+        .main-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 11;
         }
     </style>
 </head>
@@ -357,6 +413,8 @@
                 <div class="col">
                     <div class="card">
                         <div class="card-body">
+                            <!-- Hidden file input to trigger the file dialog -->
+                            <input type="file" id="fileInput" style="display: none;" />
                             <!-- Flex container for breadcrumb and buttons -->
                             <div class="d-flex align-items-center" style="margin-bottom: 20px;">
                                 <!-- Breadcrumb with margin -->
@@ -378,17 +436,21 @@
                                     <i class="ri-folder-add-fill"></i>
                                 </button>
 
+                                <!-- Button that triggers file selection (only visible based on conditions) -->
                                 <button
                                     id="addFileBtn"
                                     class="btn btn-primary btn-sm rounded-pill"
                                     style="margin-top: 10px; display: none;"
-                                    title="Create New File"
-                                    onclick="showDropzoneModal()">
+                                    title="Upload File"
+                                    onclick="triggerFileInput()">
                                     <i class="ri-file-add-fill"></i>
                                 </button>
                             </div>
 
                             <div id="tableDropzone" class="table-dropzone">
+                                <div class="table-dropzone-overlay">
+                                    <div class="main-text">Drop the files here</div>
+                                </div>
                                 <table id="folderTable" class="foldertable table table-striped table-hover" style="width:100%">
                                     <thead>
                                         <tr>
@@ -663,36 +725,42 @@
 
             const tableDropzone = new Dropzone("#tableDropzone", {
                 url: 'controller/uploadFile.php',
-                paramName: "file", // Update: should match your PHP $_FILES key
-                maxFilesize: 5, // 5 MB max file size
+                paramName: "file",
+                maxFilesize: 5,
                 clickable: false,
                 addRemoveLinks: true,
-                previewsContainer: false, // No preview needed
+                previewsContainer: false,
                 acceptedFiles: ".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx",
                 autoProcessQueue: true,
                 init: function() {
                     const myDropzone = this;
 
                     this.on("sending", function(file, xhr, formData) {
-                        // Append the folderID to the form data
-                        const folderID = currentFolderID || 0; // Replace with a dynamic value if necessary
+                        const folderID = currentFolderID || 0;
                         formData.append("folderID", folderID);
                     });
 
-                    this.on("dragenter", function() {
+                    this.on("dragenter", function(event) {
+                        event.stopPropagation();
                         $("#tableDropzone").addClass("dragover");
                     });
 
-                    this.on("dragleave drop", function() {
+                    this.on("dragleave", function(event) {
+                        if (!event.relatedTarget || !event.relatedTarget.closest("#tableDropzone")) {
+                            $("#tableDropzone").removeClass("dragover");
+                        }
+                    });
+
+                    this.on("drop", function() {
                         $("#tableDropzone").removeClass("dragover");
                     });
 
                     this.on("success", function(file, response) {
-                        response = JSON.parse(response); // Ensure response is parsed
+                        response = JSON.parse(response);
                         if (response.success) {
                             alert('File uploaded successfully!');
-                            myDropzone.removeFile(file); // Remove file from Dropzone
-                            openFolder(currentFolderID, currentfolderName); // Refresh folder contents
+                            myDropzone.removeFile(file);
+                            openFolder(currentFolderID, currentfolderName);
                         } else {
                             alert('Upload failed: ' + response.message);
                             myDropzone.removeFile(file);
@@ -776,7 +844,7 @@
 
             files.forEach(function(file) {
                 const rowNode = table.row.add([
-                    `<a href="#" class="file-link">${file.fileName}</a>`, // File name as a link
+                    `<i class="ri-file-text-line file-icon"></i> ${file.fileName}`, // File icon added here
                     '', // Placeholder for the file count
                     file.uploadedBy || 'N/A',
                     file.dateUploaded || 'N/A',
@@ -787,7 +855,7 @@
                 $(rowNode).data('FileID', file.FileID);
 
                 // Add click or double-click event to trigger preview
-                $(rowNode).dblclick(function() {
+                $(rowNode).click(function() {
                     const fileID = $(this).data('FileID'); // Retrieve fileID from the row
                     console.log(fileID); // Check if fileID is correctly retrieved
                     previewPDF(fileID); // Pass fileID to previewFile function
@@ -867,21 +935,31 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             let selectedBidID = ''; // Global variable to store the selected BidID
+            const searchInput = document.getElementById('relatedProposalSearch');
+            const dropdown = document.getElementById('relatedProposalDropdown');
+            const folderModal = document.getElementById('folderModal');
+            const previewSection = document.getElementById('proposalPreview');
 
             // Initialize tooltips for all elements with the `title` attribute
             document.querySelectorAll('[title]').forEach(function(el) {
                 new bootstrap.Tooltip(el);
             });
 
-            const searchInput = document.getElementById('relatedProposalSearch');
-            const dropdown = document.getElementById('relatedProposalDropdown');
             let currentIndex = -1; // Keeps track of the currently selected (focused) option
+
+            // Show preview when user hovers over the search input
+            searchInput.addEventListener('mouseover', function() {
+                if (searchInput.value.trim() !== '') {
+                    previewSection.classList.remove('d-none'); // Show preview if input has value
+                }
+            });
 
             // Event listener for search input
             searchInput.addEventListener('input', function() {
                 const query = searchInput.value.trim();
 
-                if (query.length > 0) {
+                // Show preview if input is not empty
+                if (query.length > 0 && !searchInput.disabled) { // Don't allow searching if input is disabled
                     // AJAX request to fetch data
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', 'controller/fetchproposal', true);
@@ -900,9 +978,10 @@
                     };
                     xhr.send(`query=${encodeURIComponent(query)}`);
                 } else {
-                    // Clear dropdown when query is empty
+                    // Clear dropdown when query is empty or input is disabled
                     dropdown.innerHTML = '';
                     dropdown.classList.remove('show');
+                    previewSection.classList.add('d-none'); // Hide preview if input is empty
                 }
             });
 
@@ -939,8 +1018,8 @@
 
             function focusItem(item) {
                 const items = dropdown.querySelectorAll('li');
-                items.forEach((i) => i.classList.remove('highlight'));
-                item.classList.add('highlight');
+                items.forEach((i) => i.classList.remove('highlight')); // Remove highlight from all items
+                item.classList.add('highlight'); // Add highlight to the current item
             }
 
             function selectItem(item) {
@@ -968,8 +1047,7 @@
                         document.getElementById('previewSolutions').textContent = data.Solutions || 'N/A';
 
                         // Show the preview section
-                        const previewSection = document.getElementById('proposalPreview');
-                        previewSection.classList.remove('d-none'); // Show if hidden
+                        previewSection.classList.remove('d-none'); // Show preview if hidden
                     }
                 };
                 xhr.send(`bidID=${encodeURIComponent(selectedBidID)}`);
@@ -982,55 +1060,62 @@
                 }
             });
 
-            // Handle form submission with AJAX
-            const folderForm = document.getElementById('folderForm');
-            folderForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(folderForm);
-
-                // Ensure that if no BidID is selected, we don't append it
-                if (!selectedBidID) {
-                    formData.append('relatedProposalId', ''); // No BidID for standalone folder
-                } else {
-                    formData.append('relatedProposalId', selectedBidID); // Add selected proposal ID
-                }
-
-                if (currentFolderID) {
-                    formData.append('parentID', currentFolderID); // Add parent folder ID
-                }
-
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'controller/createfolder.php', true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4) {
-                        const response = JSON.parse(xhr.responseText);
-                        if (xhr.status === 200 && response.success) {
-                            alert(response.message);
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('folderModal'));
-                            modal.hide();
-                            folderForm.reset();
-
-                            // Reset selectedBidID if the form was submitted without it
-                            selectedBidID = '';
-
-                            const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) backdrop.remove();
-                            fetchFolders(); // Refresh the folder table
-                        } else {
-                            alert(response.message);
-                        }
-                    }
-                };
-                xhr.send(formData);
-            });
-
             // Reset selectedBidID if the input is cleared manually
             searchInput.addEventListener('input', function() {
                 if (searchInput.value.trim() === '') {
                     selectedBidID = ''; // Clear selectedBidID if the search is cleared
+                    previewSection.classList.add('d-none'); // Hide preview if input is cleared
                 }
             });
         });
+
+        // Reference to the hidden file input and the button
+        const fileInput = document.getElementById('fileInput');
+        const addFileBtn = document.getElementById('addFileBtn');
+
+        // Show or hide the "Add File" button based on folder state
+        function toggleAddFileButton(show) {
+            addFileBtn.style.display = show ? 'inline-block' : 'none';
+        }
+
+        // Trigger file input dialog when the "Add File" button is clicked
+        function triggerFileInput() {
+            fileInput.click(); // This simulates clicking on the hidden file input
+        }
+
+        // Listen for file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0]; // Get the selected file
+            if (file) {
+                uploadFile(file); // Proceed with the file upload
+            }
+        });
+
+        // Function to upload the selected file with currentFolderID
+        function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file); // Append the file
+            formData.append('folderID', currentFolderID); // Append the current folder ID
+
+            // Perform the AJAX request to upload the file
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'controller/uploadFile.php', true);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        alert('File uploaded successfully!');
+                        openFolder(currentFolderID, currentfolderName);
+                    } else {
+                        alert('Error uploading file: ' + response.message);
+                    }
+                }
+            };
+
+            xhr.send(formData); // Send the FormData containing the file and folder ID
+        }
+
     </script>
 
 

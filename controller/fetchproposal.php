@@ -6,10 +6,15 @@ require_once '../db/db.php';
 $query = isset($_POST['query']) ? trim($_POST['query']) : '';
 
 try {
-    // Prepare the SQL query
-    $sql = "SELECT BidID, HMS_Scope FROM bids";
+    // Prepare the SQL query to fetch BidIDs that do not have a folder associated with them
+    $sql = "SELECT BidID, HMS_Scope FROM bids
+            WHERE NOT EXISTS (
+                SELECT 1 FROM folders WHERE folders.BidID = bids.BidID
+            )";
+    
+    // If there is a search query, filter the results by HMS_Scope
     if (!empty($query)) {
-        $sql .= " WHERE HMS_Scope LIKE ?";
+        $sql .= " AND HMS_Scope LIKE ?";
     }
 
     // Prepare and execute the query using MySQLi
