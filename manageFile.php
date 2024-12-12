@@ -561,7 +561,7 @@
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <!-- DataTables Bootstrap Integration JS -->
@@ -612,7 +612,7 @@
                 <i class="ri-add-fill"></i>
             </button>
             <i class="ri-folder-open-fill folder-icon"></i> ${folder.folderName}`,
-                    'N/A', // Placeholder for number of files
+                    folder.fileCount || '0', // Display file count
                     folder.CreatedBy || 'N/A',
                     folder.DateCreated || 'N/A',
                     `<button class="btn btn-link btn-sm text-secondary view-files" onclick="openFolder('${folder.folderID}', '${folder.folderName}')">
@@ -822,7 +822,7 @@
                 <i class="ri-add-fill"></i>
             </button>
             <i class="ri-folder-open-fill folder-icon"></i> ${folder.folderName}`,
-                    'N/A', // Placeholder for number of files
+                    `${folder.itemCount || 0}`, // Total count
                     folder.CreatedBy || 'N/A',
                     folder.DateCreated || 'N/A',
                     `<button class="btn btn-link btn-sm text-secondary view-files" onclick="openFolder('${folder.folderID}', '${folder.folderName}')">
