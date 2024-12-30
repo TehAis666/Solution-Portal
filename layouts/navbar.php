@@ -214,6 +214,12 @@ $role = $_SESSION['user_role']; // Get the role from the session
             <i class="bi bi-plus-circle fs-6"></i><span>Manage</span>
           </a>
         </li>
+
+        <li>
+          <a href="authorizeFile">
+            <i class="bi bi-plus-circle fs-6"></i><span>Authorize File</span>
+          </a>
+        </li>
         
       </ul>
     </li>

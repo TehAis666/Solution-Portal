@@ -29,19 +29,18 @@ if ($result->num_rows > 0) {
     // Ensure the path uses forward slashes instead of backslashes
     $filePath = str_replace('\\', '/', $filePath);
 
-    // Dynamically determine the base URL from the current request
-    $host = $_SERVER['HTTP_HOST'];  // Get current domain (e.g., localhost)
+    // Dynamically determine the base folder from the current script name
+    $host = $_SERVER['HTTP_HOST'];  // Get the current domain (e.g., localhost)
     
-    // Extract base folder based on URL path (SolutionPortal, SolutionP, etc.)
-    $basePath = str_replace('http://' . $host . '/', '', $_SERVER['REQUEST_URI']);
-    $baseFolder = 'SolutionP'; // Default folder, you can change this if needed.
-
-    // If the base folder varies (SolutionP, SolutionPortal, etc.), you can check and adjust
-    if (strpos($basePath, 'SolutionP') !== false) {
-        $baseFolder = 'SolutionPortal';  // If URL contains SolutionP
-    } elseif (strpos($basePath, 'Solution-Portal') !== false) {
-        $baseFolder = 'Solution-Portal';  // If URL contains Solution-Portal
-    }
+    // Use SCRIPT_NAME or REQUEST_URI to extract the base folder
+    $baseFolder = 'SolutionP'; // Default folder
+    
+    // Check if SCRIPT_NAME contains the expected base folder names
+    if (strpos($_SERVER['SCRIPT_NAME'], 'SolutionPortal') !== false) {
+        $baseFolder = 'SolutionPortal';
+    } elseif (strpos($_SERVER['SCRIPT_NAME'], 'Solution-Portal') !== false) {
+        $baseFolder = 'Solution-Portal';
+    } // If no match, default to 'SolutionP'
 
     // Construct the full base URL dynamically
     $baseUrl = 'http://' . $host . '/' . $baseFolder . '/';
@@ -56,4 +55,3 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 ?>
-

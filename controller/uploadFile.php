@@ -14,7 +14,7 @@ if (!is_dir($uploadDir) || !is_writable($uploadDir)) {
 }
 
 // Check if files are uploaded
-if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {  // Updated from 'files' to 'file'
+if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {
     $folderID = $_POST['folderID'] ?? null; // Get the folder ID from the request (e.g., passed via AJAX)
     
     if (!$folderID) {
@@ -57,6 +57,7 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {  // Updated fro
 
     // Insert file details into the database
     foreach ($fileDetails as $file) {
+        // Insert into `files` table
         $stmt = $conn->prepare("INSERT INTO files (fileName, FolderID, path, type, size, uploadedBy, staffID) VALUES (?, ?, ?, ?, ?, ?, ?)");
         if ($stmt === false) {
             echo json_encode(['success' => false, 'message' => 'Database query preparation failed.']);
@@ -74,7 +75,7 @@ if (isset($_FILES['file']) && !empty($_FILES['file']['name'])) {  // Updated fro
     }
 
     // Return success response
-    echo json_encode(['success' => true, 'message' => 'Files uploaded successfully.']);
+    echo json_encode(['success' => true, 'message' => 'Your files have been successfully uploaded.']);
 } else {
     echo json_encode(['success' => false, 'message' => 'No files uploaded.']);
 }

@@ -118,6 +118,13 @@
             /* Handle long text gracefully */
         }
 
+        /* Style for Other Columns */
+        table.foldertable td:nth-child(4) {
+            width: 25%;
+            word-wrap: nowrap;
+            /* Handle long text gracefully */
+        }
+
         /* Responsive Enhancements */
         @media (max-width: 768px) {
 
@@ -392,6 +399,63 @@
             transform: translate(-50%, -50%);
             z-index: 11;
         }
+
+        /* Container for breakdown rows */
+        .breakdown-container {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Each row inside the breakdown */
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            /* Gray line */
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Remove border-bottom for the last row */
+        .breakdown-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Text styling for breakdown labels */
+        .breakdown-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #555;
+            margin: 0;
+        }
+
+        /* Optional: Span styling for values */
+        .breakdown-label span {
+            font-weight: normal;
+            color: #333;
+        }
+
+        /* Buttons Row Styling */
+        .btn.edit-folder,
+        .btn.delete-folder {
+            font-size: 1.2rem;
+            color: #6c757d;
+            padding: 0;
+        }
+
+        .btn.edit-folder:hover,
+        .btn.delete-folder:hover {
+            color: #495057;
+        }
+
+        /* Icon Size */
+        .fs-4 {
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 
@@ -506,7 +570,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" form="folderForm" class="btn btn-primary rounded-pill">Create Folder</button>
+                        <button type="submit" form="folderForm" class="btn btn-primary rounded-pill" id="submitButton">Create Folder</button>
                     </div>
                 </div>
             </div>
@@ -645,7 +709,7 @@
             breadcrumbContainer.empty(); // Clear current breadcrumb
 
             // Log breadcrumb to console to ensure the correct data
-            console.log("Breadcrumb array:", breadcrumb);
+            //console.log("Breadcrumb array:", breadcrumb);
 
             let uniqueBreadcrumb = Array.from(new Set(breadcrumb));
             uniqueBreadcrumb = uniqueBreadcrumb.filter(item => item.toLowerCase() !== 'home' && item.toLowerCase() !== 'files'); // Remove "Home" and "Files"
@@ -694,24 +758,49 @@
                 let breakdownDetails;
 
                 if (!data.BidID) {
-                    breakdownDetails = `<p class="text-muted" style="font-size: 0.75rem;">Standalone Folder</p>`;
-                } else {
+                    // Case: Standalone Folder
                     breakdownDetails = `
-        <p class="text-muted" style="font-size: 0.75rem;">Agency Name: ${data.CustName || 'N/A'}</p>
-        <p class="text-muted" style="font-size: 0.75rem;">Scope: ${data.HMS_Scope || 'N/A'}</p>
-        <p class="text-muted" style="font-size: 0.75rem;">Tender Proposal: ${data.Tender_Proposal || 'N/A'}</p>
-        `;
+        <div class="breakdown-row">
+            <p class="breakdown-label">Standalone Folder</p>
+        </div>`;
+                } else {
+                    // Case: Folder with Agency Details
+                    breakdownDetails = `
+        <div class="breakdown-row">
+            <p class="breakdown-label">Agency Name: <span>${data.CustName || 'N/A'}</span></p>
+        </div>
+        <div class="breakdown-row">
+            <p class="breakdown-label">Scope: <span>${data.HMS_Scope || 'N/A'}</span></p>
+        </div>
+        <div class="breakdown-row">
+            <p class="breakdown-label">Tender Proposal: <span>${data.Tender_Proposal || 'N/A'}</span></p>
+        </div>`;
                 }
 
+                // Add the "Last Updated At" row
+                breakdownDetails += `
+    <div class="breakdown-row">
+        <p class="breakdown-label">Last Updated At: <span>${data.datelastupdate || 'N/A'}</span></p>
+    </div>`;
+
                 return `
-    <div>
+    <div class="breakdown-container p-3">
         ${breakdownDetails}
-        <button class="btn btn-link btn-sm text-secondary edit-folder" onclick="editFolder('${data.folderName}')">
-            <i class="ri-edit-fill" style="font-size: 1.2rem;"></i>
-        </button>
-        <button class="btn btn-link btn-sm text-secondary delete-folder" onclick="deleteFolder('${data.folderName}')">
-            <i class="ri-delete-bin-fill" style="font-size: 1.2rem;"></i>
-        </button>
+        <!-- Buttons Row -->
+        <div class="breakdown-row d-flex justify-content-start">
+            <button 
+                class="btn btn-link btn-sm text-secondary edit-folder me-2" 
+                onclick="editFolder('${data.folderID}')"
+            >
+                <i class="ri-edit-fill fs-4"></i>
+            </button>
+            <button 
+                class="btn btn-link btn-sm text-secondary delete-folder" 
+                onclick="deleteFolder('${data.folderID}')"
+            >
+                <i class="ri-delete-bin-fill fs-4"></i>
+            </button>
+        </div>
     </div>
     `;
             }
@@ -729,7 +818,7 @@
                 clickable: false,
                 addRemoveLinks: true,
                 previewsContainer: false,
-                acceptedFiles: ".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx",
+                acceptedFiles: ".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx",
                 autoProcessQueue: true,
                 init: function() {
                     const myDropzone = this;
@@ -757,7 +846,7 @@
                     this.on("success", function(file, response) {
                         response = JSON.parse(response);
                         if (response.success) {
-                            alert('File uploaded successfully!');
+                            alert('Your files have been successfully uploaded.');
                             myDropzone.removeFile(file);
                             openFolder(currentFolderID, currentfolderName);
                         } else {
@@ -979,161 +1068,321 @@
             xhr.send(formData); // Send the FormData containing the file and folder ID
         }
 
+        let selectedBidID = ''; // Global variable to store the selected BidID
+        const searchInput = document.getElementById('relatedProposalSearch');
+        const dropdown = document.getElementById('relatedProposalDropdown');
+        const folderModal = document.getElementById('folderModal');
+        const previewSection = document.getElementById('proposalPreview');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            let selectedBidID = ''; // Global variable to store the selected BidID
-            const searchInput = document.getElementById('relatedProposalSearch');
-            const dropdown = document.getElementById('relatedProposalDropdown');
-            const folderModal = document.getElementById('folderModal');
-            const previewSection = document.getElementById('proposalPreview');
+        // --- Tooltip Initialization ---
+        document.querySelectorAll('[title]').forEach(function(el) {
+            new bootstrap.Tooltip(el);
+        });
 
-            // Initialize tooltips for all elements with the `title` attribute
-            document.querySelectorAll('[title]').forEach(function(el) {
-                new bootstrap.Tooltip(el);
-            });
+        // --- Modal Show/Hide Logic ---
+        folderModal.addEventListener('show.bs.modal', function() {
+            if (folderModal.getAttribute('data-folder-id')) {
+                searchInput.setAttribute('disabled', 'disabled');
+                searchInput.placeholder = 'Search disabled due to folder selection';
+                previewSection.classList.add('d-none');
+                dropdown.classList.remove('show');
+            } else {
+                searchInput.removeAttribute('disabled');
+                searchInput.placeholder = 'Search proposals...';
+            }
+        });
 
-            folderModal.addEventListener('show.bs.modal', function() {
-                if (currentFolderID && currentFolderID !== '') {
-                    searchInput.setAttribute('disabled', 'disabled'); // Disable the input
-                    searchInput.placeholder = 'Search disabled due to folder selection'; // Optional placeholder text
-                    previewSection.classList.add('d-none'); // Hide the preview
-                    dropdown.classList.remove('show'); // Hide dropdown if visible
-                } else {
-                    searchInput.removeAttribute('disabled'); // Enable the input
-                    searchInput.placeholder = 'Search proposals...'; // Reset placeholder text
-                }
-            });
+        folderModal.addEventListener('hide.bs.modal', function() {
+            searchInput.value = '';
+            dropdown.innerHTML = '';
+            dropdown.classList.remove('show');
+            previewSection.classList.add('d-none');
+            folderModal.removeAttribute('data-folder-id'); // Clear folder ID
+        });
 
-            // Clear the input when the modal is closed
-            folderModal.addEventListener('hide.bs.modal', function() {
-                searchInput.value = ''; // Clear the input value
-                dropdown.innerHTML = ''; // Clear dropdown list
-                dropdown.classList.remove('show'); // Hide dropdown
-                previewSection.classList.add('d-none'); // Hide preview section
-            });
+        document.getElementById('folderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-            let currentIndex = -1; // Keeps track of the currently selected (focused) option
+            const folderID = folderModal.getAttribute('data-folder-id');
+            const folderName = document.getElementById('folderName').value.trim();
+            const linkedBidID = selectedBidID || null; // Allow null for standalone folders
 
-            // Show preview when user hovers over the search input
-            searchInput.addEventListener('mouseover', function() {
-                if (searchInput.value.trim() !== '') {
-                    previewSection.classList.remove('d-none'); // Show preview if input has value
-                }
-            });
-
-            // Event listener for search input
-            searchInput.addEventListener('input', function() {
-                const query = searchInput.value.trim();
-
-                // Show preview if input is not empty
-                if (query.length > 0 && !searchInput.disabled) { // Don't allow searching if input is disabled
-                    // AJAX request to fetch data
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'controller/fetchproposal', true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            const data = JSON.parse(xhr.responseText);
-
-                            // Populate dropdown
-                            dropdown.innerHTML = data.map(
-                                (proposal) => `<li tabindex="0" data-value="${proposal.BidID}">${proposal.HMS_Scope}</li>`
-                            ).join('');
-                            dropdown.classList.add('show');
-                            currentIndex = -1; // Reset current index when new results are fetched
-                        }
-                    };
-                    xhr.send(`query=${encodeURIComponent(query)}`);
-                } else {
-                    // Clear dropdown when query is empty or input is disabled
-                    dropdown.innerHTML = '';
-                    dropdown.classList.remove('show');
-                    previewSection.classList.add('d-none'); // Hide preview if input is empty
-                }
-            });
-
-            // Handle keydown events for navigation
-            searchInput.addEventListener('keydown', function(e) {
-                const items = dropdown.querySelectorAll('li');
-
-                if (e.key === 'ArrowDown') {
-                    // Move focus to the next item
-                    if (currentIndex < items.length - 1) {
-                        currentIndex++;
-                        focusItem(items[currentIndex]);
-                    }
-                } else if (e.key === 'ArrowUp') {
-                    // Move focus to the previous item
-                    if (currentIndex > 0) {
-                        currentIndex--;
-                        focusItem(items[currentIndex]);
-                    }
-                } else if (e.key === 'Enter') {
-                    // Select the focused item
-                    if (currentIndex >= 0) {
-                        selectItem(items[currentIndex]);
-                    }
-                }
-            });
-
-            // Handle mouse click for selection
-            dropdown.addEventListener('click', function(e) {
-                if (e.target.tagName === 'LI') {
-                    selectItem(e.target);
-                }
-            });
-
-            function focusItem(item) {
-                const items = dropdown.querySelectorAll('li');
-                items.forEach((i) => i.classList.remove('highlight')); // Remove highlight from all items
-                item.classList.add('highlight'); // Add highlight to the current item
+            // Validate folder name only
+            if (!folderName) {
+                alert("Folder name cannot be empty.");
+                return;
             }
 
-            function selectItem(item) {
-                selectedBidID = item.getAttribute('data-value'); // Store the BidID globally
-                const selectedText = item.textContent;
+            const isEditMode = folderID && folderID !== '';
+            const url = isEditMode ? 'controller/updateFolder' : 'controller/createFolder';
+            const params = new URLSearchParams({
+                folderID: folderID || '',
+                folderName: folderName,
+                linkedBidID: linkedBidID || '', // Will be null for standalone folders
+                parentID: currentFolderID || '', // Use currentFolderID or root
+            }).toString();
 
-                // Set input value to selected proposal name
-                searchInput.value = selectedText;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            alert(isEditMode ? 'Folder updated successfully!' : 'Folder created successfully!');
 
-                // Hide dropdown
-                dropdown.classList.remove('show');
+                            // Check currentFolderID and call appropriate function
+                            if (!currentFolderID || currentFolderID === '') {
+                                fetchFolders(); // Reload root folder list
+                            } else {
+                                openFolder(currentFolderID); // Reload current folder
+                            }
 
-                // Fetch details of the selected proposal using AJAX
+                            // Close the modal
+                            folderModal.style.display = 'none'; // Hide modal (example for CSS modal)
+                            folderModal.removeAttribute('data-folder-id'); // Reset modal state
+
+                            // Remove any remaining backdrop (if present)
+                            const backdrop = document.querySelector('.modal-backdrop');
+                            if (backdrop) {
+                                backdrop.parentNode.removeChild(backdrop);
+                            }
+
+                            // Optionally: Reset form fields
+                            document.getElementById('folderForm').reset();
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    } else {
+                        alert("An unexpected error occurred. Please try again.");
+                    }
+                }
+            };
+            xhr.send(params);
+        });
+
+
+        folderModal.addEventListener('show.bs.modal', function() {
+            if (currentFolderID && currentFolderID !== '') {
+                searchInput.setAttribute('disabled', 'disabled'); // Disable the input
+                searchInput.placeholder = 'Search disabled due to folder selection'; // Optional placeholder text
+                previewSection.classList.add('d-none'); // Hide the preview
+                dropdown.classList.remove('show'); // Hide dropdown if visible
+            } else {
+                searchInput.removeAttribute('disabled'); // Enable the input
+                searchInput.placeholder = 'Search proposals...'; // Reset placeholder text
+            }
+        });
+
+        // Clear the input when the modal is closed
+        folderModal.addEventListener('hide.bs.modal', function() {
+            searchInput.value = ''; // Clear the input value
+            dropdown.innerHTML = ''; // Clear dropdown list
+            dropdown.classList.remove('show'); // Hide dropdown
+            previewSection.classList.add('d-none'); // Hide preview section
+        });
+
+        let currentIndex = -1; // Keeps track of the currently selected (focused) option
+
+        // Show preview when user hovers over the search input
+        searchInput.addEventListener('mouseover', function() {
+            if (searchInput.value.trim() !== '') {
+                previewSection.classList.remove('d-none'); // Show preview if input has value
+            }
+        });
+
+        // Event listener for search input
+        searchInput.addEventListener('input', function() {
+            const query = searchInput.value.trim();
+
+            // Show preview if input is not empty
+            if (query.length > 0 && !searchInput.disabled) { // Don't allow searching if input is disabled
+                // AJAX request to fetch data
                 const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'controller/fetchProposalDetails.php', true);
+                xhr.open('POST', 'controller/fetchproposal', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         const data = JSON.parse(xhr.responseText);
 
-                        // Populate the preview section with the fetched data
-                        document.getElementById('previewCustName').textContent = data.CustName || 'N/A';
-                        document.getElementById('previewScope').textContent = data.HMS_Scope || 'N/A';
-                        document.getElementById('previewTender').textContent = data.Tender_Proposal || 'N/A';
-                        document.getElementById('previewSolutions').textContent = data.Solutions || 'N/A';
-
-                        // Show the preview section
-                        previewSection.classList.remove('d-none'); // Show preview if hidden
+                        // Populate dropdown
+                        dropdown.innerHTML = data.map(
+                            (proposal) => `<li tabindex="0" data-value="${proposal.BidID}">${proposal.HMS_Scope}</li>`
+                        ).join('');
+                        dropdown.classList.add('show');
+                        currentIndex = -1; // Reset current index when new results are fetched
                     }
                 };
-                xhr.send(`bidID=${encodeURIComponent(selectedBidID)}`);
+                xhr.send(`query=${encodeURIComponent(query)}`);
+            } else {
+                // Clear dropdown when query is empty or input is disabled
+                dropdown.innerHTML = '';
+                dropdown.classList.remove('show');
+                previewSection.classList.add('d-none'); // Hide preview if input is empty
             }
+        });
 
-            // Hide dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!dropdown.contains(e.target) && e.target !== searchInput) {
-                    dropdown.classList.remove('show');
-                }
-            });
+        // Handle keydown events for navigation
+        searchInput.addEventListener('keydown', function(e) {
+            const items = dropdown.querySelectorAll('li');
 
-            // Reset selectedBidID if the input is cleared manually
-            searchInput.addEventListener('input', function() {
-                if (searchInput.value.trim() === '') {
-                    selectedBidID = ''; // Clear selectedBidID if the search is cleared
-                    previewSection.classList.add('d-none'); // Hide preview if input is cleared
+            if (e.key === 'ArrowDown') {
+                // Move focus to the next item
+                if (currentIndex < items.length - 1) {
+                    currentIndex++;
+                    focusItem(items[currentIndex]);
                 }
-            });
+            } else if (e.key === 'ArrowUp') {
+                // Move focus to the previous item
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    focusItem(items[currentIndex]);
+                }
+            } else if (e.key === 'Enter') {
+                // Select the focused item
+                if (currentIndex >= 0) {
+                    selectItem(items[currentIndex]);
+                }
+            }
+        });
+
+        // Handle mouse click for selection
+        dropdown.addEventListener('click', function(e) {
+            if (e.target.tagName === 'LI') {
+                selectItem(e.target);
+            }
+        });
+
+        function focusItem(item) {
+            const items = dropdown.querySelectorAll('li');
+            items.forEach((i) => i.classList.remove('highlight')); // Remove highlight from all items
+            item.classList.add('highlight'); // Add highlight to the current item
+        }
+
+        function selectItem(item) {
+            selectedBidID = item.getAttribute('data-value'); // Store the BidID globally
+            const selectedText = item.textContent;
+
+            // Set input value to selected proposal name
+            searchInput.value = selectedText;
+
+            // Hide dropdown
+            dropdown.classList.remove('show');
+
+            // Fetch details of the selected proposal using AJAX
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'controller/fetchProposalDetails.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+
+                    // Populate the preview section with the fetched data
+                    document.getElementById('previewCustName').textContent = data.CustName || 'N/A';
+                    document.getElementById('previewScope').textContent = data.HMS_Scope || 'N/A';
+                    document.getElementById('previewTender').textContent = data.Tender_Proposal || 'N/A';
+                    document.getElementById('previewSolutions').textContent = data.Solutions || 'N/A';
+
+                    // Show the preview section
+                    previewSection.classList.remove('d-none'); // Show preview if hidden
+                }
+            };
+            xhr.send(`bidID=${encodeURIComponent(selectedBidID)}`);
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target) && e.target !== searchInput) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Reset selectedBidID if the input is cleared manually
+        searchInput.addEventListener('input', function() {
+            if (searchInput.value.trim() === '') {
+                selectedBidID = ''; // Clear selectedBidID if the search is cleared
+                previewSection.classList.add('d-none'); // Hide preview if input is cleared
+            }
+        });
+
+        function editFolder(folderID) {
+            folderModal.setAttribute('data-folder-id', folderID);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'controller/fetchFolderDetails.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const data = JSON.parse(xhr.responseText);
+
+                    // Populate folder name
+                    document.getElementById('folderName').value = data.folderName || '';
+
+                    // Populate related proposal (search input and preview)
+                    searchInput.value = data.linkedBidName || ''; // Set proposal name in search input
+                    selectedBidID = data.linkedBidID || ''; // Set the proposal ID for internal handling
+                    previewSection.classList.toggle('d-none', !data.linkedBidDetails);
+
+                    if (data.linkedBidDetails) {
+                        // Populate preview details
+                        document.getElementById('previewCustName').textContent = data.linkedBidDetails.CustName || 'N/A';
+                        document.getElementById('previewScope').textContent = data.linkedBidDetails.HMS_Scope || 'N/A';
+                        document.getElementById('previewTender').textContent = data.linkedBidDetails.Tender_Proposal || 'N/A';
+                        document.getElementById('previewSolutions').textContent = data.linkedBidDetails.Solutions || 'N/A';
+                    }
+
+                    // Update modal title and submit button
+                    const folderModalLabel = document.getElementById('folderModalLabel');
+                    const submitButton = document.getElementById('submitButton');
+                    if (folderModalLabel) folderModalLabel.textContent = 'Edit Folder';
+                    if (submitButton) submitButton.textContent = 'Save Changes';
+                }
+            };
+            xhr.send(`folderID=${encodeURIComponent(folderID)}`);
+
+            // Show modal
+            const modal = new bootstrap.Modal(folderModal);
+            modal.show();
+        }
+
+        folderModal.addEventListener('show.bs.modal', function() {
+            const folderID = folderModal.getAttribute('data-folder-id');
+            const submitButton = document.getElementById('submitButton');
+            const folderModalLabel = document.getElementById('folderModalLabel');
+            const folderNameInput = document.getElementById('folderName');
+
+            // If we are opening the modal to create a new folder
+            if (!folderID) {
+                // Reset for creating a new folder
+                if (folderModalLabel) {
+                    folderModalLabel.textContent = 'Create New Folder'; // Reset title for new folder
+                }
+
+                if (submitButton) {
+                    submitButton.textContent = 'Create Folder'; // Reset button text for new folder
+                }
+
+                // Clear the folder ID data attribute and form fields
+                folderModal.removeAttribute('data-folder-id'); // Ensure folderID is cleared
+                folderNameInput.value = ''; // Clear folder name input field
+            } else {
+                // If it's an edit, update modal title and button text
+                if (folderModalLabel) {
+                    folderModalLabel.textContent = 'Edit Folder'; // Update title for edit
+                }
+
+                if (submitButton) {
+                    submitButton.textContent = 'Save Changes'; // Update button text for save
+                }
+            }
+        });
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+
         });
     </script>
 

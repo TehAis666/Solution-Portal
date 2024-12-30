@@ -1,37 +1,51 @@
 <?php
 require_once '../db/db.php';
+session_start();
 
 $response = ['success' => false, 'data' => []];
 
-// Add the condition to check if parentID is not NULL
+// Ensure the session variable for user ID is set
+if (!isset($_SESSION['user_id'])) {
+    $response['message'] = 'User not logged in.';
+    echo json_encode($response);
+    exit;
+}
+
+$user_id = $_SESSION['user_id']; // Get the logged-in user's ID
+
+// Add the condition to check if parentID is not NULL and filter by CreatedBy
 $query = "
     WITH RECURSIVE folder_hierarchy AS (
-    -- Base case: Only root folders (parentID is NULL)
+        -- Base case: Only root folders (parentID is NULL)
+        SELECT 
+            folderID,
+            parentID,
+            folderName
+        FROM folders
+        WHERE parentID IS NULL
+    )
     SELECT 
-        folderID,
-        parentID,
-        folderName
-    FROM folders
-    WHERE parentID IS NULL
-)
-SELECT 
-    root.folderID,
-    root.folderName,
-    root.CreatedBy,
-    root.DateCreated,
-    root.BidID,
-    IF(root.BidID IS NOT NULL, IFNULL(b.CustName, 'N/A'), 'Standalone Folder') AS CustName,
-    IFNULL(b.HMS_Scope, 'N/A') AS HMS_Scope,
-    IFNULL(b.Tender_Proposal, 'N/A') AS Tender_Proposal,
-    -- Count all files and direct subfolders under the root folder
-    (
-        (SELECT COUNT(*) FROM files WHERE folderID = root.folderID) +
-        (SELECT COUNT(*) FROM folders WHERE parentID = root.folderID)
-    ) AS fileCount
-FROM folders root
-LEFT JOIN bids b ON root.BidID = b.BidID
-WHERE root.parentID IS NULL -- Only root folders
-ORDER BY root.DateCreated DESC;
+        root.folderID,
+        root.folderName,
+        root.CreatedBy,
+        -- Format the DateCreated field to 'g:i A on d/m/Y' (e.g., 3:41 PM on 12/12/2024)
+        DATE_FORMAT(root.DateCreated, '%l:%i %p on %d/%m/%Y') AS DateCreated,
+        -- Format the datelastupdate field to 'g:i A on d/m/Y' (e.g., 3:41 PM on 12/12/2024)
+        DATE_FORMAT(root.datelastupdated, '%l:%i %p on %d/%m/%Y') AS datelastupdate,
+        root.BidID,
+        IF(root.BidID IS NOT NULL, IFNULL(b.CustName, 'N/A'), 'Standalone Folder') AS CustName,
+        IFNULL(b.HMS_Scope, 'N/A') AS HMS_Scope,
+        IFNULL(b.Tender_Proposal, 'N/A') AS Tender_Proposal,
+        -- Count all files and direct subfolders under the root folder
+        (
+            (SELECT COUNT(*) FROM files WHERE folderID = root.folderID) +
+            (SELECT COUNT(*) FROM folders WHERE parentID = root.folderID)
+        ) AS fileCount
+    FROM folders root
+    LEFT JOIN bids b ON root.BidID = b.BidID
+    WHERE root.parentID IS NULL -- Only root folders
+    AND root.staffID = '$user_id' -- Filter by the logged-in user's ID
+    ORDER BY root.DateCreated DESC;
 ";
 
 $result = mysqli_query($conn, $query);
@@ -47,3 +61,4 @@ if ($result) {
 
 header('Content-Type: application/json');
 echo json_encode($response);
+?>
