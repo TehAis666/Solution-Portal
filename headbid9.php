@@ -24,52 +24,51 @@ try {
     if ($solutionColumn) {
         // Construct SQL query to retrieve bids and staff names, with dynamic solution column
         $sql = "
-    SELECT 
-        b.*, 
-        t.*, 
-        u.staffID, 
-        u.name AS StaffName,
-        (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
-        -- Check if the bid has more than one solution
-        CASE
-            WHEN (
-                (t.Solution1 != '' AND t.Solution1 IS NOT NULL) +
-                (t.Solution2 != '' AND t.Solution2 IS NOT NULL) +
-                (t.Solution3 != '' AND t.Solution3 IS NOT NULL) +
-                (t.Solution4 != '' AND t.Solution4 IS NOT NULL)
-            ) > 1 
-            AND b.staffID NOT IN (SELECT staffID FROM user WHERE sector = '$sector') THEN 1
-            ELSE 0
-        END AS showtag,
-        al.staffname AS LastEditedBy,
-        al.timestamp AS LastEditTimestamp,
-        u1.name AS Presalesname1,
-        u2.name AS Presalesname2,
-        u3.name AS Presalesname3,
-        u4.name AS Presalesname4
-    FROM bids b
-    JOIN tender t ON b.BidID = t.BidID
-    LEFT JOIN user u ON b.staffID = u.staffID
-    LEFT JOIN user u1 ON t.Presales1 = u1.staffID
-    LEFT JOIN user u2 ON t.Presales2 = u2.staffID
-    LEFT JOIN user u3 ON t.Presales3 = u3.staffID
-    LEFT JOIN user u4 ON t.Presales4 = u4.staffID
-    LEFT JOIN (
         SELECT 
-            refID, 
-            staffname, 
-            MAX(timestamp) AS timestamp 
-        FROM activitylog 
-        WHERE type = 'bids' 
-        GROUP BY refID, staffname
-    ) al ON b.BidID = al.refID
-    WHERE 
-        -- Show bids that have at least one solution matching the user's sector
-        (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL)
-        OR 
-        (b.staffID IN (SELECT staffID FROM user WHERE sector = '$sector'))
-";
-
+            b.*, 
+            t.*, 
+            u.staffID, 
+            u.name AS StaffName,
+            (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
+            CASE
+                WHEN (
+                    (t.Solution1 != '' AND t.Solution1 IS NOT NULL) +
+                    (t.Solution2 != '' AND t.Solution2 IS NOT NULL) +
+                    (t.Solution3 != '' AND t.Solution3 IS NOT NULL) +
+                    (t.Solution4 != '' AND t.Solution4 IS NOT NULL)
+                ) > 1 
+                AND b.staffID NOT IN (SELECT staffID FROM user WHERE sector = '$sector') THEN 1
+                ELSE 0
+            END AS showtag,
+            al.staffname AS LastEditedBy,
+            al.timestamp AS LastEditTimestamp,
+            u1.name AS Presalesname1,
+            u2.name AS Presalesname2,
+            u3.name AS Presalesname3,
+            u4.name AS Presalesname4
+        FROM bids b
+        JOIN tender t ON b.BidID = t.BidID
+        LEFT JOIN user u ON b.staffID = u.staffID
+        LEFT JOIN user u1 ON t.Presales1 = u1.staffID
+        LEFT JOIN user u2 ON t.Presales2 = u2.staffID
+        LEFT JOIN user u3 ON t.Presales3 = u3.staffID
+        LEFT JOIN user u4 ON t.Presales4 = u4.staffID
+        LEFT JOIN (
+            SELECT al1.refID, al1.staffname, al1.timestamp
+            FROM activitylog al1
+            WHERE al1.type = 'bids'
+            AND al1.timestamp = (
+                SELECT MAX(al2.timestamp)
+                FROM activitylog al2
+                WHERE al2.type = 'bids' AND al2.refID = al1.refID
+            )
+        ) al ON b.BidID = al.refID
+        WHERE 
+            (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL)
+            OR 
+            (b.staffID IN (SELECT staffID FROM user WHERE sector = '$sector'))
+    ";
+    
 
 
         // Prepare and execute the SQL statement
@@ -122,8 +121,6 @@ try {
     echo "Error: " . $e->getMessage();
 }
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">

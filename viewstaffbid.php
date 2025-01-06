@@ -9,26 +9,54 @@
 include_once 'db/db.php';
 
 try {
-  // Get staffID and staff name from the URL or session
-  $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : $_SESSION['user_id'];
-  $name = isset($_GET['name']) ? $_GET['name'] : '';  // Get the staff name from the URL
+  $encryption_key = "your-secret-key"; // Same key used for encryption
+  $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Same initialization vector
+  $staffID = 0; // Default staffID in case of failure
+
+  if (isset($_GET['token'])) {
+      // Decode and decrypt the token
+      $encrypted_token = base64_decode($_GET['token']);
+      $staffID = openssl_decrypt($encrypted_token, 'aes-256-cbc', $encryption_key, 0, $iv);
+
+      if (!$staffID) {
+          throw new Exception("Invalid token.");
+      }
+  } else {
+      throw new Exception("No token provided.");
+  }
+
+  // Validate that the staffID is numeric
+  $staffID = intval($staffID);
+  if ($staffID <= 0) {
+      throw new Exception("Invalid staffID.");
+  }
+  
+
 
   // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
   $stmt = $conn->query("
         SELECT 
-            b.*, 
-            t.*, 
+            b.*,           
+            t.*,  
             (t.Value1 + t.Value2 + t.Value3 + t.Value4) AS TotalValue,
             CASE 
                 WHEN b.staffID = $staffID THEN 'creator' 
-                WHEN t.presales1 = '$name' OR t.presales2 = '$name' OR t.presales3 = '$name' OR t.presales4 = '$name' THEN 'partner'
+                WHEN t.presales1 = '$staffID' OR t.presales2 = '$staffID' OR t.presales3 = '$staffID' OR t.presales4 = '$staffID' THEN 'partner'
                 WHEN r.staffID = $staffID AND r.status = 'Accepted' THEN 'affiliate'
-            END AS role
+            END AS role,
+            u1.name AS Presalesname1,
+            u2.name AS Presalesname2,
+            u3.name AS Presalesname3,
+            u4.name AS Presalesname4
         FROM bids b
         JOIN tender t ON b.BidID = t.BidID
         LEFT JOIN requestbids r ON r.BidID = b.BidID AND r.status = 'Accepted'  -- Only affiliates with 'Accepted' status
+        LEFT JOIN user u1 ON t.Presales1 = u1.staffID
+        LEFT JOIN user u2 ON t.Presales2 = u2.staffID
+        LEFT JOIN user u3 ON t.Presales3 = u3.staffID
+        LEFT JOIN user u4 ON t.Presales4 = u4.staffID
         WHERE b.staffID = $staffID  -- Staff is the creator
-           OR t.presales1 = '$name' OR t.presales2 = '$name' OR t.presales3 = '$name' OR t.presales4 = '$name'  -- Staff is a partner
+           OR t.presales1 = '$staffID' OR t.presales2 = '$staffID' OR t.presales3 = '$staffID' OR t.presales4 = '$staffID'  -- Staff is a partner
            OR (r.staffID = $staffID AND r.status = 'Accepted')  -- Staff is an affiliate with 'Accepted' status
     ");
 
@@ -39,20 +67,52 @@ try {
   echo "Error: " . $e->getMessage();
 }
 
+// Prepare an array for presales names by sector
+$presalesBySector = [
+  'AwanHeiTech' => [],
+  'PaduNet' => [],
+  'Secure-X' => [],
+  'i-Sentrix' => []
+];
+
+// Query to retrieve presales staff names by sector
+$presalesStmt = $conn->query("SELECT staffID, name, sector FROM user WHERE role IN ('presales', 'head')");
+
+// Populate the presales array with names organized by sector
+while ($row = $presalesStmt->fetch_assoc()) {
+  if (isset($presalesBySector[$row['sector']])) {
+    $presalesBySector[$row['sector']][] = [
+      'staffID' => $row['staffID'],
+      'name' => $row['name']
+    ];
+  }
+}
+
 try {
-  // Get the staff member's name
-  $staffID = isset($_GET['staffID']) ? intval($_GET['staffID']) : 0;
-  $stmt = $conn->prepare("SELECT name FROM user WHERE staffID = ?");
+  $encryption_key = "your-secret-key"; // Same key used for encryption
+  $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Same initialization vector
+  // Decrypt the name token
+  
+  $encryptedName = isset($_GET['nameToken']) ? base64_decode($_GET['nameToken']) : null;
+  $staffName = $encryptedName ? openssl_decrypt($encryptedName, 'aes-256-cbc', $encryption_key, 0, $iv) : 'Staff Member';
+
+  // Validate that staffID exists in the database for added security (optional)
+  $stmt = $conn->prepare("SELECT COUNT(*) FROM user WHERE staffID = ?");
   $stmt->bind_param("i", $staffID);
   $stmt->execute();
-  $result = $stmt->get_result();
+  $stmt->bind_result($count);
+  $stmt->fetch();
+  if ($count == 0) {
+      die("Invalid staff ID.");
+  }
 
-  // Fetch the staff member's name
-  $staffName = $result->fetch_assoc()['name'] ?? 'Staff Member';
+
+  $stmt->close();
 } catch (Exception $e) {
   // Handle any errors
   echo "Error: " . $e->getMessage();
 }
+
 ?>
 
 
@@ -474,9 +534,9 @@ try {
                         <td>
                           <?php echo htmlspecialchars($bid['CustName']); ?>
                           <?php if ($bid['role'] == 'partner'): ?>
-                            <span class="badge bg-info">Partner</span>
+                            <span class="badge bg-success">Partner</span>
                           <?php elseif ($bid['role'] == 'affiliate'): ?>
-                            <span class="badge bg-warning">Sub-Presales</span>
+                            <span class="badge bg-warning">Sub-Presale</span>
                           <?php endif; ?>
                         </td>
                         <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
@@ -516,9 +576,12 @@ try {
                             data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
                             data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
                             data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
+                            data-presalesname1="<?php echo htmlspecialchars($bid['Presalesname1'] ?? 'null'); ?>"
+                            data-presalesname2="<?php echo htmlspecialchars($bid['Presalesname2'] ?? 'null'); ?>"
+                            data-presalesname3="<?php echo htmlspecialchars($bid['Presalesname3'] ?? 'null'); ?>"
+                            data-presalesname4="<?php echo htmlspecialchars($bid['Presalesname4'] ?? 'null'); ?>"
                             data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
                             data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
-
                             data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
                             data-value2="<?php echo htmlspecialchars($bid['Value2']); ?>"
                             data-value3="<?php echo htmlspecialchars($bid['Value3']); ?>"
@@ -529,6 +592,8 @@ try {
                             data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
                             data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
                             data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
+                            data-staffid="<?php echo htmlspecialchars($bid['staffID']); ?>"
+                            data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"
                             data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>">
                             View
                           </button>
@@ -686,6 +751,7 @@ try {
             <form id="updateBidForm">
               <input type="hidden" name="BidID" id="updateBidID">
               <input type="hidden" name="TenderID" id="updateTenderID">
+              <input type="hidden" name="StaffID" id="updateStaff">
               <div class="container">
                 <!-- First Slide -->
                 <div id="firstSlide">
@@ -819,7 +885,17 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
-                      <input type="text" id="updatePresales1" class="form-control" name="Presales1">
+                      <select id="updatePresales1" class="form-control" name="Presales1">
+                        <?php if (!empty($presalesBySector['AwanHeiTech'])): ?>
+                          <?php foreach ($presalesBySector['AwanHeiTech'] as $presales): ?>
+                            <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                              <?php echo htmlspecialchars($presales['name']); ?>
+                            </option>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <option value="">No Presales Available</option>
+                        <?php endif; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue1" class="form-label"><strong>Value (RM):</strong></label>
@@ -836,7 +912,17 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
-                      <input type="text" id="updatePresales2" class="form-control" name="Presales2">
+                      <select id="updatePresales2" class="form-control" name="Presales2">
+                        <?php if (!empty($presalesBySector['PaduNet'])): ?>
+                          <?php foreach ($presalesBySector['PaduNet'] as $presales): ?>
+                            <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                              <?php echo htmlspecialchars($presales['name']); ?>
+                            </option>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <option value="">No Presales Available</option>
+                        <?php endif; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue2" class="form-label"><strong>Value (RM):</strong></label>
@@ -853,7 +939,17 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
-                      <input type="text" id="updatePresales3" class="form-control" name="Presales3">
+                      <select id="updatePresales3" class="form-control" name="Presales3">
+                        <?php if (!empty($presalesBySector['Secure-X'])): ?>
+                          <?php foreach ($presalesBySector['Secure-X'] as $presales): ?>
+                            <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                              <?php echo htmlspecialchars($presales['name']); ?>
+                            </option>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <option value="">No Presales Available</option>
+                        <?php endif; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue3" class="form-label"><strong>Value (RM):</strong></label>
@@ -870,7 +966,17 @@ try {
                     </div>
                     <div class="col-md-4">
                       <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
-                      <input type="text" id="updatePresales4" class="form-control" name="Presales4">
+                      <select id="updatePresales4" class="form-control" name="Presales4">
+                        <?php if (!empty($presalesBySector['i-Sentrix'])): ?>
+                          <?php foreach ($presalesBySector['i-Sentrix'] as $presales): ?>
+                            <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                              <?php echo htmlspecialchars($presales['name']); ?>
+                            </option>
+                          <?php endforeach; ?>
+                        <?php else: ?>
+                          <option value="">No Presales Available</option>
+                        <?php endif; ?>
+                      </select>
                     </div>
                     <div class="col-md-4">
                       <label for="updateValue4" class="form-label"><strong>Value (RM):</strong></label>
@@ -1165,6 +1271,10 @@ try {
         var presales2 = $(this).data('presales2');
         var presales3 = $(this).data('presales3');
         var presales4 = $(this).data('presales4');
+        var presalesname1 = $(this).data('presalesname1');
+        var presalesname2 = $(this).data('presalesname2');
+        var presalesname3 = $(this).data('presalesname3');
+        var presalesname4 = $(this).data('presalesname4');
 
         var requestDate = $(this).data('requestdate');
         var submissionDate = $(this).data('submissiondate');
@@ -1180,6 +1290,9 @@ try {
         var bidID = $(this).data('bidid');
         var tenderID = $(this).data('tenderid');
 
+        var staffID = $(this).data('staffid');
+        var staffName = $(this).data('staffname');
+
         // Populate the View Modal
         $('#modalCustName').text(custName);
         $('#modalHMSScope').text(hmsScope);
@@ -1194,10 +1307,10 @@ try {
         $('#modalSolution2').text(solution2);
         $('#modalSolution3').text(solution3);
         $('#modalSolution4').text(solution4);
-        $('#modalPresales1').text(presales1);
-        $('#modalPresales2').text(presales2);
-        $('#modalPresales3').text(presales3);
-        $('#modalPresales4').text(presales4);
+        $('#modalPresales1').text(presalesname1);
+        $('#modalPresales2').text(presalesname2);
+        $('#modalPresales3').text(presalesname3);
+        $('#modalPresales4').text(presalesname4);
 
         $('#modalRequestDate').text(requestDate);
         $('#modalSubmissionDate').text(submissionDate);
@@ -1243,8 +1356,13 @@ try {
         $('#updateBidID').val(bidID);
         $('#updateTenderID').val(tenderID);
 
+        $('#updateStaff').val(staffID); // Set hidden field for staff ID
+        $('#updateStaffName').val(staffID); // Set the staff name for display in the dropdown
+
         // Show the View Modal
         $('#viewbids').modal('show');
+
+        console.log("staffID", staffID);
       });
 
       // Function to return HTML for status badges

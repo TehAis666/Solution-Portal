@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirmpassword = htmlspecialchars($_POST['confirmpassword']); 
     $sector = htmlspecialchars($_POST['sector']);
     $phone = htmlspecialchars($_POST['phone']);
+    $scope = htmlspecialchars($_POST['scope']);
+
     
 
     // Initialize managerID
@@ -22,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // }
 
     // Check if any form field is empty
-    if (empty($staff_id) || empty($name) || empty($email) || empty($password) || empty($sector) || empty($phone)) {
+    if (empty($staff_id) || empty($name) || empty($email) || empty($password) || empty($sector) || empty($phone) || empty($scope)) {
         echo "<script>alert('Please fill out all fields.'); history.back();</script>";
         exit;
     }
@@ -48,8 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     // Prepare SQL statement using prepared statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO user (staffID, name, email, password, sector, phonenum, managerID) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssss", $staff_id, $name, $email, $hashed_password, $sector, $phone, $managerID);
+    $stmt = $conn->prepare("INSERT INTO user (staffID, name, email, password, sector, phonenum, scope) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssss", $staff_id, $name, $email, $hashed_password, $sector, $phone, $scope);
 
     // Execute the query
     if ($stmt->execute()) {

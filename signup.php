@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" />
 
     <title>Sign Up</title>
 
@@ -36,8 +37,10 @@
                     rgba(52, 152, 219, 0.7)
                     /* Lighter blue near the bottom */
                 ),
-                url('https://media.macphun.com/img/uploads/macphun/blog/2414/1_IlluminatingtheUrbanJungleAnIntrotoCityscapePhotographyISkylum.jpeg') no-repeat center center fixed;
+                /* url('https://media.macphun.com/img/uploads/macphun/blog/2414/1_IlluminatingtheUrbanJungleAnIntrotoCityscapePhotographyISkylum.jpeg') no-repeat center center fixed; */
+                url('images/menara.jpg') no-repeat center center fixed;
             background-size: cover;
+
         }
 
         body::after {
@@ -60,7 +63,7 @@
 
 
         .form-structor {
-            background-color: #222;
+            background-color: #a8a8a8;
             /* Dark gray background for the form */
             border-radius: 15px;
             /* Rounded corners */
@@ -96,7 +99,7 @@
             background-size: 755px;
             /* background-image: url('https://apicms.thestar.com.my/uploads/images/2023/12/06/2425813.jpg'); */
             /* background-image: url('images/menara.jpg'); */
-            background-color: whitesmoke;
+            /* background-color: whitesmoke; */
         }
 
         .login {
@@ -122,7 +125,7 @@
         }
 
         .login .form-title {
-            color: black; 
+            color: black;
             font-size: 1.8em;
             /* Initial font size (smaller) */
             text-align: center;
@@ -171,7 +174,7 @@
         /* Optional styling for hover effect */
         .login .form-title:hover {
             opacity: 0.8;
-            
+
         }
 
 
@@ -235,7 +238,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: white;
+            background-color: #E36C14;
             z-index: 5;
             transition: all .3s ease;
         }
@@ -246,7 +249,7 @@
             left: 50%;
             top: -20px;
             transform: translate(-50%, 0);
-            background-color: white;
+            background-color: #E36C14;
             width: 200%;
             height: 250px;
             border-radius: 50%;
@@ -451,6 +454,10 @@
             cursor: pointer;
         }
 
+        #scopeDisplay {
+            cursor: pointer;
+        }
+
         .picture {
             position: absolute;
             top: 20px;
@@ -464,6 +471,7 @@
             z-index: 10;
 
         }
+
     </style>
 </head>
 
@@ -503,6 +511,17 @@
                                 </ul>
                             </div>
                         </div>
+                        <div class="sector-selection">
+                            <input type="text" name="scope" class="input" id="scopeDisplay" placeholder="Scope" readonly required />
+                            <div class="dropdown">
+                                <ul>
+                                    <li onclick="setsector('Developer')" data-value="Developer">Developer</li>
+                                    <li onclick="setsector('Senior Developer')" data-value="Senior Developer">Senior Developer</li>
+                                    <li onclick="setsector('Tester')" data-value="Tester">Tester</li>
+                                    <li onclick="setsector('Manager')" data-value="Manager">Manager</li>
+                                </ul>
+                            </div>
+                        </div>
                         <input type="text" name="name" class="input" placeholder="Name" required />
                         <input type="email" name="email" class="input" placeholder="Email" required />
                         <input type="password" name="password" class="input" placeholder="Password" required />
@@ -519,7 +538,6 @@
                     <button type="submit" class="submit-btn">Sign Up</button>
                     <p id="error" style="color: red; display: none;"></p>
                 </form>
-
             </div>
         </div>
     </div>
@@ -529,29 +547,35 @@
 <script>
     console.clear();
 
-    const sectorDisplay = document.getElementById('sectorDisplay');
-    const dropdown = document.querySelector('.dropdown');
-    const sectorItems = dropdown.querySelectorAll('li');
+    function setupDropdown(inputId, dropdownClass) {
+        const inputField = document.getElementById(inputId);
+        const dropdown = inputField.closest(`.${dropdownClass}`).querySelector('.dropdown');
+        const items = dropdown.querySelectorAll('li');
 
-    // Toggle dropdown visibility when input is clicked
-    sectorDisplay.addEventListener('click', () => {
-        dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
-    });
-
-    // Hide dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target) && e.target !== sectorDisplay) {
-            dropdown.style.display = 'none';
-        }
-    });
-
-    // Update input value when selecting a sector
-    sectorItems.forEach(item => {
-        item.addEventListener('click', () => {
-            sectorDisplay.value = item.textContent; // Set input to the selected sector
-            dropdown.style.display = 'none'; // Close the dropdown
+        // Toggle dropdown visibility when input is clicked
+        inputField.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.style.display = (dropdown.style.display === 'block') ? 'none' : 'block';
         });
-    });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', () => {
+            dropdown.style.display = 'none';
+        });
+
+        // Update input value when selecting an item
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                inputField.value = item.textContent; // Set input to the selected item
+                dropdown.style.display = 'none'; // Close the dropdown
+            });
+        });
+    }
+
+    // Setup dropdown functionality for both sector and scope
+    setupDropdown('sectorDisplay', 'sector-selection');
+    setupDropdown('scopeDisplay', 'sector-selection');
 
     const singupBtn = document.getElementById('singup');
     const loginBtn = document.getElementById('login');

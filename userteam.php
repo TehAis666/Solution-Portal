@@ -12,6 +12,7 @@ $sector = $_SESSION['user_sector'];
 $isHead = ($_SESSION['user_role'] === 'head');
 $name = $_SESSION['user_name'];
 
+
 try {
     // Get the head of the sector
     $stmtHead = $conn->query("
@@ -503,13 +504,22 @@ try {
                         <h5 class="section-title">Presales Members</h5>
                     </div>
                     <?php if (!empty($teamMembers)) { ?>
-                        <?php foreach ($teamMembers as $member) { ?>
+                        <?php
+                        // Define encryption key and IV outside the loop to avoid redeclaration
+                        $encryption_key = 'your-secret-key'; // Replace with your secure key
+                        $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Replace with your IV logic
+
+                        foreach ($teamMembers as $member) {
+                            // Encrypt the staffID and name
+                            $token = !empty($member['staffID']) ? base64_encode(openssl_encrypt((string)$member['staffID'], 'aes-256-cbc', $encryption_key, 0, $iv)) : null;
+                            $nameToken = base64_encode(openssl_encrypt($member['name'], 'aes-256-cbc', $encryption_key, 0, $iv)); // Use same key and IV as for staffID
+                        ?>
                             <div class="col-md-3 col-sm-6 text-center mb-4">
                                 <div class="card">
                                     <div class="card-body">
                                         <!-- Team Member's Profile Picture and Name -->
                                         <?php if ($member['staffID'] == $staffID || $isHead) { ?>
-                                            <a href="viewstaffbid.php?staffID=<?php echo htmlspecialchars($member['staffID']); ?>&name=<?php echo urlencode($member['name']); ?>" class="staff-name-link">
+                                            <a href="viewstaffbid.php?token=<?php echo urlencode($token); ?>&nameToken=<?php echo urlencode($nameToken); ?>" class="staff-name-link">
                                             <?php } ?>
                                             <img src="<?php echo !empty($member['userpfp']) ? 'pfp/' . $member['userpfp'] : 'pfp/default.jpg'; ?>" alt="Profile Picture" class="profile-pic">
                                             <b>
@@ -520,16 +530,18 @@ try {
                                                     <?php } ?>
                                                 </p>
                                             </b>
+                                            <?php if ($member['staffID'] == $staffID || $isHead) { ?>
                                             </a>
-                                            <p class="mt-2"><?php echo htmlspecialchars($member['role']); ?></p>
-                                            <p>Total Bids: <?php echo htmlspecialchars($member['bid_count']); ?></p>
+                                        <?php } ?>
+                                        <p class="mt-2"><?php echo htmlspecialchars($member['scope']); ?></p>
+                                        <p>Total Bids: <?php echo htmlspecialchars($member['bid_count']); ?></p>
 
-                                            <!-- Bid Status Counts with Badges -->
-                                            <p>
-                                                <span class="badge bg-success">Submitted: <?php echo htmlspecialchars($member['submitted_count']); ?></span>
-                                                <span class="badge bg-danger">Dropped: <?php echo htmlspecialchars($member['dropped_count']); ?></span>
-                                                <span class="badge bg-warning text-dark">WIP: <?php echo htmlspecialchars($member['wip_count']); ?></span>
-                                            </p>
+                                        <!-- Bid Status Counts with Badges -->
+                                        <p>
+                                            <span class="badge bg-success">Submitted: <?php echo htmlspecialchars($member['submitted_count']); ?></span>
+                                            <span class="badge bg-danger">Dropped: <?php echo htmlspecialchars($member['dropped_count']); ?></span>
+                                            <span class="badge bg-warning text-dark">WIP: <?php echo htmlspecialchars($member['wip_count']); ?></span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -537,6 +549,7 @@ try {
                     <?php } else { ?>
                         <p>No team members found.</p>
                     <?php } ?>
+
                 </div>
 
             </div>

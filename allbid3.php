@@ -66,14 +66,15 @@ try {
     LEFT JOIN user u4 ON t.Presales4 = u4.staffID
     LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? 
     LEFT JOIN (
-        SELECT 
-            refID, 
-            staffname, 
-            MAX(timestamp) AS timestamp 
-        FROM activitylog 
-        WHERE type = 'bids' 
-        GROUP BY refID, staffname
-    ) al ON b.BidID = al.refID
+            SELECT al1.refID, al1.staffname, al1.timestamp
+            FROM activitylog al1
+            WHERE al1.type = 'bids'
+            AND al1.timestamp = (
+                SELECT MAX(al2.timestamp)
+                FROM activitylog al2
+                WHERE al2.type = 'bids' AND al2.refID = al1.refID
+            )
+        ) al ON b.BidID = al.refID
     WHERE 
         ($solutionConditions)
         OR 
@@ -83,7 +84,7 @@ try {
 
     // Prepare and execute the statement
     $stmt = $conn->prepare($query);
-    $stmt->bind_param('ssss', $staffID, $userName, $staffID, $sector);
+    $stmt->bind_param('ssss', $staffID, $staffID, $staffID, $sector);
     $stmt->execute();
     $bids = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 

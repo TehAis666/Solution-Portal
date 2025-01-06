@@ -28,7 +28,10 @@ if ($stmt_update->execute()) {
         logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Approved Sign up Request: " . $name, "user", $staffID, $conn);
     } else if ($status == 'Rejected') {
         logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Rejected Sign up Request: " . $name, "user", $staffID, $conn);
+    } else if ($status == 'Disable') {
+        logActivity($_SESSION['user_id'], $_SESSION['user_name'], "Disabled the account for: " . $name, "user", $staffID, $conn);
     }
+    
     echo "Status updated successfully.";
 } else {
     die("Error updating status: " . $stmt_update->error);

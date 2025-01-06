@@ -8,6 +8,8 @@
 // Include the database connection file
 include_once 'db/db.php';
 
+
+
 try {
     $staffID = $_SESSION['user_id'];
     $name = $_SESSION['user_name'];
@@ -495,6 +497,9 @@ try {
                                 <tbody>
                                     <?php if (!empty($bids)): ?>
                                         <?php foreach ($bids as $bid): ?>
+                                            <?php
+                                            $encodedBidID = base64_encode($bid['BidID']); // Encode the BidID here
+                                            ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($bid['UpdateDate']); ?></td>
                                                 <td>
@@ -516,7 +521,7 @@ try {
                                                     <?php elseif ($bid['role'] == 'affiliate'): ?>
                                                         <span class="badge bg-warning">Sub-Presales</span>
                                                     <?php elseif ($bid['role'] == 'creator'): ?>
-                                                            <span class="badge bg-primary">Creator</span>
+                                                        <span class="badge bg-primary">Creator</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
@@ -571,7 +576,8 @@ try {
                                                         data-status="<?php echo htmlspecialchars($bid['Status']); ?>"
                                                         data-tenderstatus="<?php echo htmlspecialchars($bid['TenderStatus']); ?>"
                                                         data-remarks="<?php echo htmlspecialchars($bid['Remarks']); ?>"
-                                                        data-bidid="<?php echo htmlspecialchars($bid['BidID']); ?>"
+
+                                                        data-bidid="<?php echo base64_encode($bid['BidID']); ?>"
                                                         data-tenderid="<?php echo htmlspecialchars($bid['TenderID']); ?>"
                                                         data-staffname="<?php echo htmlspecialchars($bid['StaffName'] ?? 'null'); ?>"
                                                         data-affiliatename="<?php echo htmlspecialchars($bid['AffiliateName'] ?? 'N/A'); ?>"> <!-- StaffName -->
@@ -758,7 +764,7 @@ try {
                                             <label class="form-label"><strong>Sub-Presales:</strong></label>
                                         </div>
                                         <div class="col-md-8">
-                                            <a id="updateAffiliateName" class="form-control-plaintext text-primary">Edit Permission</a>
+                                            <a id="updateAffiliateName" data-bidid="<?php echo $encodedBidID; ?>" class="form-control-plaintext text-primary">Edit Permission</a>
                                         </div>
                                     </div>
                                     <!-- Existing fields -->
@@ -1379,11 +1385,22 @@ try {
                 }
                 console.log("role num", role);
                 console.log("BIDID", bidID);
-                document.getElementById('updateAffiliateName').href = 'updaterequest?BidID=' + bidID;
+
+                $('#updateAffiliateName').on('click', function(event) {
+                    event.preventDefault(); // Prevent default behavior
+
+                    const encodedBidID = encodeURIComponent(bidID);
+                    console.log('Encoded BidID:', encodedBidID); // Debugging line
+
+                    // Create the URL using the encoded BidID
+                    const url = 'updaterequest?BidID=' + encodedBidID;
+                    window.location.href = url; // Redirect
+                });
+
                 // Show the View Modal
                 $('#viewbids').modal('show');
             });
- 
+
 
             // Function to return HTML for status badges
             function getStatusBadge(status) {

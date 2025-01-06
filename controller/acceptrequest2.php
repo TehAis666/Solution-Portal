@@ -6,19 +6,17 @@ include_once 'handler/updateactivitylog.php';
 session_start();
 
 // Check if the request method is POST and necessary data is provided
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requestID'], $_POST['userID'], $_POST['action'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requestID'], $_POST['userID'], $_POST['newStatus'])) {
     $requestID = intval($_POST['requestID']);
     $userID = intval($_POST['userID']);
-    $action = $_POST['action'];
+    $newStatus = $_POST['newStatus'];
 
-    // Validate the action is either 'accept' or 'reject'
-    if (!in_array($action, ['accept', 'reject'])) {
-        echo json_encode(['success' => false, 'message' => 'Invalid action.']);
+    // Validate the new status is either 'Accepted' or 'Rejected'
+    $validStatuses = ['Accepted', 'Rejected'];
+    if (!in_array($newStatus, $validStatuses)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid status.']);
         exit;
     }
-
-    // Determine the new status based on the action
-    $newStatus = ($action === 'accept') ? 'Accepted' : 'Rejected';
 
     try {
         // Begin a transaction
@@ -75,4 +73,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['requestID'], $_POST['
     // Send a JSON response for invalid requests
     echo json_encode(['success' => false, 'message' => 'Invalid request.']);
 }
-

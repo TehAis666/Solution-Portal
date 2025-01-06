@@ -506,23 +506,30 @@ try {
                                                         echo '<span class="badge bg-danger">Rejected</span>';
                                                     } elseif ($status == 'Pending') {
                                                         echo '<span class="badge bg-warning text-dark">Pending</span>';
+                                                    } elseif ($status == 'Disable') {
+                                                        echo '<span class="badge bg-dark">Disable</span>';
                                                     } else {
                                                         echo '<span class="badge bg-secondary">Unknown</span>';
                                                     }
                                                     ?>
                                                 </td>
                                                 <td>
-                                                    <div style="display: flex; justify-content: center; gap: 10px;">                                                   
+                                                    <div style="display: flex; justify-content: center; gap: 10px;">
                                                         <button type="button" class="btn btn-primary approvebtn"
                                                             data-staff-id="<?php echo htmlspecialchars($user['staffID']); ?>"
                                                             style="<?php echo ($user['status'] === 'Approved') ? 'display:none;' : ''; ?>">
                                                             Approve
-                                                        </button>                                                                                                          
+                                                        </button>
                                                         <button type="button" class="btn btn-danger rejectbtn"
                                                             data-staff-id="<?php echo htmlspecialchars($user['staffID']); ?>"
                                                             style="<?php echo ($user['status'] === 'Rejected') ? 'display:none;' : ''; ?>">
                                                             Reject
-                                                        </button>                                                        
+                                                        </button>
+                                                        <button type="button" class="btn btn-warning disablebtn"
+                                                            data-staff-id="<?php echo htmlspecialchars($user['staffID']); ?>"
+                                                            style="<?php echo ($user['status'] === 'Disable') ? 'display:none;' : ''; ?>">
+                                                            Disable
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -742,6 +749,14 @@ try {
                 changeStatus(staffID, name, 'Rejected', row[0]); // Pass the row for updating
             });
 
+            // Delegated event listener for the reject button
+            $(document).on('click', '.disablebtn', function() {
+                const row = $(this).closest('tr');
+                const staffID = row.find('td:first-child').text().trim(); // Get staffID from the first column
+                const name = row.find('td:nth-child(2)').text().trim(); // Get name from the second column
+                changeStatus(staffID, name, 'Disable', row[0]); // Pass the row for updating
+            });
+
             function changeStatus(staffID, name, status, row) {
                 $.ajax({
                     url: 'controller/requestcont', // The URL to send the request to
@@ -759,10 +774,17 @@ try {
                             statusCell.innerHTML = '<span class="badge bg-success">Approved</span>';
                             row.querySelector('.approvebtn').style.display = 'none';
                             row.querySelector('.rejectbtn').style.display = 'inline-block';
+                            row.querySelector('.disablebtn').style.display = 'inline-block';
                         } else if (status === 'Rejected') {
                             statusCell.innerHTML = '<span class="badge bg-danger">Rejected</span>';
                             row.querySelector('.rejectbtn').style.display = 'none';
                             row.querySelector('.approvebtn').style.display = 'inline-block';
+                            row.querySelector('.disablebtn').style.display = 'inline-block';
+                        } else if (status === 'Disable') {
+                            statusCell.innerHTML = '<span class="badge bg-dark">Disable</span>';
+                            row.querySelector('.disablebtn').style.display = 'none';
+                            row.querySelector('.approvebtn').style.display = 'none';
+                            row.querySelector('.rejectbtn').style.display = 'none';
                         }
                         calculateDashboard(); // Update dashboard counts after status change
 

@@ -60,13 +60,14 @@ try {
     LEFT JOIN user u3 ON t.Presales3 = u3.staffID
     LEFT JOIN user u4 ON t.Presales4 = u4.staffID
     LEFT JOIN (
-            SELECT 
-                refID, 
-                staffname, 
-                MAX(timestamp) AS timestamp 
-            FROM activitylog 
-            WHERE type = 'bids' 
-            GROUP BY refID, staffname
+            SELECT al1.refID, al1.staffname, al1.timestamp
+            FROM activitylog al1
+            WHERE al1.type = 'bids'
+            AND al1.timestamp = (
+                SELECT MAX(al2.timestamp)
+                FROM activitylog al2
+                WHERE al2.type = 'bids' AND al2.refID = al1.refID
+            )
         ) al ON b.BidID = al.refID
     ";
 

@@ -36,6 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         alert('You do not have permission to access this website. Please contact hr@heitech.com.my for further inquiries.');
                         window.location.href = '../signup';
                       </script>";
+            } elseif ($userStatus === 'Disable') {
+                // Status is Rejected
+                echo "<script>
+                        alert('Your account already been blocked. Please contact hr@heitech.com.my for further inquiries.');
+                        window.location.href = '../signup';
+                      </script>";
             } else {
                 // Verify the password
                 if (password_verify($password, $user['password'])) {

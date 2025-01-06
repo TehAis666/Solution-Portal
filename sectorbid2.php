@@ -44,11 +44,19 @@ try {
             WHEN rb.status = 'requested' THEN 'requested' -- User has requested access
             WHEN rb.status = 'Rejected' THEN 'rejected' -- User's request was rejected
             ELSE 'others'
-        END AS role
+        END AS role,
+        u1.name AS Presalesname1,
+        u2.name AS Presalesname2,
+        u3.name AS Presalesname3,
+        u4.name AS Presalesname4
     FROM bids b
     JOIN tender t ON b.BidID = t.BidID
     LEFT JOIN user u ON b.staffID = u.staffID
     LEFT JOIN requestbids rb ON b.BidID = rb.BidID AND rb.staffID = ? -- Check the session user's status
+    LEFT JOIN user u1 ON t.Presales1 = u1.staffID
+    LEFT JOIN user u2 ON t.Presales2 = u2.staffID
+    LEFT JOIN user u3 ON t.Presales3 = u3.staffID
+    LEFT JOIN user u4 ON t.Presales4 = u4.staffID
     WHERE 
         (t.$solutionColumn != '' AND t.$solutionColumn IS NOT NULL) 
         OR 
@@ -84,12 +92,15 @@ try {
     ];
 
     // Query to retrieve presales staff names by sector
-    $presalesStmt = $conn->query("SELECT name, sector FROM user");
+    $presalesStmt = $conn->query("SELECT staffID, name, sector FROM user WHERE role IN ('presales', 'head')");
 
     // Populate the presales array with names organized by sector
     while ($row = $presalesStmt->fetch_assoc()) {
         if (isset($presalesBySector[$row['sector']])) {
-            $presalesBySector[$row['sector']][] = $row['name'];
+            $presalesBySector[$row['sector']][] = [
+                'staffID' => $row['staffID'],
+                'name' => $row['name']
+            ];
         }
     }
 } catch (Exception $e) {
@@ -573,6 +584,10 @@ try {
                                                         data-presales2="<?php echo htmlspecialchars($bid['Presales2']); ?>"
                                                         data-presales3="<?php echo htmlspecialchars($bid['Presales3']); ?>"
                                                         data-presales4="<?php echo htmlspecialchars($bid['Presales4']); ?>"
+                                                        data-presalesname1="<?php echo htmlspecialchars($bid['Presalesname1'] ?? 'null'); ?>"
+                                                        data-presalesname2="<?php echo htmlspecialchars($bid['Presalesname2'] ?? 'null'); ?>"
+                                                        data-presalesname3="<?php echo htmlspecialchars($bid['Presalesname3'] ?? 'null'); ?>"
+                                                        data-presalesname4="<?php echo htmlspecialchars($bid['Presalesname4'] ?? 'null'); ?>"
                                                         data-requestdate="<?php echo htmlspecialchars($bid['RequestDate']); ?>"
                                                         data-submissiondate="<?php echo htmlspecialchars($bid['SubmissionDate'] ?? date('Y-m-d')); ?>"
                                                         data-value1="<?php echo htmlspecialchars($bid['Value1']); ?>"
@@ -690,28 +705,28 @@ try {
                                 <div class="col-sm-8" id="modalSubmissionDate">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Value1 (RM):</strong></div>
-                                <div class="col-sm-8" id="modalValue1">-</div>
+                                <div class="col-sm-4 total-value"><strong>Value1 (RM):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalValue1">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Value2 (RM):</strong></div>
-                                <div class="col-sm-8" id="modalValue2">-</div>
+                                <div class="col-sm-4 total-value"><strong>Value2 (RM):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalValue2">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Value3 (RM):</strong></div>
-                                <div class="col-sm-8" id="modalValue3">-</div>
+                                <div class="col-sm-4 total-value"><strong>Value3 (RM):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalValue3">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Value4 (RM):</strong></div>
-                                <div class="col-sm-8" id="modalValue4">-</div>
+                                <div class="col-sm-4 total-value"><strong>Value4 (RM):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalValue4">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>Total Value (RM):</strong></div>
-                                <div class="col-sm-8" id="modalTotalValue">-</div>
+                                <div class="col-sm-4 total-value"><strong>Total Value (RM):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalTotalValue">-</div>
                             </div>
                             <div class="row mb-3">
-                                <div class="col-sm-4"><strong>RM Value (Final):</strong></div>
-                                <div class="col-sm-8" id="modalRMValue">-</div>
+                                <div class="col-sm-4 total-value"><strong>RM Value (Final):</strong></div>
+                                <div class="col-sm-8 total-value" id="modalRMValue">-</div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-sm-4"><strong>Status:</strong></div>
@@ -888,8 +903,8 @@ try {
                                         <button type="button" class="btn btn-primary" id="nextSlideButton">HMS Solutions</button>
                                     </div>
                                 </div>
-                                <!-- Second Slide -->
-                                <div id="secondSlide" style="display: none;">
+                                 <!-- Second Slide -->
+                                 <div id="secondSlide" style="display: none;">
                                     <!-- Solutions, Presales, and Values -->
                                     <div class="row mb-3">
                                         <div class="col-md-4">
@@ -902,9 +917,15 @@ try {
                                         <div class="col-md-4">
                                             <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
                                             <select id="updatePresales1" class="form-control" name="Presales1">
-                                                <?php foreach ($presalesBySector['AwanHeiTech'] as $name): ?>
-                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php if (!empty($presalesBySector['AwanHeiTech'])): ?>
+                                                    <?php foreach ($presalesBySector['AwanHeiTech'] as $presales): ?>
+                                                        <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                                                            <?php echo htmlspecialchars($presales['name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <option value="">No Presales Available</option>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -923,9 +944,15 @@ try {
                                         <div class="col-md-4">
                                             <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
                                             <select id="updatePresales2" class="form-control" name="Presales2">
-                                                <?php foreach ($presalesBySector['PaduNet'] as $name): ?>
-                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php if (!empty($presalesBySector['PaduNet'])): ?>
+                                                    <?php foreach ($presalesBySector['PaduNet'] as $presales): ?>
+                                                        <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                                                            <?php echo htmlspecialchars($presales['name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <option value="">No Presales Available</option>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -944,9 +971,15 @@ try {
                                         <div class="col-md-4">
                                             <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
                                             <select id="updatePresales3" class="form-control" name="Presales3">
-                                                <?php foreach ($presalesBySector['Secure-X'] as $name): ?>
-                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php if (!empty($presalesBySector['Secure-X'])): ?>
+                                                    <?php foreach ($presalesBySector['Secure-X'] as $presales): ?>
+                                                        <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                                                            <?php echo htmlspecialchars($presales['name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <option value="">No Presales Available</option>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -965,9 +998,15 @@ try {
                                         <div class="col-md-4">
                                             <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
                                             <select id="updatePresales4" class="form-control" name="Presales4">
-                                                <?php foreach ($presalesBySector['i-Sentrix'] as $name): ?>
-                                                    <option value="<?php echo htmlspecialchars($name); ?>"><?php echo htmlspecialchars($name); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php if (!empty($presalesBySector['i-Sentrix'])): ?>
+                                                    <?php foreach ($presalesBySector['i-Sentrix'] as $presales): ?>
+                                                        <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
+                                                            <?php echo htmlspecialchars($presales['name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php else: ?>
+                                                    <option value="">No Presales Available</option>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                         <div class="col-md-4">
@@ -975,7 +1014,6 @@ try {
                                             <input type="number" step="0.01" id="updateValue4" class="form-control" name="Value4">
                                         </div>
                                     </div>
-
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label for="updateTotalValue" class="form-label"><strong>Total Request Value (RM):</strong></label>
@@ -1263,6 +1301,10 @@ try {
                 var presales2 = $(this).data('presales2');
                 var presales3 = $(this).data('presales3');
                 var presales4 = $(this).data('presales4');
+                var presalesname1 = $(this).data('presalesname1');
+                var presalesname2 = $(this).data('presalesname2');
+                var presalesname3 = $(this).data('presalesname3');
+                var presalesname4 = $(this).data('presalesname4');
 
                 var requestDate = $(this).data('requestdate');
                 var submissionDate = $(this).data('submissiondate');
@@ -1298,10 +1340,10 @@ try {
                 $('#modalSolution2').text(solution2);
                 $('#modalSolution3').text(solution3);
                 $('#modalSolution4').text(solution4);
-                $('#modalPresales1').text(presales1);
-                $('#modalPresales2').text(presales2);
-                $('#modalPresales3').text(presales3);
-                $('#modalPresales4').text(presales4);
+                $('#modalPresales1').text(presalesname1);
+                $('#modalPresales2').text(presalesname2);
+                $('#modalPresales3').text(presalesname3);
+                $('#modalPresales4').text(presalesname4);
 
                 $('#modalRequestDate').text(requestDate);
                 $('#modalSubmissionDate').text(submissionDate);
@@ -1369,10 +1411,16 @@ try {
                     $('#requestBtn').hide(); // Hide Request Edit button for other roles
                 }
 
-                if (role === 'creator') {
+                if (role === 'creator' ) {
                     $('.sub-presales-field').show(); // Show Sub-Presales field
                 } else {
                     $('.sub-presales-field').hide(); // Hide Sub-Presales field
+                }
+
+                if (role === 'creator' || role === 'affiliate' || role === 'partner') {
+                    $('.total-value').show(); // Show Sub-Presales field
+                } else {
+                    $('.total-value').hide(); // Hide Sub-Presales field
                 }
 
                 // Show the View Modal
