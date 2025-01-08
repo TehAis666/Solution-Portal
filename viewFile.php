@@ -501,6 +501,15 @@
                                         </ol>
                                     </nav>
                                 </div>
+                                <!-- Buttons Container with custom spacing -->
+                                <button
+                                    class="btn btn-primary btn-sm rounded-pill me-2"
+                                    style="margin-top: 10px;"
+                                    title="Go Back"
+                                    onclick="goBack()">
+                                    <i class="ri-arrow-left-line"></i>
+                                </button>
+
                             </div>
 
                             <div id="tableDropzone" class="table-dropzone">
@@ -635,10 +644,7 @@
         let isFolderView = true;
         let currentFolderID = null;
         let currentfolderName = '';
-        let breadcrumb = [{
-            name: 'Home',
-            id: null
-        }];
+        let breadcrumb = [];
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
@@ -720,7 +726,7 @@
             currentFolderID = folderID;
             currentfolderName = folderName;
 
-            // Check if the last breadcrumb is the same as the one we are trying to add
+            // Avoid adding the Home breadcrumb
             if (!breadcrumb.length || breadcrumb[breadcrumb.length - 1].id !== folderID) {
                 breadcrumb.push({
                     name: folderName,
@@ -944,14 +950,25 @@
 
 
             fetchFolders(); // Fetch folder data when the page loads
+
+            // Check sessionStorage for folder data and call openFolder if available
+            const sessionFolderID = sessionStorage.getItem('sessionfolderID');
+            const sessionFolderName = sessionStorage.getItem('sessionfolderName');
+
+            if (sessionFolderID && sessionFolderName) {
+                // Automatically open the folder if the data exists in sessionStorage
+                openFolder(sessionFolderID, sessionFolderName);
+            }
         });
     </script>
 
-
-
-
     <script>
+        // JavaScript function to go back in the browser history
+        function goBack() {
+            window.history.back();
+        }
     </script>
+
 </body>
 
 </html>

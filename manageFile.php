@@ -656,7 +656,9 @@
         let isFolderView = true;
         let currentFolderID = null; // Store the currently selected folder ID
         let currentfolderName = '';
-        let breadcrumb = ['Home']; // Start breadcrumb with Home
+        let tmpfolderid = null;
+        let tmpfolderName = '';
+        let breadcrumb = []; // Start breadcrumb with Home
         const loggedInUserID = <?php echo json_encode($_SESSION['user_id']); ?>;
 
         // Specify the worker path
@@ -721,17 +723,31 @@
             const breadcrumbContainer = $('.breadcrumb');
             breadcrumbContainer.empty(); // Clear current breadcrumb
 
-            // Log breadcrumb to console to ensure the correct data
-            //console.log("Breadcrumb array:", breadcrumb);
-
-            let uniqueBreadcrumb = Array.from(new Set(breadcrumb));
-            uniqueBreadcrumb = uniqueBreadcrumb.filter(item => item.toLowerCase() !== 'home' && item.toLowerCase() !== 'files'); // Remove "Home" and "Files"
+            let uniqueBreadcrumb = Array.from(new Set(breadcrumb.map(item => item.folderName))); // Get unique folder names
 
             breadcrumbContainer.append('<li class="breadcrumb-item"><a href="#" onclick="goHome()">Home</a></li>');
 
-            uniqueBreadcrumb.forEach((item, index) => {
-                breadcrumbContainer.append(`<li class="breadcrumb-item ${index === uniqueBreadcrumb.length - 1 ? 'active' : ''}">${item}</li>`);
+            uniqueBreadcrumb.forEach((folderName, index) => {
+                if (folderName) { // Only render folderName if it's valid
+                    breadcrumbContainer.append(`
+                <li class="breadcrumb-item ${index === uniqueBreadcrumb.length - 1 ? 'active' : ''}">
+                    <a href="#" onclick="navigateToFolder(${index})">${folderName}</a>
+                </li>
+            `);
+                }
             });
+        }
+
+        function navigateToFolder(index) {
+            // Update breadcrumb to the selected folder index
+            breadcrumb = breadcrumb.slice(0, index + 1); // Slice breadcrumb up to the selected index
+            updateBreadcrumb(); // Update breadcrumb UI
+
+            // Get the selected folder information from breadcrumb
+            const selectedFolder = breadcrumb[index];
+
+            // Use the folderID from breadcrumb to navigate
+            openFolder(selectedFolder.folderID, selectedFolder.folderName);
         }
 
         $(document).ready(function() {
@@ -897,20 +913,26 @@
         function openFolder(folderID, folderName) {
             currentFolderID = folderID; // Update current folder ID
             currentfolderName = folderName;
-            if (folderName && folderName.trim() !== '') { // Check if folderName is non-empty
-                breadcrumb.push(folderName);
+
+            // Push both folder name and ID into breadcrumb (internal storage)
+            if (breadcrumb[breadcrumb.length - 1]?.folderName !== folderName) {
+                breadcrumb.push({
+                    folderID: folderID,
+                    folderName: folderName
+                }); // Store only folderID and folderName
             }
+
             $.ajax({
                 url: 'controller/fetchFolderContents.php',
                 method: 'GET',
                 data: {
                     folderID: folderID
-                },
+                }, // Always send the correct folderID here
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
                         populateFolderContents(response.data.folders, response.data.files); // Pass both folders and files
-                        toggleAddFileButton(true);
+                        toggleAddFileButton(true); // Show the "Add File" button
                     } else {
                         alert(response.message || 'Failed to load folder contents.');
                         displayNoFilesMessage(); // Show "No files" message
@@ -950,10 +972,11 @@
                 $(rowNode).dblclick(function() {
                     const folderID = $(this).data('folderID');
                     const folderName = folder.folderName;
-                    openFolder(folderID, folderName);
+                    openFolder(folderID, folderName); // Open the selected folder
                 });
             });
 
+            // Add files to the table
             files.forEach(function(file) {
                 const rowNode = table.row.add([
                     `<i class="ri-file-text-line file-icon"></i> ${file.fileName}`, // File icon added here
@@ -966,11 +989,10 @@
                 // Store fileID in the row
                 $(rowNode).data('FileID', file.FileID);
 
-                // Add click or double-click event to trigger preview
+                // Add click event to trigger preview
                 $(rowNode).click(function() {
                     const fileID = $(this).data('FileID'); // Retrieve fileID from the row
-                    console.log(fileID); // Check if fileID is correctly retrieved
-                    previewPDF(fileID); // Pass fileID to previewFile function
+                    previewPDF(fileID); // Pass fileID to previewPDF function
                 });
             });
 
@@ -1046,16 +1068,15 @@
 
         // Go back to Home (reset breadcrumb)
         function goHome() {
-            breadcrumb = ['Home']; // Reset breadcrumb to just 'Home'
+            breadcrumb = []; // Reset breadcrumb to just 'Home'
             isFolderView = true; // Ensure we are in folder view
             fetchFolders(); // Fetch the top-level folders
-            updateBreadcrumb(); // Update breadcrumb
+            updateBreadcrumb(); // Update breadcrumb UI
 
             // Hide the "Add New File" button when going to Home
-            toggleAddFileButton(false); // This will hide the button
-            currentFolderID = '';
+            toggleAddFileButton(false); // Hide the button
+            currentFolderID = ''; // Reset the folder ID
         }
-
         // Toggle view between folder and file view
         function toggleView() {
             if (isFolderView) {
