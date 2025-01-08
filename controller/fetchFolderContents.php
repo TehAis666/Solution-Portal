@@ -1,4 +1,3 @@
-
 <?php
 require_once '../db/db.php';  // Include the database connection
 
@@ -16,7 +15,7 @@ if ($folderID >= 0) {  // Allow root folder (ID 0)
             f.folderID, 
             f.folderName, 
             f.CreatedBy, 
-            f.DateCreated,
+            DATE_FORMAT(f.DateCreated, '%d/%m/%Y') AS DateCreated,
             (
                 (SELECT COUNT(*) FROM folders WHERE parentID = f.folderID) +
                 (SELECT COUNT(*) FROM files WHERE folderID = f.folderID)
@@ -45,7 +44,7 @@ if ($folderID >= 0) {  // Allow root folder (ID 0)
             FileID,
             fileName, 
             uploadedBy, 
-            dateUploaded
+            DATE_FORMAT(dateUploaded, '%d/%m/%Y') AS dateUploaded
         FROM files
         WHERE folderID = ?
         ORDER BY dateUploaded DESC;

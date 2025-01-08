@@ -9,7 +9,6 @@ if (!$fileID) {
     exit;
 }
 
-// Query to get the file path and type from the database
 $query = "SELECT path, type FROM files WHERE fileID = ?";
 $stmt = $conn->prepare($query);
 
@@ -24,34 +23,19 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $file = $result->fetch_assoc();
-    $filePath = $file['path'];
+    $filePath = str_replace('\\', '/', $file['path']); // Use forward slashes
+    $fileType = $file['type']; // Get file type
 
-    // Ensure the path uses forward slashes instead of backslashes
-    $filePath = str_replace('\\', '/', $filePath);
-
-    // Dynamically determine the base folder from the current script name
-    $host = $_SERVER['HTTP_HOST'];  // Get the current domain (e.g., localhost)
-    
-    // Use SCRIPT_NAME or REQUEST_URI to extract the base folder
-    $baseFolder = 'SolutionP'; // Default folder
-    
-    // Check if SCRIPT_NAME contains the expected base folder names
-    if (strpos($_SERVER['SCRIPT_NAME'], 'SolutionPortal') !== false) {
-        $baseFolder = 'SolutionPortal';
-    } elseif (strpos($_SERVER['SCRIPT_NAME'], 'Solution-Portal') !== false) {
-        $baseFolder = 'Solution-Portal';
-    } // If no match, default to 'SolutionP'
-
-    // Construct the full base URL dynamically
+    $host = $_SERVER['HTTP_HOST'];
+    $baseFolder = 'SolutionPortal'; // Default folder, adjust if needed
     $baseUrl = 'http://' . $host . '/' . $baseFolder . '/';
-
-    // Concatenate the full file URL
     $fileUrl = $baseUrl . $filePath;
 
-    echo json_encode(['success' => true, 'fileUrl' => $fileUrl]);
+    echo json_encode(['success' => true, 'fileUrl' => $fileUrl, 'fileType' => $fileType]);
 } else {
     echo json_encode(['success' => false, 'message' => 'File not found.']);
 }
 
 $stmt->close();
+
 ?>

@@ -441,15 +441,27 @@
 
         /* Buttons Row Styling */
         .btn.edit-folder,
-        .btn.delete-folder {
+        .btn.delete-folder,
+        .btn.authorize-access {
             font-size: 1.2rem;
             color: #6c757d;
+            /* Default button color */
             padding: 0;
+            background: none;
+            /* Ensure no background is applied */
+            border: none;
+            /* Remove default button border */
+            cursor: pointer;
+            /* Show pointer cursor on hover */
         }
 
         .btn.edit-folder:hover,
-        .btn.delete-folder:hover {
+        .btn.delete-folder:hover,
+        .btn.authorize-access:hover {
             color: #495057;
+            /* Darker color on hover */
+            text-decoration: none;
+            /* Prevent link underline */
         }
 
         /* Icon Size */
@@ -645,6 +657,7 @@
         let currentFolderID = null; // Store the currently selected folder ID
         let currentfolderName = '';
         let breadcrumb = ['Home']; // Start breadcrumb with Home
+        const loggedInUserID = <?php echo json_encode($_SESSION['user_id']); ?>;
 
         // Specify the worker path
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
@@ -758,51 +771,62 @@
                 let breakdownDetails;
 
                 if (!data.BidID) {
-                    // Case: Standalone Folder
                     breakdownDetails = `
-        <div class="breakdown-row">
-            <p class="breakdown-label">Standalone Folder</p>
-        </div>`;
+                <div class="breakdown-row">
+                    <p class="breakdown-label">Standalone Folder</p>
+                </div>`;
                 } else {
-                    // Case: Folder with Agency Details
                     breakdownDetails = `
-        <div class="breakdown-row">
-            <p class="breakdown-label">Agency Name: <span>${data.CustName || 'N/A'}</span></p>
-        </div>
-        <div class="breakdown-row">
-            <p class="breakdown-label">Scope: <span>${data.HMS_Scope || 'N/A'}</span></p>
-        </div>
-        <div class="breakdown-row">
-            <p class="breakdown-label">Tender Proposal: <span>${data.Tender_Proposal || 'N/A'}</span></p>
-        </div>`;
+                <div class="breakdown-row">
+                    <p class="breakdown-label">Agency Name: <span>${data.CustName || 'N/A'}</span></p>
+                </div>
+                <div class="breakdown-row">
+                    <p class="breakdown-label">Scope: <span>${data.HMS_Scope || 'N/A'}</span></p>
+                </div>
+                <div class="breakdown-row">
+                    <p class="breakdown-label">Tender Proposal: <span>${data.Tender_Proposal || 'N/A'}</span></p>
+                </div>`;
                 }
 
-                // Add the "Last Updated At" row
                 breakdownDetails += `
-    <div class="breakdown-row">
-        <p class="breakdown-label">Last Updated At: <span>${data.datelastupdate || 'N/A'}</span></p>
-    </div>`;
+            <div class="breakdown-row">
+                <p class="breakdown-label">Last Updated At: <span>${data.datelastupdate || 'N/A'}</span></p>
+            </div>`;
+
+                let buttonsRow = `
+            <div class="breakdown-row d-flex justify-content-start">
+                <button 
+                    class="btn btn-link btn-sm text-secondary edit-folder me-2" 
+                    onclick="editFolder('${data.folderID}')"
+                >
+                    <i class="ri-edit-fill fs-4"></i>
+                </button>
+                <button 
+                    class="btn btn-link btn-sm text-secondary delete-folder me-2" 
+                    onclick="deleteFolder('${data.folderID}')"
+                >
+                    <i class="ri-delete-bin-fill fs-4"></i>
+                </button>`;
+
+                // Check if the logged-in user is the folder's creator
+                if (parseInt(loggedInUserID) === parseInt(data.staffID)) {
+                    buttonsRow += `
+                <button 
+                    class="btn btn-link btn-sm text-primary authorize-access me-2" 
+                    onclick="authorizeAccess('${data.folderID}')"
+                >
+                    <i class="ri-key-fill fs-4"></i>
+                </button>`;
+                }
+
+                buttonsRow += `</div>`;
 
                 return `
-    <div class="breakdown-container p-3">
-        ${breakdownDetails}
-        <!-- Buttons Row -->
-        <div class="breakdown-row d-flex justify-content-start">
-            <button 
-                class="btn btn-link btn-sm text-secondary edit-folder me-2" 
-                onclick="editFolder('${data.folderID}')"
-            >
-                <i class="ri-edit-fill fs-4"></i>
-            </button>
-            <button 
-                class="btn btn-link btn-sm text-secondary delete-folder" 
-                onclick="deleteFolder('${data.folderID}')"
-            >
-                <i class="ri-delete-bin-fill fs-4"></i>
-            </button>
-        </div>
-    </div>
-    `;
+            <div class="breakdown-container p-3">
+                ${breakdownDetails}
+                ${buttonsRow}
+            </div>
+        `;
             }
 
 
@@ -956,7 +980,7 @@
 
         function previewPDF(fileID) {
             $.ajax({
-                url: 'controller/filepreview.php', // Server-side script to handle file preview
+                url: 'controller/filepreview.php',
                 method: 'POST',
                 data: {
                     fileID: fileID
@@ -964,9 +988,29 @@
                 success: function(response) {
                     const data = JSON.parse(response);
                     if (data.success) {
-                        const fileUrl = encodeURIComponent(data.fileUrl); // Encode the file URL
-                        const viewerUrl = `pdfviewer/web/viewer.html?file=${fileUrl}`;
-                        window.open(viewerUrl, '_blank'); // Open the viewer in a new tab
+                        const fileUrl = data.fileUrl;
+                        const fileType = data.fileType;
+
+                        if (fileType === 'application/pdf') {
+                            const viewerUrl = `pdfviewer/web/viewer.html?file=${encodeURIComponent(fileUrl)}`;
+                            window.open(viewerUrl, '_blank');
+                        } else if (fileType.startsWith('image/')) {
+                            window.open(fileUrl, '_blank');
+                        } else if (
+                            fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                            fileType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                            fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        ) {
+                            // Alert for unsupported file types
+                            const userResponse = confirm(
+                                "This document cannot be viewed in the browser. Would you like to download it?"
+                            );
+                            if (userResponse) {
+                                window.location.href = fileUrl; // Trigger file download
+                            }
+                        } else {
+                            window.open(fileUrl, '_blank');
+                        }
                     } else {
                         alert('Error loading file preview.');
                     }
@@ -1378,8 +1422,125 @@
             }
         });
 
+        function authorizeAccess(folderID) {
+            // Fetch users from the same sector as the current session
+            fetch(`controller/fetchUserSector.php?folderID=${folderID}`, {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let userOptionsCheckboxes = '';
+                    data.users.forEach(user => {
+                        let isChecked = user.hasAccess ? 'checked' : '';
+                        userOptionsCheckboxes += `
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="user-${user.staffID}" value="${user.staffID}" ${isChecked}>
+                    <label class="form-check-label" for="user-${user.staffID}">${user.Name}</label>
+                </div>
+            `;
+                    });
 
+                    // Build the modal HTML
+                    const modalHTML = `
+            <div class="modal fade" id="authorizeAccessModal" tabindex="-1" aria-labelledby="authorizeAccessModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="authorizeAccessModalLabel">Authorize Access</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="authorizeAccessForm">
+                                <label for="userSelect" class="form-label mb-3">Authorize Staff:</label>
+                                
+                                <!-- Custom Multi-select Dropdown -->
+                                <div class="custom-multiselect-container">
+                                    <div class="dropdown w-100">
+                                        <button class="btn btn-secondary w-100" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Select Staff <span id="selectedCount">0</span> selected
+                                        </button>
+                                        <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton" style="max-height: 300px; overflow-y: auto;">
+                                            ${userOptionsCheckboxes}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="submitAccess('${folderID}')">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
+                    // Insert modal HTML into the body
+                    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                    // Initialize and show modal
+                    const modal = new bootstrap.Modal(document.getElementById('authorizeAccessModal'));
+                    modal.show();
+
+                    // Calculate and set initial selected count
+                    const initialSelectedCount = document.querySelectorAll('.form-check-input:checked').length;
+                    document.getElementById('selectedCount').textContent = initialSelectedCount;
+
+                    // Update selected count dynamically when checkboxes are clicked
+                    const checkboxes = document.querySelectorAll('.form-check-input');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.addEventListener('change', () => {
+                            const selectedCount = document.querySelectorAll('.form-check-input:checked').length;
+                            document.getElementById('selectedCount').textContent = selectedCount;
+                        });
+                    });
+
+                    // Remove modal from the DOM after it's closed
+                    document.getElementById('authorizeAccessModal').addEventListener('hidden.bs.modal', function() {
+                        document.getElementById('authorizeAccessModal').remove();
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching users:', error);
+                });
+        }
+
+        function submitAccess(folderID) {
+            // Gather selected users
+            const checkboxes = document.querySelectorAll('.form-check-input');
+            const selectedUsers = Array.from(checkboxes).map(checkbox => ({
+                userID: checkbox.value,
+                status: checkbox.checked ? 'granted' : 'revoked',
+            }));
+
+            // Send the selected users to the server
+            fetch('controller/submitAccess.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        folderID,
+                        selectedUsers
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Close the modal on success
+                        const modalElement = document.getElementById('authorizeAccessModal');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide(); // Programmatically close the modal
+                    } else {
+                        console.error('Failed to save access:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting access:', error);
+                });
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
 
