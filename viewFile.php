@@ -950,7 +950,9 @@
 
 
             fetchFolders(); // Fetch folder data when the page loads
+        });
 
+        window.onload = function() {
             // Check sessionStorage for folder data and call openFolder if available
             const sessionFolderID = sessionStorage.getItem('sessionfolderID');
             const sessionFolderName = sessionStorage.getItem('sessionfolderName');
@@ -959,7 +961,7 @@
                 // Automatically open the folder if the data exists in sessionStorage
                 openFolder(sessionFolderID, sessionFolderName);
             }
-        });
+        };
     </script>
 
     <script>

@@ -1502,7 +1502,7 @@ try {
                             sessionStorage.setItem('sessionfolderName', data.folderName);
 
                             // Now, redirect to viewfile.php
-                            window.location.href = 'viewfile.php';
+                            window.location.href = 'viewfile';
                         } else {
                             alert('The folder does not exist.');
                         }

@@ -856,6 +856,11 @@ try {
                             </div>
                         </div>
                     </div>
+                    <div class="container mt-4">
+                            <div class="text-center">
+                                <a href="#" id="viewFilesLink" class="btn btn-link">Go to View Files</a>
+                            </div>
+                        </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary rounded-btn" data-bs-dismiss="modal">Close</button>
                         <button class="btn btn-primary edit-btn rounded-btn" data-toggle="modal" data-target="#editModal">Edit</button>
@@ -1595,6 +1600,48 @@ try {
                         alert('Bid updated successfully!');
                         $('#editModal').modal('hide');
                         location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your code here
+            console.log('DOM fully loaded');
+
+            // Example:
+            $(document).on('click', '.viewbtn', function() {
+                var bidID = $(this).data('bidid');
+                $('#viewFilesLink').data('bidid', bidID);
+            });
+
+            $('#viewFilesLink').click(function(event) {
+                event.preventDefault(); // Prevent the default action (redirect)
+
+                var bidID = $(this).data('bidid');
+
+                $.ajax({
+                    url: 'controller/validationfolder.php',
+                    type: 'POST',
+                    data: {
+                        bidID: bidID
+                    },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+
+                        if (data.exists) {
+                            // Store the folder data in sessionStorage
+                            sessionStorage.setItem('sessionfolderID', data.folderID);
+                            sessionStorage.setItem('sessionfolderName', data.folderName);
+
+                            // Now, redirect to viewfile.php
+                            window.location.href = 'viewfile';
+                        } else {
+                            alert('The folder does not exist.');
+                        }
                     },
                     error: function(xhr, status, error) {
                         console.log('Error:', error);
