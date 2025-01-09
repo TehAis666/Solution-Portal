@@ -115,7 +115,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'admin' || $role == 'SA'): // Only Admin can access ManageBid 
         ?>
           <li>
-            <a href="adminbid3">
+            <a href="adminbid4">
               <i class="bi bi-gear fs-6"></i><span>ManageBid</span>
             </a>
           </li>
@@ -124,7 +124,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'admin' || $role == 'SA') : // Only Admin
         ?>
           <li>
-            <a href="userbid3">
+            <a href="userbid7">
               <i class="bi bi-person-circle fs-6"></i><span>My Bid</span>
             <a href="adminuserbid">
               <i class="bi bi-circle"></i><span>My Bid</span>
@@ -144,7 +144,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="allbid2">
+            <a href="allbid3">
               <i class="bi bi-briefcase fs-6"></i><span>HeiTech Bid</span>
             </a>
           </li>
@@ -153,7 +153,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'head'): // Only Head Presales
         ?>
           <li>
-            <a href="headbid8">
+            <a href="headbid9">
               <i class="bi bi-building fs-6"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
@@ -171,7 +171,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="userbid4">
+            <a href="userbid7">
               <i class="bi bi-pencil-square fs-6"></i><span>Manage Bid</span>
             </a>
           </li>
