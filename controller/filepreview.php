@@ -9,7 +9,6 @@ if (!$fileID) {
     exit;
 }
 
-// Query to get the file path and type from the database
 $query = "SELECT path, type FROM files WHERE fileID = ?";
 $stmt = $conn->prepare($query);
 
@@ -24,21 +23,19 @@ $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $file = $result->fetch_assoc();
-    $filePath = $file['path'];
+    $filePath = str_replace('\\', '/', $file['path']); // Use forward slashes
+    $fileType = $file['type']; // Get file type
 
-    // Ensure the path uses forward slashes instead of backslashes
-    $filePath = str_replace('\\', '/', $filePath);
-    
-    // Assuming the base URL for accessing documents is "http://localhost/SolutionP/"
-    $baseUrl = 'http://localhost/SolutionP/';
-    
-    // Concatenate the base URL with the stored relative file path
+    $host = $_SERVER['HTTP_HOST'];
+    $baseFolder = 'SolutionPortal'; // Default folder, adjust if needed
+    $baseUrl = 'http://' . $host . '/' . $baseFolder . '/';
     $fileUrl = $baseUrl . $filePath;
 
-    echo json_encode(['success' => true, 'fileUrl' => $fileUrl]);
+    echo json_encode(['success' => true, 'fileUrl' => $fileUrl, 'fileType' => $fileType]);
 } else {
     echo json_encode(['success' => false, 'message' => 'File not found.']);
 }
 
 $stmt->close();
+
 ?>

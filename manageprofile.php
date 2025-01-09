@@ -43,6 +43,9 @@ $user_data = include 'controller/fetchprofile.php'; // Include fetchpfp.php to g
 
   <!-- Custom Styles -->
   <style>
+    .card {
+    border-radius: 15px; /* Adjust the number to increase or decrease roundness */
+    }
     /* Adjust form input boxes */
     .form-control,
     .form-select {

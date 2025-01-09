@@ -12,13 +12,17 @@ if ($folderID >= 0) {  // Allow root folder (ID 0)
     // Fetch subfolders within the folder
     $folderQuery = "
         SELECT 
-            folderID, 
-            folderName, 
-            CreatedBy, 
-            DateCreated
-        FROM folders
-        WHERE parentID = ?
-        ORDER BY DateCreated DESC;
+            f.folderID, 
+            f.folderName, 
+            f.CreatedBy, 
+            DATE_FORMAT(f.DateCreated, '%d/%m/%Y') AS DateCreated,
+            (
+                (SELECT COUNT(*) FROM folders WHERE parentID = f.folderID) +
+                (SELECT COUNT(*) FROM files WHERE folderID = f.folderID)
+            ) AS itemCount
+        FROM folders f
+        WHERE f.parentID = ?
+        ORDER BY f.DateCreated DESC;
     ";
 
     if ($folderStmt = mysqli_prepare($conn, $folderQuery)) {
@@ -40,7 +44,7 @@ if ($folderID >= 0) {  // Allow root folder (ID 0)
             FileID,
             fileName, 
             uploadedBy, 
-            dateUploaded
+            DATE_FORMAT(dateUploaded, '%d/%m/%Y') AS dateUploaded
         FROM files
         WHERE folderID = ?
         ORDER BY dateUploaded DESC;

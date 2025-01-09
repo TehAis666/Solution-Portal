@@ -55,6 +55,10 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
 
   <!-- Custom Styles -->
   <style>
+    .card {
+    border-radius: 15px; /* Adjust the number to increase or decrease roundness */
+    }
+
     /* Adjust form input boxes */
     .form-control,
     .form-select {
@@ -126,6 +130,11 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
     .card-body {
       padding: 8px 12px;
     }
+   /*  .card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+  } */
+
 
     /* Reduce padding inside the card */
     .card.filtering {
@@ -294,13 +303,13 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
               <!-- Filter Buttons with Boxicons -->
               <!-- Compact Rounded Buttons with Tooltips -->
               <div class="col-auto d-flex align-items-center gap-2">
-                <button type="submit" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Filter">
-                  <i class="bx bx-filter"></i>
+                <button type="submit" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Filter" style="width: 30px; height: 30px; padding: 0;">
+                  <i class="bx bx-slider"></i>
                 </button>
-                <button id="exportToPDF" type="button" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Export to PDF">
+                <button id="exportToPDF" type="button" class="btn btn-primary btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Export to PDF" style="width: 30px; height: 30px; padding: 0;">
                   <i class="bx bxs-file-pdf"></i>
                 </button>
-                <button id="resetAllCharts" type="button" class="btn btn-light btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset All Charts">
+                <button id="resetAllCharts" type="button" class="btn btn-light btn-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset All Charts" style="width: 30px; height: 30px; padding: 0;">
                   <i class="bx bx-reset"></i>
                 </button>
               </div>
@@ -322,7 +331,7 @@ $solutionCountsJson = json_encode($solutionBusinessUnitCounts);
                   <div class="d-flex align-items-center">
                     <div
                       class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
+                      <i class="bi bi-cash-stack"></i>
                     </div>
                     <div class="ps-3">
                       <h6 id="totalBids"><?php echo $totalBids; ?></h6>

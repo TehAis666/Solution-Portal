@@ -154,6 +154,11 @@ try {
 
     <!--New Css Added-->
     <style>
+        .card {
+            border-radius: 15px;
+            /* Adjust the number to increase or decrease roundness */
+        }
+
         /*--Dark Mode Style--*/
         .dark-mode {
             background-color: #121212;
@@ -383,6 +388,20 @@ try {
             /* Bold labels */
         }
 
+        .rounded-btn {
+            border-radius: 50px;
+            /* Adjust the value to increase or decrease roundness */
+            padding: 10px 20px;
+            /* Optional: Adjust padding for better button appearance */
+        }
+
+        .badge {
+            border-radius: 50px;
+            /* Makes badges fully rounded */
+            padding: 0.5rem 1rem;
+            /* Adjust padding for a better rounded appearance */
+        }
+
         .btn-primary.edit-btn {
             background-color: #28a745;
             /* Green color for edit button */
@@ -559,12 +578,12 @@ try {
                                                     }
                                                     ?>
                                                 </td>
-                                                <td>
+                                                <td class="text-center align-middle">
                                                     <!-- View Button with Data Attributes for Each Bid -->
-                                                    <button type="button" class="btn btn-primary viewbtn"
+                                                    <button type="button" class="btn btn-primary btn-sm viewbtn rounded-pill"
                                                         data-bs-toggle="modal" data-bs-target="#viewbids"
                                                         data-lastupdatedby="<?php echo htmlspecialchars($bid['LastEditedBy'] ?? 'null'); ?>"
-                                                        data-lastupdatedate="<?php echo htmlspecialchars($bid['LastEditTimestamp'] ?? 'null'); ?>"                                                    
+                                                        data-lastupdatedate="<?php echo htmlspecialchars($bid['LastEditTimestamp'] ?? 'null'); ?>"
                                                         data-updatedate="<?php echo htmlspecialchars($bid['UpdateDate']); ?>"
                                                         data-showtag="<?php echo htmlspecialchars($bid['showtag']); ?>"
                                                         data-custname="<?php echo htmlspecialchars($bid['CustName']); ?>"
@@ -744,10 +763,16 @@ try {
                                 <div class="col-sm-8" id="modallastupdatedate">-</div>
                             </div>
                         </div>
+
+                        <div class="container mt-4">
+                            <div class="text-center">
+                                <a href="#" id="viewFilesLink" class="btn btn-link">Go to View Files</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-primary edit-btn" data-toggle="modal" data-target="#editModal">Edit</button>
+                        <button type="button" class="btn btn-secondary rounded-btn" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary edit-btn rounded-btn" data-toggle="modal" data-target="#editModal">Edit</button>
                     </div>
                 </div>
             </div>
@@ -1354,7 +1379,7 @@ try {
 
                 $('#modallastupdatedby').text(lastupdatedby);
                 $('#modallastupdatedate').text(lastupdatedate);
-                
+
 
                 // Populate the Update Form in Edit Modal
                 $('#updateCustName').val(custName);
@@ -1439,6 +1464,48 @@ try {
                         alert('Bid updated successfully!');
                         $('#editModal').modal('hide');
                         location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your code here
+            console.log('DOM fully loaded');
+
+            // Example:
+            $(document).on('click', '.viewbtn', function() {
+                var bidID = $(this).data('bidid');
+                $('#viewFilesLink').data('bidid', bidID);
+            });
+
+            $('#viewFilesLink').click(function(event) {
+                event.preventDefault(); // Prevent the default action (redirect)
+
+                var bidID = $(this).data('bidid');
+
+                $.ajax({
+                    url: 'controller/validationfolder.php',
+                    type: 'POST',
+                    data: {
+                        bidID: bidID
+                    },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+
+                        if (data.exists) {
+                            // Store the folder data in sessionStorage
+                            sessionStorage.setItem('sessionfolderID', data.folderID);
+                            sessionStorage.setItem('sessionfolderName', data.folderName);
+
+                            // Now, redirect to viewfile.php
+                            window.location.href = 'viewfile.php';
+                        } else {
+                            alert('The folder does not exist.');
+                        }
                     },
                     error: function(xhr, status, error) {
                         console.log('Error:', error);

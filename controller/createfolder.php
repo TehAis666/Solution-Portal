@@ -6,7 +6,7 @@ $response = ['success' => false, 'message' => 'Unknown error'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $folderName = mysqli_real_escape_string($conn, $_POST['folderName']);
-    $relatedProposalId = isset($_POST['relatedProposalId']) ? mysqli_real_escape_string($conn, $_POST['relatedProposalId']) : null;
+    $relatedProposalId = isset($_POST['linkedBidID']) ? mysqli_real_escape_string($conn, $_POST['linkedBidID']) : null;
     $parentID = isset($_POST['parentID']) ? mysqli_real_escape_string($conn, $_POST['parentID']) : null;
 
     $staffId = isset($_SESSION['user_id']) ? mysqli_real_escape_string($conn, $_SESSION['user_id']) : null;

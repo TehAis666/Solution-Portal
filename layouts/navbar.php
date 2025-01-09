@@ -107,7 +107,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
         <li>
           <a href="addbid">
-            <i class="bi bi-circle"></i><span>Add Bid</span>
+            <i class="bi bi-plus-circle fs-6"></i><span>Add Bid</span>
           </a>
         </li>
         <?php endif; ?>
@@ -115,8 +115,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'admin' || $role == 'SA'): // Only Admin can access ManageBid 
         ?>
           <li>
-            <a href="adminbid4">
-              <i class="bi bi-circle"></i><span>ManageBid</span>
+            <a href="adminbid3">
+              <i class="bi bi-gear fs-6"></i><span>ManageBid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -124,6 +124,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'admin' || $role == 'SA') : // Only Admin
         ?>
           <li>
+            <a href="userbid3">
+              <i class="bi bi-person-circle fs-6"></i><span>My Bid</span>
             <a href="adminuserbid">
               <i class="bi bi-circle"></i><span>My Bid</span>
             </a>
@@ -134,7 +136,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="adminbidaccess">
-              <i class="bi bi-circle"></i><span>Bid Access Control</span>
+              <i class="bi bi-lock fs-6"></i><span>Bid Access Control</span>
             </a>
           </li>
         <?php endif; ?>
@@ -142,8 +144,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="allbid3">
-              <i class="bi bi-circle"></i><span>HeiTech Bid</span>
+            <a href="allbid2">
+              <i class="bi bi-briefcase fs-6"></i><span>HeiTech Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -151,8 +153,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'head'): // Only Head Presales
         ?>
           <li>
-            <a href="headbid9">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
+            <a href="headbid8">
+              <i class="bi bi-building fs-6"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -161,7 +163,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="sectorbid2">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Bid</span>
+              <i class="bi bi-folder"></i><span><?php echo $sector; ?> Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -169,8 +171,8 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="userbid7">
-              <i class="bi bi-circle"></i><span>Manage Bid</span>
+            <a href="userbid4">
+              <i class="bi bi-pencil-square fs-6"></i><span>Manage Bid</span>
             </a>
           </li>
         <?php endif; ?>
@@ -179,7 +181,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="acceptrequest">
-              <i class="bi bi-circle"></i><span>Manage Bid Access</span>
+              <i class="bi bi-person-check fs-6"></i><span>Manage Bid Access</span>
             </a>
           </li>
         <?php endif; ?>
@@ -188,10 +190,39 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="viewbid">
-              <i class="bi bi-circle"></i><span>View Bid</span>
+              <i class="bi bi-eye fs-6"></i><span>CTO/SO/SA Bid</span>
             </a>
           </li>
         <?php endif; ?>
+      </ul>
+    </li>
+
+    <!-- ======= First nav List ======= -->
+    <li class="nav-item">
+      <a
+        class="nav-link collapsed"
+        data-bs-target="#File-nav"
+        data-bs-toggle="collapse"
+        href="#">
+        <i class="bi bi-stack"></i><span>File Repository</span>
+        <i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul
+        id="File-nav"
+        class="nav-content collapse"
+        data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="manageFile">
+            <i class="bi bi-plus-circle fs-6"></i><span>Manage</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="authorizeFile">
+            <i class="bi bi-plus-circle fs-6"></i><span>Authorize File</span>
+          </a>
+        </li>
+        
       </ul>
     </li>
 
@@ -221,7 +252,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         ?>
           <li>
             <a href="userteam">
-              <i class="bi bi-circle"></i><span><?php echo $sector; ?> Members</span>
+              <i class="bi bi-people-fill fs-6"></i><span><?php echo $sector; ?> Members</span>
             </a>
           </li>
         <?php endif; ?>
