@@ -531,7 +531,7 @@ try {
                                                 <td>
                                                     <?php echo htmlspecialchars($bid['CustName']); ?>
                                                     <?php
-                                                     if ($bid['role'] == 'creator'): ?>
+                                                    if ($bid['role'] == 'creator'): ?>
                                                         <span class="badge bg-primary">Creator</span>
                                                     <?php elseif ($bid['role'] == 'partner'): ?>
                                                         <span class="badge bg-success">Partner</span>
@@ -544,7 +544,7 @@ try {
                                                     <?php else: ?>
                                                         <span class="badge bg-secondary">Others</span>
                                                     <?php endif; ?>
-                                                    
+
                                                 </td>
                                                 <td><?php echo htmlspecialchars($bid['Tender_Proposal']); ?></td>
                                                 <td><?php echo htmlspecialchars(number_format($bid['TotalValue'], 2, '.', ',')); ?></td>
@@ -741,6 +741,13 @@ try {
                                 <div class="col-sm-8" id="modalRemarks">-</div>
                             </div>
                         </div>
+
+                        <div class="container mt-4">
+                            <div class="text-center">
+                                <a href="#" id="viewFilesLink" class="btn btn-link">Go to View Files</a>
+                            </div>
+                        </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -903,8 +910,8 @@ try {
                                         <button type="button" class="btn btn-primary" id="nextSlideButton">HMS Solutions</button>
                                     </div>
                                 </div>
-                                 <!-- Second Slide -->
-                                 <div id="secondSlide" style="display: none;">
+                                <!-- Second Slide -->
+                                <div id="secondSlide" style="display: none;">
                                     <!-- Solutions, Presales, and Values -->
                                     <div class="row mb-3">
                                         <div class="col-md-4">
@@ -1411,7 +1418,7 @@ try {
                     $('#requestBtn').hide(); // Hide Request Edit button for other roles
                 }
 
-                if (role === 'creator' ) {
+                if (role === 'creator') {
                     $('.sub-presales-field').show(); // Show Sub-Presales field
                 } else {
                     $('.sub-presales-field').hide(); // Hide Sub-Presales field
@@ -1470,10 +1477,50 @@ try {
         });
         console.log('Presales2 Value:', $('#updatePresales2').val());
 
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // Click Action:
+            $(document).on('click', '.viewbtn', function() {
+                var bidID = $(this).data('bidid');
+                $('#viewFilesLink').data('bidid', bidID);
+            });
+
+            $('#viewFilesLink').click(function(event) {
+                event.preventDefault(); // Prevent the default action (redirect)
+
+                var bidID = $(this).data('bidid');
+
+                $.ajax({
+                    url: 'controller/validationfolder.php',
+                    type: 'POST',
+                    data: {
+                        bidID: bidID
+                    },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+
+                        if (data.exists) {
+                            // Store the folder data in sessionStorage
+                            sessionStorage.setItem('sessionfolderID', data.folderID);
+                            sessionStorage.setItem('sessionfolderName', data.folderName);
+
+                            // Now, redirect to viewfile.php
+                            window.location.href = 'viewfile';
+                        } else {
+                            alert('The folder does not exist.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+
         $.fn.dataTable.ext.errMode = 'throw';
     </script>
 
-<!-- Request Access -->
+    <!-- Request Access -->
     <script>
         // Now, pass the PHP session variable to JavaScript
         $('#requestBtn').click(function() {
@@ -1500,7 +1547,7 @@ try {
         });
     </script>
 
-<!-- Business Unit -->
+    <!-- Business Unit -->
     <script>
         document.getElementById("updateBusinessUnit").addEventListener("change", function() {
             const businessUnit = this.value;

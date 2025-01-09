@@ -758,6 +758,13 @@ try {
                                 <div class="col-sm-8" id="modallastupdatedate">-</div>
                             </div>
                         </div>
+
+                        <div class="container mt-4">
+                            <div class="text-center">
+                                <a href="#" id="viewFilesLink" class="btn btn-link">Go to View Files</a>
+                            </div>
+                        </div>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -1492,6 +1499,49 @@ try {
                 });
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your code here
+            console.log('DOM fully loaded');
+
+            // Example:
+            $(document).on('click', '.viewbtn', function() {
+                var bidID = $(this).data('bidid');
+                $('#viewFilesLink').data('bidid', bidID);
+            });
+
+            $('#viewFilesLink').click(function(event) {
+                event.preventDefault(); // Prevent the default action (redirect)
+
+                var bidID = $(this).data('bidid');
+
+                $.ajax({
+                    url: 'controller/validationfolder.php',
+                    type: 'POST',
+                    data: {
+                        bidID: bidID
+                    },
+                    success: function(response) {
+                        var data = JSON.parse(response);
+
+                        if (data.exists) {
+                            // Store the folder data in sessionStorage
+                            sessionStorage.setItem('sessionfolderID', data.folderID);
+                            sessionStorage.setItem('sessionfolderName', data.folderName);
+
+                            // Now, redirect to viewfile.php
+                            window.location.href = 'viewfile';
+                        } else {
+                            alert('The folder does not exist.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+        });
+        
         console.log('Presales2 Value:', $('#updatePresales2').val());
 
         $.fn.dataTable.ext.errMode = 'throw';
