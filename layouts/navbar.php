@@ -103,7 +103,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         class="nav-content collapse"
         data-bs-parent="#sidebar-nav">
 
-        <?php if ($role == 'presales' || $role == 'head' || $role == 'admin'): // Only SO/SA/CTO
+        <?php if ($role == 'presales' || $role == 'head' || $role == 'admin' || $role == 'SA'): 
         ?>
         <li>
           <a href="addbid">
@@ -112,7 +112,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         </li>
         <?php endif; ?>
 
-        <?php if ($role == 'admin'): // Only Admin can access ManageBid 
+        <?php if ($role == 'admin' || $role == 'SA'): // Only Admin can access ManageBid 
         ?>
           <li>
             <a href="adminbid4">
@@ -121,16 +121,16 @@ $role = $_SESSION['user_role']; // Get the role from the session
           </li>
         <?php endif; ?>
 
-        <?php if ($role == 'admin'): // Only Admin
+        <?php if ($role == 'admin' || $role == 'SA') : // Only Admin
         ?>
           <li>
-            <a href="userbid3">
+            <a href="adminuserbid">
               <i class="bi bi-circle"></i><span>My Bid</span>
             </a>
           </li>
         <?php endif; ?>
 
-        <?php if ($role == 'admin'): // Only Admin can access
+        <?php if ($role == 'admin' || $role == 'SA'): // Only Admin can access
         ?>
           <li>
             <a href="adminbidaccess">
@@ -169,7 +169,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
         <?php if ($role == 'presales' || $role == 'head'): // Only Presales & Head Presales 
         ?>
           <li>
-            <a href="userbid6">
+            <a href="userbid7">
               <i class="bi bi-circle"></i><span>Manage Bid</span>
             </a>
           </li>
@@ -184,7 +184,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
           </li>
         <?php endif; ?>
 
-        <?php if ($role != 'presales' && $role != 'head' && $role != 'admin'): // Only SO/SA/CTO
+        <?php if ($role != 'presales' && $role != 'head' && $role != 'admin' && $role != 'SA'): // Only SO/SA/CTO
         ?>
           <li>
             <a href="viewbid">
@@ -197,7 +197,7 @@ $role = $_SESSION['user_role']; // Get the role from the session
 
     <!-- End First Nav -->
     <!-- ======= First nav List ======= -->
-    <?php if ($role != 'admin'): // Only Admin
+    <?php if ($role != 'admin' && $role != 'SA'): // Only Admin
         ?>
     <li class="nav-item">
       <a

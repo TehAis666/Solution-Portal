@@ -539,6 +539,9 @@ try {
     </script>
 
     <script>
+        let unsavedChanges = false;
+        let previousStatus = null; // Variable to store the previous status
+
         // Function to handle status updates
         function updateStatus(row, newStatus) {
             if (!row) {
@@ -557,16 +560,26 @@ try {
             }
         }
 
+        // Detect change in status dropdown
         document.addEventListener('change', function(event) {
             if (event.target.classList.contains('status-select')) {
+                unsavedChanges = true;
+
                 const selectedOption = event.target.value;
                 if (selectedOption === 'Accepted') {
                     event.target.style.color = 'green';
                 } else if (selectedOption === 'Rejected') {
                     event.target.style.color = 'red';
                 } else if (selectedOption === 'Pending') {
-                    event.target.style.color = 'yellow';
+                    event.target.style.color = 'orange';
                 }
+            }
+        });
+
+        // Store the previous status when the dropdown is focused
+        document.addEventListener('focusin', function(event) {
+            if (event.target.classList.contains('status-select')) {
+                previousStatus = event.target.value; // Save the current status
             }
         });
 
@@ -597,6 +610,7 @@ try {
                     .then(data => {
                         if (data.success) {
                             updateStatus(row, data.newStatus);
+                            unsavedChanges = false; // Reset unsaved changes flag
                         } else {
                             console.error('Error:', data.message);
                         }
@@ -604,12 +618,37 @@ try {
                     .catch(error => console.error('Error:', error));
             }
         });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('status-select')) {
+                if (unsavedChanges) {
+                    const confirmSave = confirm("You have updated the status. Would you like to save your changes?");
+                    if (confirmSave) {
+                        // Find and trigger the save button programmatically
+                        const row = event.target.closest('tr');
+                        const saveButton = row.querySelector('.save-status-btn');
+                        if (saveButton) {
+                            saveButton.click();
+                        }
+                    } else {
+                        // Revert the dropdown to the previous status
+                        event.target.value = previousStatus;
+
+                        // Optionally reset the color
+                        if (previousStatus === 'Accepted') {
+                            event.target.style.color = 'green';
+                        } else if (previousStatus === 'Rejected') {
+                            event.target.style.color = 'red';
+                        } else if (previousStatus === 'Pending') {
+                            event.target.style.color = 'orange';
+                        }
+
+                        unsavedChanges = false;
+                    }
+                }
+            }
+        });
     </script>
-
-
-
-
-
 
     <!-- DarkMode Toggle -->
     <script>

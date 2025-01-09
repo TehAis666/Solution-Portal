@@ -416,22 +416,36 @@ try {
                                             <td style="text-align:center"><?php echo htmlspecialchars($user['phonenum']); ?></td>
                                             <td style="text-align:center"><?php echo htmlspecialchars($user['CustName']); ?></td>
                                             <td style="text-align:center"><?php echo htmlspecialchars($user['Tender_Proposal']); ?></td>
-                                            <td style="text-align:center"><?php echo htmlspecialchars($user['status']); ?></td>
                                             <td style="text-align:center">
-                                                <div style="display: flex; justify-content: center; gap: 10px;">
-                                                    <button type="button" class="btn btn-success acceptbtn"
-                                                        data-user-id="<?php echo $user['staffID']; ?>"
-                                                        data-request-id="<?php echo $user['requestID']; ?>"
-                                                        style="<?php echo ($user['status'] === 'Accepted') ? 'display:none;' : ''; ?>">
-                                                        Accept
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger rejectbtn"
-                                                        data-user-id="<?php echo $user['staffID']; ?>"
-                                                        data-request-id="<?php echo $user['requestID']; ?>"
-                                                        style="<?php echo ($user['status'] === 'Rejected') ? 'display:none;' : ''; ?>">
-                                                        Reject
-                                                    </button>
-                                                </div>
+                                                <select
+                                                    class="form-select status-select"
+                                                    data-user-id="<?php echo $user['staffID']; ?>"
+                                                    data-request-id="<?php echo $user['requestID']; ?>"
+                                                    style="color: <?php
+                                                                    echo ($user['status'] === 'Accepted') ? 'green' : (($user['status'] === 'Rejected') ? 'red' : 'orange'); ?>;">
+                                                    <option value="Pending" hidden
+                                                        <?php echo ($user['status'] !== 'Accepted' && $user['status'] !== 'Rejected') ? 'selected' : ''; ?>
+                                                        style="color: orange;">
+                                                        Pending
+                                                    </option>
+                                                    <option value="Accepted"
+                                                        <?php echo ($user['status'] === 'Accepted') ? 'selected' : ''; ?>
+                                                        style="color: green;">
+                                                        Accepted
+                                                    </option>
+                                                    <option value="Rejected"
+                                                        <?php echo ($user['status'] === 'Rejected') ? 'selected' : ''; ?>
+                                                        style="color: red;">
+                                                        Rejected
+                                                    </option>
+                                                </select>
+                                            </td>
+                                            <td style="text-align:center">
+                                                <button type="button" class="btn btn-primary save-status-btn"
+                                                    data-user-id="<?php echo $user['staffID']; ?>"
+                                                    data-request-id="<?php echo $user['requestID']; ?>">
+                                                    Save
+                                                </button>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -488,85 +502,113 @@ try {
     </script>
 
 <script>
-        function updateRowButtons(row, status) {
+        let unsavedChanges = false;
+        let previousStatus = null; // Variable to store the previous status
+
+        // Function to handle status updates
+        function updateStatus(row, newStatus) {
             if (!row) {
                 console.error("Row is null or undefined.");
                 return;
             }
 
-            console.log("Row HTML:", row.innerHTML); // Log the full row HTML for inspection
-
-            const acceptButton = row.querySelector('.acceptbtn');
-            const rejectButton = row.querySelector('.rejectbtn');
-
-            if (!acceptButton || !rejectButton) {
-                console.error("Accept or Reject button is missing from the row.");
-                return;
-            }
-
             const statusCell = row.querySelector('td:nth-child(6)');
             if (statusCell) {
-                statusCell.textContent = status;
+                statusCell.textContent = newStatus;
             }
 
-            if (status === 'Accepted') {
-                acceptButton.style.display = 'none';
-                rejectButton.style.display = 'inline-block';
-            } else if (status === 'Rejected') {
-                rejectButton.style.display = 'none';
-                acceptButton.style.display = 'inline-block';
+            const statusSelect = row.querySelector('.status-select');
+            if (statusSelect) {
+                statusSelect.value = newStatus;
             }
         }
 
+        // Detect change in status dropdown
+        document.addEventListener('change', function(event) {
+            if (event.target.classList.contains('status-select')) {
+                unsavedChanges = true;
 
-        // Generic function to handle button actions
+                const selectedOption = event.target.value;
+                if (selectedOption === 'Accepted') {
+                    event.target.style.color = 'green';
+                } else if (selectedOption === 'Rejected') {
+                    event.target.style.color = 'red';
+                } else if (selectedOption === 'Pending') {
+                    event.target.style.color = 'orange';
+                }
+            }
+        });
+
+        // Store the previous status when the dropdown is focused
+        document.addEventListener('focusin', function(event) {
+            if (event.target.classList.contains('status-select')) {
+                previousStatus = event.target.value; // Save the current status
+            }
+        });
+
+        // Event listener for Save button
         document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('acceptbtn')) {
+            if (event.target.classList.contains('save-status-btn')) {
                 const row = event.target.closest('tr');
                 const userID = event.target.getAttribute('data-user-id');
                 const requestID = event.target.getAttribute('data-request-id');
+                const statusSelect = row.querySelector('.status-select');
 
-                // AJAX logic to handle Accept action
-                fetch('controller/acceptrequest.php', {
+                if (!statusSelect) {
+                    console.error("Status dropdown not found in the row.");
+                    return;
+                }
+
+                const newStatus = statusSelect.value;
+
+                // AJAX logic to handle status update
+                fetch('controller/acceptrequest2.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: `userID=${userID}&requestID=${requestID}&action=accept`,
+                        body: `userID=${userID}&requestID=${requestID}&newStatus=${newStatus}`,
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            updateRowButtons(row, data.newStatus);
+                            updateStatus(row, data.newStatus);
+                            unsavedChanges = false; // Reset unsaved changes flag
                         } else {
                             console.error('Error:', data.message);
                         }
                     })
                     .catch(error => console.error('Error:', error));
             }
+        });
 
-            if (event.target.classList.contains('rejectbtn')) {
-                const row = event.target.closest('tr');
-                const userID = event.target.getAttribute('data-user-id');
-                const requestID = event.target.getAttribute('data-request-id');
-
-                // AJAX logic to handle Reject action
-                fetch('controller/acceptrequest.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: `userID=${userID}&requestID=${requestID}&action=reject`,
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateRowButtons(row, data.newStatus);
-                        } else {
-                            console.error('Error:', data.message);
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('status-select')) {
+                if (unsavedChanges) {
+                    const confirmSave = confirm("You have updated the status. Would you like to save your changes?");
+                    if (confirmSave) {
+                        // Find and trigger the save button programmatically
+                        const row = event.target.closest('tr');
+                        const saveButton = row.querySelector('.save-status-btn');
+                        if (saveButton) {
+                            saveButton.click();
                         }
-                    })
-                    .catch(error => console.error('Error:', error));
+                    } else {
+                        // Revert the dropdown to the previous status
+                        event.target.value = previousStatus;
+
+                        // Optionally reset the color
+                        if (previousStatus === 'Accepted') {
+                            event.target.style.color = 'green';
+                        } else if (previousStatus === 'Rejected') {
+                            event.target.style.color = 'red';
+                        } else if (previousStatus === 'Pending') {
+                            event.target.style.color = 'orange';
+                        }
+
+                        unsavedChanges = false;
+                    }
+                }
             }
         });
     </script>

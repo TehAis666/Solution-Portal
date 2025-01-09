@@ -9,7 +9,7 @@
 include_once 'db/db.php';
 
 try {
-  $encryption_key = "your-secret-key"; // Same key used for encryption
+  $encryption_key = "team-member"; // Same key used for encryption
   $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Same initialization vector
   $staffID = 0; // Default staffID in case of failure
 
@@ -31,8 +31,6 @@ try {
       throw new Exception("Invalid staffID.");
   }
   
-
-
   // Modify the query to calculate TotalValue by summing Value1 to Value4 and filter by staffID
   $stmt = $conn->query("
         SELECT 
@@ -89,7 +87,7 @@ while ($row = $presalesStmt->fetch_assoc()) {
 }
 
 try {
-  $encryption_key = "your-secret-key"; // Same key used for encryption
+  $encryption_key = "team-member"; // Same key used for encryption
   $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Same initialization vector
   // Decrypt the name token
   

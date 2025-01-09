@@ -916,7 +916,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
-                                            <select id="updatePresales1" class="form-control" name="Presales1">
+                                            <select id="updatePresales1" class="form-select" name="Presales1">
                                                 <?php if (!empty($presalesBySector['AwanHeiTech'])): ?>
                                                     <?php foreach ($presalesBySector['AwanHeiTech'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -943,7 +943,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
-                                            <select id="updatePresales2" class="form-control" name="Presales2">
+                                            <select id="updatePresales2" class="form-select" name="Presales2">
                                                 <?php if (!empty($presalesBySector['PaduNet'])): ?>
                                                     <?php foreach ($presalesBySector['PaduNet'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -970,7 +970,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
-                                            <select id="updatePresales3" class="form-control" name="Presales3">
+                                            <select id="updatePresales3" class="form-select" name="Presales3">
                                                 <?php if (!empty($presalesBySector['Secure-X'])): ?>
                                                     <?php foreach ($presalesBySector['Secure-X'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -997,7 +997,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
-                                            <select id="updatePresales4" class="form-control" name="Presales4">
+                                            <select id="updatePresales4" class="form-select" name="Presales4">
                                                 <?php if (!empty($presalesBySector['i-Sentrix'])): ?>
                                                     <?php foreach ($presalesBySector['i-Sentrix'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">

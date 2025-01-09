@@ -402,15 +402,6 @@ try {
         .clickable {
             cursor: pointer;
             /* Change cursor to pointer */
-            transition: transform 0.2s;
-            /* Add transition for smooth effect */
-        }
-
-        .clickable:hover {
-            transform: scale(1.1);
-            /* Scale up slightly on hover */
-            color: #ffcc00;
-            /* Change color on hover if you want */
         }
     </style>
 </head>
@@ -764,7 +755,7 @@ try {
                                             <label class="form-label"><strong>Sub-Presales:</strong></label>
                                         </div>
                                         <div class="col-md-8">
-                                            <a id="updateAffiliateName" data-bidid="<?php echo $encodedBidID; ?>" class="form-control-plaintext text-primary">Edit Permission</a>
+                                            <a id="updateAffiliateName" data-bidid="<?php echo $encodedBidID; ?>" class="form-control-plaintext text-primary clickable">Edit Permission</a>
                                         </div>
                                     </div>
                                     <!-- Existing fields -->
@@ -899,7 +890,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales1" class="form-label"><strong>PIC/Presales AwanHeiTech:</strong></label>
-                                            <select id="updatePresales1" class="form-control" name="Presales1">
+                                            <select id="updatePresales1" class="form-select" name="Presales1">
                                                 <?php if (!empty($presalesBySector['AwanHeiTech'])): ?>
                                                     <?php foreach ($presalesBySector['AwanHeiTech'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -926,7 +917,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales2" class="form-label"><strong>PIC/Presales PaduNet:</strong></label>
-                                            <select id="updatePresales2" class="form-control" name="Presales2">
+                                            <select id="updatePresales2" class="form-select" name="Presales2">
                                                 <?php if (!empty($presalesBySector['PaduNet'])): ?>
                                                     <?php foreach ($presalesBySector['PaduNet'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -953,7 +944,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales3" class="form-label"><strong>PIC/Presales Secure-X:</strong></label>
-                                            <select id="updatePresales3" class="form-control" name="Presales3">
+                                            <select id="updatePresales3" class="form-select" name="Presales3">
                                                 <?php if (!empty($presalesBySector['Secure-X'])): ?>
                                                     <?php foreach ($presalesBySector['Secure-X'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -980,7 +971,7 @@ try {
                                         </div>
                                         <div class="col-md-4">
                                             <label for="updatePresales4" class="form-label"><strong>PIC/Presales i-Sentrix:</strong></label>
-                                            <select id="updatePresales4" class="form-control" name="Presales4">
+                                            <select id="updatePresales4" class="form-select" name="Presales4">
                                                 <?php if (!empty($presalesBySector['i-Sentrix'])): ?>
                                                     <?php foreach ($presalesBySector['i-Sentrix'] as $presales): ?>
                                                         <option value="<?php echo htmlspecialchars($presales['staffID']); ?>">
@@ -1428,7 +1419,7 @@ try {
                 // alert('Form Data: ' + formData); // Display all serialized form data in alert
 
                 $.ajax({
-                    url: 'controller/updateuserbidcont.php',
+                    url: 'controller/updateuserbidcont2.php',
                     type: 'POST',
                     data: formData,
                     success: function(response) {

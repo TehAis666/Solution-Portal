@@ -615,7 +615,6 @@ try {
                                                 <option value="SO">Service Owner (SO)</option>
                                                 <option value="SA">Solution Architect (SA)</option>
                                                 <option value="head">Head Presales</option>
-                                                <option value="presales">Presales</option>
                                             </select>
                                         </div>
                                     </div>

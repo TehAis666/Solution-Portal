@@ -506,7 +506,7 @@ try {
                     <?php if (!empty($teamMembers)) { ?>
                         <?php
                         // Define encryption key and IV outside the loop to avoid redeclaration
-                        $encryption_key = 'your-secret-key'; // Replace with your secure key
+                        $encryption_key = 'team-member'; // Replace with your secure key
                         $iv = substr(hash('sha256', 'your-init-vector'), 0, 16); // Replace with your IV logic
 
                         foreach ($teamMembers as $member) {
