@@ -983,7 +983,10 @@
                     '', // Placeholder for the file count
                     file.uploadedBy || 'N/A',
                     file.dateUploaded || 'N/A',
-                    '' // No action for files yet
+                    // Add Delete button with ri-delete-bin-fill icon
+                    `<button class="btn btn-link btn-sm text-danger delete-file" onclick="deleteFile('${file.FileID}')">
+                        <i class="ri-delete-bin-fill" style="font-size: 1.2rem;"></i>
+                    </button>`
                 ]).node();
 
                 // Store fileID in the row
@@ -1561,6 +1564,37 @@
                 .catch(error => {
                     console.error('Error submitting access:', error);
                 });
+        }
+
+        function deleteFile(fileID) {
+
+            // Prevent the event from propagating to the row click event (which triggers preview)
+            event.stopPropagation();
+            // Show confirmation dialog
+            const confirmation = confirm("Are you sure you want to delete this file?");
+
+            if (confirmation) {
+                // Proceed with AJAX request to delete the file
+                $.ajax({
+                    url: 'controller/deleteFile.php', // Make sure to create the controller file
+                    method: 'POST',
+                    data: {
+                        fileID: fileID
+                    },
+                    success: function(response) {
+                        const data = JSON.parse(response);
+                        if (data.success) {
+                            alert('File deleted successfully');
+                            openFolder(currentFolderID);
+                        } else {
+                            alert('Error deleting file: ' + (data.message || 'Unknown error'));
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred while trying to delete the file.');
+                    }
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {

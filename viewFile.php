@@ -648,20 +648,17 @@
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-        function fetchFolders() {
-            $.ajax({
-                url: 'controller/fetchFolders.php',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        populateTable(response.data);
-                    } else {
-                        alert(response.message || 'No folders found');
-                    }
-                }
-            });
-        }
+        window.onload = function() {
+            const sessionFolderID = sessionStorage.getItem('sessionfolderID');
+            const sessionFolderName = sessionStorage.getItem('sessionfolderName');
+
+            if (sessionFolderID && sessionFolderName) {
+                
+                openFolder(sessionFolderID, sessionFolderName);
+            } else {
+                window.history.back(); // Fallback 
+            }
+        };
 
         function populateTable(folders) {
             const table = $('#folderTable').DataTable();
@@ -719,7 +716,7 @@
                 }]
             });
 
-            fetchFolders();
+            //fetchFolders();
         });
 
         function openFolder(folderID, folderName) {
@@ -865,7 +862,7 @@
                 id: null
             }];
             isFolderView = true;
-            fetchFolders();
+            //fetchFolders();
             updateBreadcrumb();
             currentFolderID = null;
         }
@@ -949,19 +946,8 @@
             }
 
 
-            fetchFolders(); // Fetch folder data when the page loads
+            //fetchFolders(); // Fetch folder data when the page loads
         });
-
-        window.onload = function() {
-            // Check sessionStorage for folder data and call openFolder if available
-            const sessionFolderID = sessionStorage.getItem('sessionfolderID');
-            const sessionFolderName = sessionStorage.getItem('sessionfolderName');
-
-            if (sessionFolderID && sessionFolderName) {
-                // Automatically open the folder if the data exists in sessionStorage
-                openFolder(sessionFolderID, sessionFolderName);
-            }
-        };
     </script>
 
     <script>

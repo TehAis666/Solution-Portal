@@ -63,7 +63,7 @@
 
 
         .form-structor {
-            background-color: #a8a8a8;
+            background-color: #E0E0E2;
             /* Dark gray background for the form */
             border-radius: 15px;
             /* Rounded corners */

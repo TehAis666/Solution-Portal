@@ -18,7 +18,7 @@ if (isset($_SESSION['last_activity'])) {
 
         echo "<script>
             alert('Your session has timed out due to inactivity. Please log in again.');
-            window.location.href = 'signup.php';
+            window.location.href = 'index';
         </script>";
         exit();
     }

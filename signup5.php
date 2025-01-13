@@ -26,7 +26,7 @@
             align-items: center;
             font-family: 'Nunito', sans-serif;
             border-radius: 50%;
-            background-color: #2C3E50;
+            background-color: #f3f3f9;
             background: linear-gradient(to bottom,
                     rgba(13, 22, 75, 0.95),
                     /* Deep dark blue */
@@ -50,7 +50,7 @@
             position: relative;
             width: 900px;
             height: 550px;
-            background: #c9def0;
+            background: white;
             box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
             border-radius: 15px;
         }
@@ -70,6 +70,7 @@
             width: 100%;
             font-size: 30px;
             text-align: center;
+            color: #3577F1;
         }
 
         label {
@@ -125,13 +126,13 @@
             text-transform: uppercase;
             font-weight: 600;
             font-family: 'Nunito', sans-serif;
-            background: blue;
+            background: #3577F1;
             transition: .5s;
         }
 
         .submit:hover {
             transition: .5s;
-            background: #000;
+            background: #2857A0;
         }
 
         .forgot-pass {
@@ -219,7 +220,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+            background: #F7F7F2;
         }
 
         .cont.s-signup .img:before {
@@ -248,13 +249,14 @@
         }
 
         .img-text h1 {
-            color: blue;
+            color: #04045b;
         }
 
         .img-text p {
             font-size: 14px;
             line-height: 1.5;
             margin-top: 10px;
+            color: #0d160b;
         }
 
         .cont.s-signup .img-text.m-up {
@@ -296,7 +298,7 @@
             height: 36px;
             margin: 0 auto;
             background: transparent;
-            color: #fff;
+            color: #0D160B;
             text-transform: uppercase;
             font-size: 15px;
             cursor: pointer;
@@ -310,7 +312,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            border: 2px solid #fff;
+            border: 2px solid #04045b;
             border-radius: 30px;
         }
 
@@ -479,6 +481,8 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        
     </style>
 </head>
 
